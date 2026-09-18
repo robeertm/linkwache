@@ -76,7 +76,9 @@ export function resultCard(r, env, lang) {
   const rd = facts.rdap || {};
   const dns = facts.dns || {};
   const li = f.map((x) => { const tx = findingText(lang, x); return `<li class="f ${x.stufe}"><span class="dot"></span><div><b>${esc(tx.titel)}</b>${esc(tx.text)}</div></li>`; }).join("");
-  const scanBlock = scan.status === "done"
+  const scanBlock = scan.status === "done" && !scan.screenshot
+    ? `<div class="pending noshot">${esc(t(lang, "r.noshot"))}${scan.loadError ? " " + esc(t(lang, "r.noshot.err", { e: scan.loadError })) : ""} <a href="${esc(scan.reportUrl)}" rel="noopener" target="_blank">${esc(t(lang, "r.shot.report"))}</a></div>`
+    : scan.status === "done"
     ? `<figure class="shot"><img src="${esc(scan.screenshot)}" alt="Screenshot" loading="lazy">
        <figcaption>${esc(t(lang, "r.shot"))}${scan.title ? " " + esc(t(lang, "r.shot.title", { t: scan.title })) : ""}${scan.country ? " " + esc(t(lang, "r.shot.server", { c: scan.country })) : ""} <a href="${esc(scan.reportUrl)}" rel="noopener" target="_blank">${esc(t(lang, "r.shot.report"))}</a></figcaption></figure>`
     : scan.status === "pending" ? `<div class="pending" data-poll="${esc(r.id)}">${esc(t(lang, "r.pending"))}</div>`

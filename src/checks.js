@@ -265,9 +265,14 @@ export async function urlscanResult(uuid, key) {
   const j = await r.json();
   const page = j.page || {};
   const v = j.verdicts?.overall || {};
+  // Sandbox konnte die Seite gar nicht laden (z. B. Name nicht auflösbar) → urlscan liefert
+  // unter der Screenshot-URL nur ein 404-Platzhalterbild. Das darf nicht als "so sieht die Seite aus" erscheinen.
+  const failed = (j.data?.requests || []).map((x) => x.response?.failed).find((f) => f && f.type === "Document");
+  let screenshot = `https://urlscan.io/screenshots/${uuid}.png`;
+  try { const h = await fetchTimeout(screenshot, { method: "HEAD" }, 5000); if (!h.ok) screenshot = null; } catch { /* im Zweifel Bild lassen */ }
   return {
     ok: true, status: "done",
-    screenshot: `https://urlscan.io/screenshots/${uuid}.png`,
+    screenshot, loadError: failed?.errorText || "",
     reportUrl: `https://urlscan.io/result/${uuid}/`,
     title: page.title || "", finalUrl: page.url || "", ip: page.ip || "", country: page.country || "",
     server: page.server || "", asn: page.asnname || "",
