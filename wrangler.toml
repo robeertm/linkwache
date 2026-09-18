@@ -1,0 +1,53 @@
+name = "linkwache"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Statische Dateien (Startseite, Impressum, Manifest) liegen in public/.
+[assets]
+directory = "./public"
+binding = "ASSETS"
+not_found_handling = "404-page"
+run_worker_first = ["/", "/index.html", "/api/*", "/r/*", "/share", "/telegram"]
+
+# Ergebnisse (90 Tage) und Zähler. Namespace-ID nach `wrangler kv namespace create RESULTS` eintragen.
+[[kv_namespaces]]
+binding = "RESULTS"
+id = "REPLACE_ME"
+preview_id = "local"
+
+# Missbrauchsschutz: 20 Prüfungen pro Minute je Absender (IP wird nur gehasht, nie gespeichert).
+[[unsafe.bindings]]
+name = "CHECK_LIMIT"
+type = "ratelimit"
+namespace_id = "1001"
+simple = { limit = 20, period = 60 }
+
+[vars]
+SITE_NAME = "Linkwache"
+# Öffentliche Adresse der Seite (für Ergebnis-Links in Mail/Telegram). Ohne Schrägstrich am Ende.
+SITE_URL = "https://linkwache.de"
+# Spendenknopf: PayPal.me-Name ODER PayPal-Mailadresse (leer = kein Knopf)
+PAYPAL_ME = ""
+PAYPAL_MAIL = ""
+# Kontaktadresse für Rückfragen (erscheint in Mail-Antworten und als Mail-Eingang auf der Startseite)
+CONTACT_MAIL = ""
+# Telegram-Bot-Name ohne @ (leer = Telegram-Kachel wird nicht angezeigt)
+TELEGRAM_BOT = ""
+# "off" blendet die Mail-Kachel aus, solange Email Routing nicht eingerichtet ist
+MAIL_IN = "off"
+LEGAL_NAME = ""
+LEGAL_STREET = ""
+LEGAL_CITY = ""
+LEGAL_PLACE = ""
+
+
+# Geheimnisse NICHT hier, sondern per `wrangler secret put <NAME>`:
+#   SAFE_BROWSING_KEY  Google Safe Browsing API v4
+#   URLSCAN_KEY        urlscan.io (Sandbox-Screenshot)
+#   URLHAUS_KEY        abuse.ch Auth-Key (optional)
+#   TELEGRAM_TOKEN     Bot-Token von @BotFather
+#   TELEGRAM_SECRET    frei gewählte Zeichenkette, gleich beim setWebhook mitgeben
+
+# Mail-Eingang: Cloudflare Email Routing → Regel „pruefen@<domain>“ → Worker linkwache.
+# Braucht keine Bindung: der Worker antwortet mit message.reply().

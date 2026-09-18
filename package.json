@@ -1,0 +1,20 @@
+{
+  "name": "linkwache",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Linkwache — prüft verdächtige Links, ohne sie zu öffnen. Cloudflare Worker.",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "mimetext": "^3.0.24",
+    "postal-mime": "^3.0.0",
+    "tldts": "^6.1.86"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

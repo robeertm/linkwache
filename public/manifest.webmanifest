@@ -1,0 +1,16 @@
+{
+  "name": "Linkwache",
+  "short_name": "Linkwache",
+  "description": "Link prüfen, ohne ihn zu öffnen.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c0d16",
+  "theme_color": "#a78bfa",
+  "lang": "de",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }, { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }],
+  "share_target": {
+    "action": "/share",
+    "method": "GET",
+    "params": { "title": "title", "text": "text", "url": "url" }
+  }
+}
