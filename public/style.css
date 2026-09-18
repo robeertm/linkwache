@@ -3,14 +3,44 @@
    Linkwache-Farbe: Violett. Ampelfarben bleiben rot/gelb/grün. */
 :root{
   color-scheme:dark;
-  --grund:#0c0d16;
-  --karte:rgba(255,255,255,.045);--karte2:rgba(255,255,255,.075);--karte3:rgba(255,255,255,.11);
-  --rand:rgba(255,255,255,.10);
-  --text:#eeeef8;--leise:#9b9fb8;
-  --akzent:#a78bfa;--akzent-tinte:#1c1038;
+  --grund:#15112b;
+  --glow1:rgba(167,139,250,.30);--glow2:rgba(96,165,250,.14);--glow3:rgba(139,92,246,.22);
+  --karte:rgba(255,255,255,.055);--karte2:rgba(255,255,255,.09);--karte3:rgba(255,255,255,.13);
+  --feld:rgba(255,255,255,.07);
+  --rand:rgba(255,255,255,.11);
+  --text:#efedfa;--leise:#a7a3c4;
+  --akzent:#a78bfa;--akzent-tinte:#1c1038;--akzent-glow:rgba(167,139,250,.28);
   --ok:#34d399;--info:#60a5fa;--warnung:#fbbf24;--kritisch:#f87171;
   --rot:var(--kritisch);--gelb:var(--warnung);--gruen:var(--ok);
+  --schatten:0 1px 0 rgba(255,255,255,.04) inset,0 6px 20px rgba(0,0,0,.28);
   --r:1.1rem;
+}
+/* Tagmodus: folgt dem System, der Knopf im Kopf (🌙/☀️) übersteuert. */
+:root[data-theme="light"]{
+  color-scheme:light;
+  --grund:#f4f1fc;
+  --glow1:rgba(139,92,246,.20);--glow2:rgba(96,165,250,.12);--glow3:rgba(167,139,250,.18);
+  --karte:rgba(255,255,255,.72);--karte2:rgba(124,92,220,.08);--karte3:rgba(124,92,220,.14);
+  --feld:rgba(255,255,255,.85);
+  --rand:rgba(60,40,120,.14);
+  --text:#1d1838;--leise:#5f5a80;
+  --akzent:#6d4fd6;--akzent-tinte:#ffffff;--akzent-glow:rgba(109,79,214,.25);
+  --ok:#1f9e6a;--info:#2f7fe0;--warnung:#b7791f;--kritisch:#d24a4a;
+  --schatten:0 1px 0 rgba(255,255,255,.6) inset,0 6px 20px rgba(60,40,120,.10);
+}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){
+    color-scheme:light;
+    --grund:#f4f1fc;
+    --glow1:rgba(139,92,246,.20);--glow2:rgba(96,165,250,.12);--glow3:rgba(167,139,250,.18);
+    --karte:rgba(255,255,255,.72);--karte2:rgba(124,92,220,.08);--karte3:rgba(124,92,220,.14);
+    --feld:rgba(255,255,255,.85);
+    --rand:rgba(60,40,120,.14);
+    --text:#1d1838;--leise:#5f5a80;
+    --akzent:#6d4fd6;--akzent-tinte:#ffffff;--akzent-glow:rgba(109,79,214,.25);
+    --ok:#1f9e6a;--info:#2f7fe0;--warnung:#b7791f;--kritisch:#d24a4a;
+    --schatten:0 1px 0 rgba(255,255,255,.6) inset,0 6px 20px rgba(60,40,120,.10);
+  }
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 /* overflow-x nur auf body genügt nicht — läuft ein Kind über, wächst html mit. */
@@ -21,9 +51,9 @@ body{
   font-family:ui-rounded,"SF Pro Rounded",system-ui,"Segoe UI",Roboto,sans-serif;
   -webkit-font-smoothing:antialiased;line-height:1.45;padding:0 16px;
   background-image:
-    radial-gradient(60rem 34rem at 8% -10%, rgba(167,139,250,.18), transparent 60%),
-    radial-gradient(46rem 30rem at 100% 4%, rgba(96,165,250,.10), transparent 58%),
-    radial-gradient(50rem 34rem at 50% 118%, rgba(167,139,250,.10), transparent 60%);
+    radial-gradient(60rem 34rem at 8% -10%, var(--glow1), transparent 60%),
+    radial-gradient(46rem 30rem at 100% 4%, var(--glow2), transparent 58%),
+    radial-gradient(50rem 34rem at 50% 118%, var(--glow3), transparent 60%);
   background-attachment:fixed;
 }
 main,header.top,footer,.legal{max-width:760px;margin-inline:auto}
@@ -42,7 +72,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:
 .karte,.paste,.step,.findings .f,.url,.pending,.facts,.verdict{
   background:var(--karte);border:1px solid var(--rand);border-radius:var(--r);
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 6px 20px rgba(0,0,0,.25)}
+  box-shadow:var(--schatten)}
 
 /* Kopfband mit Wappen */
 header.top{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;padding:1.1rem 0 .6rem}
@@ -57,19 +87,20 @@ header.top{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;padding:1.1r
 header nav{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
 header nav a{color:var(--leise);text-decoration:none;font-size:.9rem;padding:.3rem .55rem;border-radius:.6rem}
 header nav a:hover{background:var(--karte2);color:var(--text)}
+button.theme{font:inherit;font-size:1rem;line-height:1;padding:.35rem .5rem;border:1px solid var(--rand);border-radius:.6rem;background:var(--karte2);color:var(--text);cursor:pointer}
 select.lang{font:inherit;font-size:.84rem;padding:.35rem .5rem;border:1px solid var(--rand);border-radius:.6rem;background:var(--karte2);color:var(--text)}
 
 /* Eingabe */
 .paste{padding:1rem 1.05rem;margin:14px 0}
 .paste label{display:block;margin-bottom:.4rem}
-.paste textarea{width:100%;min-height:96px;font:inherit;font-size:1rem;padding:12px;border:1px solid var(--rand);border-radius:.8rem;resize:vertical;background:rgba(255,255,255,.06);color:var(--text)}
+.paste textarea{width:100%;min-height:96px;font:inherit;font-size:1rem;padding:12px;border:1px solid var(--rand);border-radius:.8rem;resize:vertical;background:var(--feld);color:var(--text)}
 .paste textarea::placeholder{color:var(--leise);opacity:.7}
 .paste textarea:focus{outline:2px solid var(--akzent);outline-offset:1px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
 .btn{display:inline-block;background:var(--akzent);color:var(--akzent-tinte);border:1px solid var(--akzent);border-radius:.8rem;padding:12px 18px;font:inherit;font-weight:650;cursor:pointer;text-decoration:none;text-align:center;transition:filter .15s ease,background .15s ease}
 .btn:hover{filter:brightness(1.08)}
 .row .btn{flex:1 1 200px}
-.btn.big{font-size:1.08rem;padding:14px 22px;box-shadow:0 8px 24px rgba(167,139,250,.25)}
+.btn.big{font-size:1.08rem;padding:14px 22px;box-shadow:0 8px 24px var(--akzent-glow)}
 .btn.ghost{background:var(--karte2);color:var(--text);border-color:var(--rand)}
 .btn.ghost:hover{background:var(--karte3);filter:none}
 .btn.coffee{background:#e0a458;border-color:#e0a458;color:#2a1d0a}
@@ -105,7 +136,7 @@ select.lang{font:inherit;font-size:.84rem;padding:.35rem .5rem;border:1px solid 
 .facts td:first-child{color:var(--leise);width:34%}
 .share{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
 .share .btn{flex:1 1 140px}
-.share input{flex:1 1 220px;font:inherit;font-size:.9rem;padding:10px;border:1px solid var(--rand);border-radius:.8rem;background:rgba(255,255,255,.06);color:var(--text)}
+.share input{flex:1 1 220px;font:inherit;font-size:.9rem;padding:10px;border:1px solid var(--rand);border-radius:.8rem;background:var(--feld);color:var(--text)}
 
 /* Schritte */
 .steps{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));margin:10px 0}

@@ -23,11 +23,11 @@ export function page({ lang, title, body, env, noindex = false, extraHead = "", 
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(t(lang, "site.desc"))}">
 ${noindex ? '<meta name="robots" content="noindex">' : LANGS.map((l) => `<link rel="alternate" hreflang="${l}" href="${esc(env.SITE_URL)}${esc(path)}?lang=${l}">`).join("")}
-<link rel="stylesheet" href="/style.css"><link rel="icon" href="/icon.svg"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#0c0d16">
+<link rel="stylesheet" href="/style.css"><script src="/theme.js"></script><link rel="icon" href="/icon.svg"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#0c0d16">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(t(lang, "site.desc"))}">
 ${extraHead}<script>window.LW=${JSON.stringify(cfg)}</script></head><body>
 <header class="top"><a class="brand" href="/?lang=${lang}"><span class="wappen"><img src="/icon.svg" alt=""></span><span>${esc(env.SITE_NAME || "Linkwache")}<small>${esc(t(lang, "site.tagline"))}</small></span></a>
-<nav><a href="/?lang=${lang}#so-gehts">${esc(t(lang, "nav.how"))}</a><a href="/impressum.html">${esc(t(lang, "nav.legal"))}</a>${langSwitch(lang, path)}</nav></header>
+<nav><a href="/?lang=${lang}#so-gehts">${esc(t(lang, "nav.how"))}</a><a href="/impressum.html">${esc(t(lang, "nav.legal"))}</a><button class="theme" id="theme" type="button" aria-label="Theme">🌙</button>${langSwitch(lang, path)}</nav></header>
 <main>${body}</main>
 <footer><p>${esc(t(lang, "foot.note"))}</p>
 ${paypalLink(env) ? `<p><a class="btn coffee" href="${esc(paypalLink(env))}" rel="noopener" target="_blank">${esc(t(lang, "foot.coffee"))}</a></p>` : ""}
