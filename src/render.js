@@ -102,7 +102,7 @@ ${scanBlock}
 <tr><td>${esc(t(lang, "r.dbs"))}</td><td>Safe Browsing: ${dbTxt(facts.safebrowsing, (x) => t(lang, x.matches?.length ? "r.hit" : "r.nohit"))} · URLhaus: ${dbTxt(facts.urlhaus, (x) => t(lang, x.listed ? "r.listed" : "r.nohit"))} · PhishTank: ${dbTxt(facts.phishtank, (x) => t(lang, x.listed ? "r.listed" : "r.nohit"))} · urlscan: ${dbTxt(facts.urlscanSearch, (x) => x.total ? t(lang, "r.scans", { n: x.total }) : t(lang, "r.noscans"))}</td></tr>
 <tr><td>${esc(t(lang, "r.when"))}</td><td>${esc(String(r.checked).replace("T", " ").slice(0, 16))} UTC</td></tr>
 </table>${facts.safebrowsing?.ok ? `<p class="small">Safe Browsing: <a href="https://developers.google.com/safe-browsing/v4/advisory" rel="noopener" target="_blank">Advisory provided by Google</a>.</p>` : ""}</details>
-<div class="share"><input id="share" readonly value="${esc(shareUrl)}"><button class="btn" data-copy="#share">${esc(t(lang, "r.copy"))}</button>
+<div class="share"><label class="lbl" for="share">${esc(t(lang, "r.share.lbl"))}</label><input id="share" readonly value="${esc(shareUrl)}"><button class="btn" data-copy="#share">${esc(t(lang, "r.copy"))}</button>
 <a class="btn ghost" href="https://wa.me/?text=${encodeURIComponent(t(lang, "r.wa.text", { kurz: v.kurz, url: shareUrl }))}" rel="noopener" target="_blank">${esc(t(lang, "r.wa"))}</a></div>`;
 }
 
