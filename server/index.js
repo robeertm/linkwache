@@ -9,6 +9,7 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import crypto from "node:crypto";
 import worker from "../src/index.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -64,11 +65,14 @@ const ASSETS = {
       return new Response(fs.existsSync(nf) ? fs.readFileSync(nf) : "not found", { status: 404, headers: { "content-type": "text/html; charset=utf-8" } });
     }
     const ext = path.extname(file).toLowerCase();
-    return new Response(fs.readFileSync(file), { headers: { "content-type": MIME[ext] || "application/octet-stream", "cache-control": ext === ".html" ? "no-cache" : "public, max-age=3600" } });
+    return new Response(fs.readFileSync(file), { headers: { "content-type": MIME[ext] || "application/octet-stream", "cache-control": ext === ".html" ? "no-cache" : "public, max-age=600" } });
   },
 };
 
+// Versionsstempel für style/app/theme: ändert sich mit dem Inhalt, damit kein Handy eine alte Fassung aus dem Cache zieht.
+const ASSET_VER = crypto.createHash("sha1").update(["style.css","app.js","theme.js"].map((f) => { try { return fs.readFileSync(path.join(PUBLIC, f)); } catch { return ""; } }).join("")).digest("hex").slice(0, 8);
 const env = {
+  ASSET_VER,
   SITE_NAME: process.env.SITE_NAME || "Linkwache",
   SITE_URL: (process.env.SITE_URL || `http://localhost:${PORT}`).replace(/\/$/, ""),
   PAYPAL_ME: process.env.PAYPAL_ME || "",

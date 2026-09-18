@@ -2,6 +2,7 @@
 import { esc, defang } from "./util.js";
 import { STUFE_EMOJI } from "./verdict.js";
 import { t, findingText, verdictText, LANGS, LANG_NAMES } from "./i18n.js";
+import { PAGES } from "./i18n_pages.js";
 
 /** Spendenlink: PayPal.me-Name oder eine PayPal-Mailadresse (klassischer Zahlungslink, geht mit jedem Konto). */
 export function paypalLink(env) {
@@ -23,7 +24,7 @@ export function page({ lang, title, body, env, noindex = false, extraHead = "", 
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(t(lang, "site.desc"))}">
 ${noindex ? '<meta name="robots" content="noindex">' : LANGS.map((l) => `<link rel="alternate" hreflang="${l}" href="${esc(env.SITE_URL)}${esc(path)}?lang=${l}">`).join("")}
-<link rel="stylesheet" href="/style.css"><script src="/theme.js"></script><link rel="icon" href="/icon.svg"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#0c0d16">
+<link rel="stylesheet" href="/style.css?v=${esc(env.ASSET_VER || "1")}"><script src="/theme.js?v=${esc(env.ASSET_VER || "1")}"></script><link rel="icon" href="/icon.svg"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#0c0d16">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(t(lang, "site.desc"))}">
 ${extraHead}<script>window.LW=${JSON.stringify(cfg)}</script></head><body>
 <header class="top"><a class="brand" href="/?lang=${lang}"><span class="wappen"><img src="/icon.svg" alt=""></span><span>${esc(env.SITE_NAME || "Linkwache")}<small>${esc(t(lang, "site.tagline"))}</small></span></a>
@@ -31,8 +32,8 @@ ${extraHead}<script>window.LW=${JSON.stringify(cfg)}</script></head><body>
 <main>${body}</main>
 <footer><p>${esc(t(lang, "foot.note"))}</p>
 ${paypalLink(env) ? `<p><a class="btn coffee" href="${esc(paypalLink(env))}" rel="noopener" target="_blank">${esc(t(lang, "foot.coffee"))}</a></p>` : ""}
-<p class="small"><a href="/impressum.html">${esc(t(lang, "nav.legal"))}</a> · <a href="/datenschutz.html">${esc(t(lang, "foot.privacy"))}</a> · <a href="https://github.com/robeertm/linkwache" rel="noopener">${esc(t(lang, "foot.source"))}</a></p></footer>
-<script src="/app.js" defer></script></body></html>`;
+<p class="small"><a href="/impressum.html?lang=${lang}">${esc(t(lang, "nav.legal"))}</a> · <a href="/datenschutz.html?lang=${lang}">${esc(t(lang, "foot.privacy"))}</a> · <a href="https://github.com/robeertm/linkwache" rel="noopener">${esc(t(lang, "foot.source"))}</a></p></footer>
+<script src="/app.js?v=${esc(env.ASSET_VER || "1")}" defer></script></body></html>`;
 }
 
 export function homePage(lang, env) {
@@ -114,4 +115,63 @@ export function resultText(r, env, lang) {
     t(lang, "txt.details", { url: `${env.SITE_URL}/r/${r.id}?lang=${lang}` }),
   ];
   return lines.join("\n");
+}
+
+
+/** Unterseiten-Text: HTML erlaubt (aus dem Quelltext), Platzhalter werden escaped eingesetzt. */
+function tp(lang, key, env, extra = {}) {
+  const d = PAGES[lang] || PAGES.de;
+  let s = d[key] ?? PAGES.de[key] ?? key;
+  const site = String(env.SITE_URL || "").replace(/\/$/, "");
+  const vals = { lang, site, host: site.replace(/^https?:\/\//, ""), mail: env.CONTACT_MAIL || "", place: env.LEGAL_PLACE || env.LEGAL_CITY || "Deutschland", ...extra };
+  for (const [k, v] of Object.entries(vals)) s = s.split("{" + k + "}").join(k === "lang" ? v : esc(String(v)));
+  return s;
+}
+
+export function legalPage(lang, env) {
+  const name = env.LEGAL_NAME || "[Name eintragen]", street = env.LEGAL_STREET || "[Straße eintragen]", city = env.LEGAL_CITY || "[PLZ Ort eintragen]";
+  const body = `<div class="legal">
+  <h1>${tp(lang, "legal.h1", env)}</h1>
+  <p>${tp(lang, "legal.intro", env)}</p>
+  <p><b>${esc(name)}</b><br>${esc(street)}<br>${esc(city)}<br>Deutschland</p>
+  ${env.CONTACT_MAIL ? `<p>${tp(lang, "legal.mail", env)}: <a href="mailto:${esc(env.CONTACT_MAIL)}">${esc(env.CONTACT_MAIL)}</a></p>` : ""}
+  <h2>${tp(lang, "legal.note.h", env)}</h2><p>${tp(lang, "legal.note.p1", env)}</p><p>${tp(lang, "legal.note.p2", env)}</p>
+  <h2>${tp(lang, "legal.services.h", env)}</h2><p>${tp(lang, "legal.services.p", env)}</p>
+  </div>`;
+  return page({ lang, title: `${tp(lang, "legal.title", env)} · ${env.SITE_NAME || "Linkwache"}`, body, env, noindex: true, path: "/impressum.html" });
+}
+
+export function privacyPage(lang, env) {
+  const P = (k) => tp(lang, k, env);
+  const body = `<div class="legal">
+  <h1>${P("privacy.h1")}</h1><p>${P("privacy.resp")}</p>
+  <h2>${P("privacy.host.h")}</h2><p>${P("privacy.host.p")}</p>
+  <h2>${P("privacy.store.h")}</h2><ul><li>${P("privacy.store.1")}</li><li>${P("privacy.store.2")}</li><li>${P("privacy.store.3")}</li></ul>
+  <h2>${P("privacy.logs.h")}</h2><p>${P("privacy.logs.p")}</p>
+  <h2>${P("privacy.flow.h")}</h2><p>${P("privacy.flow.p")}</p><ul><li>${P("privacy.flow.1")}</li><li>${P("privacy.flow.2")}</li><li>${P("privacy.flow.3")}</li><li>${P("privacy.flow.4")}</li><li>${P("privacy.flow.5")}</li></ul><p>${P("privacy.basis")}</p>
+  <h2>${P("privacy.paypal.h")}</h2><p>${P("privacy.paypal.p")}</p>
+  <h2>${P("privacy.cookies.h")}</h2><p>${P("privacy.cookies.p")}</p>
+  <h2>${P("privacy.rights.h")}</h2><p>${P("privacy.rights.p")}</p>
+  <p class="small">${P("privacy.stand")}</p></div>`;
+  return page({ lang, title: `${P("privacy.title")} · ${env.SITE_NAME || "Linkwache"}`, body, env, noindex: true, path: "/datenschutz.html" });
+}
+
+export function shortcutPage(lang, env) {
+  const P = (k) => tp(lang, k, env);
+  const body = `<div class="legal">
+  <h1>${P("sc.h1")}</h1><p class="lead">${P("sc.lead")}</p>
+  <div class="paste"><h3 style="margin:0 0 .4rem">${P("sc.onetap.h")}</h3><p class="small" style="margin:0 0 .8rem">${P("sc.onetap.p")}</p>
+  <div class="row"><a class="btn big" href="/Linkwache.shortcut" download="Linkwache.shortcut">${P("sc.onetap.btn")}</a></div>
+  <p class="hint">${P("sc.onetap.hint")}</p></div>
+  <h2>${P("sc.manual.h")}</h2>
+  <div class="steps"><div class="step"><h3>${P("sc.s1.h")}</h3><p>${P("sc.s1.p")}</p></div><div class="step"><h3>${P("sc.s2.h")}</h3><p>${P("sc.s2.p")}</p></div><div class="step"><h3>${P("sc.s3.h")}</h3><p>${P("sc.s3.p")}</p></div></div>
+  <p class="small">${P("sc.after")}</p>
+  <p><a class="btn ghost" href="/?lang=${lang}">${P("sc.back")}</a></p></div>`;
+  return page({ lang, title: `${P("sc.title")} · ${env.SITE_NAME || "Linkwache"}`, body, env, path: "/kurzbefehl.html" });
+}
+
+export function notFoundPage(lang, env) {
+  const P = (k) => tp(lang, k, env);
+  const body = `<div class="legal"><h1>${P("nf.h1")}</h1><p>${P("nf.p")}</p><p><a class="btn" href="/?lang=${lang}">${P("nf.back")}</a></p></div>`;
+  return page({ lang, title: `${P("nf.title")} · ${env.SITE_NAME || "Linkwache"}`, body, env, noindex: true, path: "/" });
 }
