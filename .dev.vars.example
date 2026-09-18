@@ -1,0 +1,6 @@
+# Kopie als .dev.vars (wird nicht eingecheckt) für `wrangler dev`
+SAFE_BROWSING_KEY=
+URLSCAN_KEY=
+URLHAUS_KEY=
+TELEGRAM_TOKEN=
+TELEGRAM_SECRET=

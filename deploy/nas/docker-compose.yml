@@ -1,0 +1,29 @@
+# Linkwache auf der Synology (Container Manager). Reverse Proxy der DSM leitet
+# https://linkwache.<ddns>/ auf 127.0.0.1:8081. Geheimnisse liegen in ./linkwache.env (0600).
+services:
+  linkwache:
+    image: linkwache:latest
+    container_name: linkwache
+    labels:
+      - com.centurylinklabs.watchtower.enable=false   # lokales Image, Watchtower soll nicht ziehen
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:8080"
+    env_file:
+      - ./linkwache.env
+    volumes:
+      - ./data:/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 256m
+    pids_limit: 128
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
