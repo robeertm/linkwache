@@ -7,7 +7,7 @@
 //   email()                  Mail-Eingang (Cloudflare Email Routing)
 // Alles andere sind statische Dateien aus public/.
 import { runCheck, refreshScan } from "./check.js";
-import { page, homePage, resultCard, resultText, paypalLink } from "./render.js";
+import { page, homePage, resultCard, resultText, paypalLink, legalPage, privacyPage, shortcutPage, notFoundPage } from "./render.js";
 import { handleTelegram } from "./telegram.js";
 import { extractUrls, sha256hex, esc } from "./util.js";
 import { pickLang, t, verdictText } from "./i18n.js";
@@ -24,6 +24,9 @@ export default {
       if (p === "/api/check" && req.method === "POST") return apiCheck(req, env, ctx, lang);
       if (p.startsWith("/api/result/")) return apiResult(p.slice("/api/result/".length), env, ctx, lang);
       if (p.startsWith("/r/")) return resultPage(p.slice(3), env, ctx, lang);
+      if (p === "/impressum.html") return html(legalPage(lang, env), 200, lang);
+      if (p === "/datenschutz.html") return html(privacyPage(lang, env), 200, lang);
+      if (p === "/kurzbefehl.html") return html(shortcutPage(lang, env), 200, lang);
       if (p === "/share") return share(url);
       if (p === "/telegram" && req.method === "POST") return handleTelegram(req, env, ctx, { runCheck, resultText });
       if (p === "/api/health") return json({ ok: true, name: env.SITE_NAME, paypal: paypalLink(env), scan: !!env.URLSCAN_KEY, sb: !!env.SAFE_BROWSING_KEY, telegram: !!env.TELEGRAM_TOKEN });
@@ -106,20 +109,9 @@ const json = (o, status = 200) => new Response(JSON.stringify(o), { status, head
 const html = (s, status = 200, lang = "de") => new Response(s, { status, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", "content-language": lang, "vary": "accept-language" } });
 
 
-/** Statische Seiten (Impressum, Datenschutz, Kurzbefehl) tragen Platzhalter wie {{LEGAL_NAME}} —
- *  die Person hinter der Instanz steht in der Umgebung, nicht im Quelltext. */
-const PLACEHOLDER = /\{\{(SITE_URL|SITE_HOST|SITE_NAME|CONTACT_MAIL|LEGAL_NAME|LEGAL_STREET|LEGAL_CITY|LEGAL_PLACE)\}\}/g;
 async function staticPage(req, env) {
   const r = await env.ASSETS.fetch(req);
-  if (!/text\/html/.test(r.headers.get("content-type") || "")) return r;
-  const site = String(env.SITE_URL || "").replace(/\/$/, "");
-  const vals = {
-    SITE_URL: site, SITE_HOST: site.replace(/^https?:\/\//, ""), SITE_NAME: env.SITE_NAME || "Linkwache",
-    CONTACT_MAIL: env.CONTACT_MAIL || "", LEGAL_NAME: env.LEGAL_NAME || "[Name eintragen]",
-    LEGAL_STREET: env.LEGAL_STREET || "[Straße eintragen]", LEGAL_CITY: env.LEGAL_CITY || "[PLZ Ort eintragen]",
-    LEGAL_PLACE: env.LEGAL_PLACE || env.LEGAL_CITY || "Deutschland",
-  };
-  const body = (await r.text()).replace(PLACEHOLDER, (_, k) => vals[k]);
-  const h = new Headers(r.headers); h.delete("content-length");
-  return new Response(body, { status: r.status, headers: h });
+  if (r.status !== 404) return r;
+  const lang = pickLang(req, new URL(req.url).searchParams.get("lang"));
+  return html(notFoundPage(lang, env), 404, lang);
 }
