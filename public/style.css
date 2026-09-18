@@ -136,7 +136,8 @@ select.lang{font:inherit;font-size:.84rem;padding:.35rem .5rem;border:1px solid 
 .facts td:first-child{color:var(--leise);width:34%}
 .share{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
 .share .btn{flex:1 1 140px}
-.share input{flex:1 1 220px;font:inherit;font-size:.9rem;padding:10px;border:1px solid var(--rand);border-radius:.8rem;background:var(--feld);color:var(--text)}
+.share .lbl{flex-basis:100%;font-size:.72rem;color:var(--leise);text-transform:uppercase;letter-spacing:.06em;margin-bottom:-4px}
+.share input{flex:1 1 100%;text-overflow:ellipsis;font:inherit;font-size:.9rem;padding:10px;border:1px solid var(--rand);border-radius:.8rem;background:var(--feld);color:var(--text)}
 
 /* Schritte */
 .steps{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));margin:10px 0}
