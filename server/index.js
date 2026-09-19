@@ -10,6 +10,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import crypto from "node:crypto";
+import zlib from "node:zlib";
 import worker from "../src/index.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -97,6 +98,31 @@ const SECURITY = {
   "content-security-policy": "default-src 'self'; img-src 'self' https://urlscan.io data:; style-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'",
 };
 
+// ── Zähler je Tag (keine Adressen, keine Links): Anfragen, Prüfungen, Abweisungen, Bytes ──
+// Liegt in data/stats.json; die Antwort auf „wie viel läuft hier eigentlich?" ohne Zugriffslog.
+const STATS_FILE = path.join(DATA, "stats.json");
+let stats = {};
+try { stats = JSON.parse(fs.readFileSync(STATS_FILE, "utf8")); } catch { /* frisch */ }
+let statsDirty = false;
+function count(kind, bytesIn, bytesOut) {
+  const d = new Date().toISOString().slice(0, 10);
+  const t = stats[d] || (stats[d] = { requests: 0, checks: 0, results: 0, rejected: 0, errors: 0, bytesIn: 0, bytesOut: 0 });
+  t.requests++; t.bytesIn += bytesIn; t.bytesOut += bytesOut;
+  if (kind) t[kind]++;
+  statsDirty = true;
+}
+function flushStats() {
+  if (!statsDirty) return;
+  statsDirty = false;
+  for (const d of Object.keys(stats)) if (Date.now() - Date.parse(d) > 400 * 86400 * 1000) delete stats[d];
+  try { fs.writeFileSync(STATS_FILE, JSON.stringify(stats, null, 1)); } catch (e) { console.error("stats", String(e).slice(0, 100)); }
+}
+setInterval(flushStats, 60 * 1000).unref();
+for (const sig of ["SIGTERM", "SIGINT"]) process.on(sig, () => { flushStats(); process.exit(0); });
+
+// Textantworten ab 1 KB gzip-komprimiert ausliefern (der DSM-Proxy komprimiert nicht).
+const COMPRESSIBLE = /^(text\/|application\/(json|javascript|manifest\+json)|image\/svg)/;
+
 http.createServer(async (req, res) => {
   try {
     const chunks = [];
@@ -120,8 +146,17 @@ http.createServer(async (req, res) => {
     const ctx = { waitUntil: (p) => tasks.push(p), passThroughOnException() {} };
     const r = await worker.fetch(request, env, ctx);
     const out = Object.fromEntries(r.headers.entries());
+    let buf = Buffer.from(await r.arrayBuffer());
+    if (buf.length > 1024 && COMPRESSIBLE.test(out["content-type"] || "") && /\bgzip\b/.test(String(req.headers["accept-encoding"] || ""))) {
+      buf = zlib.gzipSync(buf);
+      out["content-encoding"] = "gzip";
+      out["vary"] = [out["vary"], "accept-encoding"].filter(Boolean).join(", ");
+      delete out["content-length"];
+    }
     res.writeHead(r.status, { ...SECURITY, ...out });
-    res.end(Buffer.from(await r.arrayBuffer()));
+    res.end(buf);
+    const p = req.url.split("?")[0];
+    count(r.status === 429 ? "rejected" : r.status >= 500 ? "errors" : p === "/api/check" ? "checks" : p.startsWith("/r/") ? "results" : "", body ? body.length : 0, buf.length);
     await Promise.allSettled(tasks);
   } catch (e) {
     console.error(new Date().toISOString(), "fehler", String(e).slice(0, 300));
