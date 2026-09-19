@@ -103,7 +103,8 @@ select.lang{font:inherit;font-size:.84rem;padding:.35rem .5rem;border:1px solid 
 .btn.big{font-size:1.08rem;padding:14px 22px;box-shadow:0 8px 24px var(--akzent-glow)}
 .btn.ghost{background:var(--karte2);color:var(--text);border-color:var(--rand)}
 .btn.ghost:hover{background:var(--karte3);filter:none}
-.btn.coffee{background:#e0a458;border-color:#e0a458;color:#2a1d0a}
+.btn.coffee{background:transparent;border-color:color-mix(in srgb,#e0a458 45%,transparent);color:var(--leise);font-weight:500;font-size:.85rem;padding:8px 14px}
+.btn.coffee:hover{background:color-mix(in srgb,#e0a458 12%,transparent);color:var(--text);filter:none}
 .btn:disabled{opacity:.5;cursor:wait}
 .btn:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid var(--akzent);outline-offset:2px}
 
