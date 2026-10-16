@@ -3,7 +3,7 @@
 // Einrichten: SETUP.md, Abschnitt Telegram. Der Webhook wird mit einem
 // Geheimnis (TELEGRAM_SECRET) gesetzt; ohne das richtige Geheimnis antwortet
 // dieser Handler mit 403 — sonst könnte jeder den Bot in unserem Namen füttern.
-import { extractUrls } from "./util.js";
+import { extractUrls, sha256hex } from "./util.js";
 import { t, LANGS, DEFAULT_LANG } from "./i18n.js";
 
 const TTL = 90 * 86400;
@@ -34,7 +34,9 @@ export async function handleTelegram(req, env, ctx, { runCheck, resultText }) {
   }
   // Grenze je Chat (vorher keine: jede Nachricht = bis zu 3 volle Prüfungen samt urlscan)
   if (env.CHECK_LIMIT) {
-    const { success } = await env.CHECK_LIMIT.limit({ key: "tg:" + chat + "|" + new Date().toISOString().slice(0, 10) });
+    // nur ein Streuwert, nie die Chat-Nummer selbst (wie bei der IP)
+    const key = "tg:" + (await sha256hex(chat + "|" + new Date().toISOString().slice(0, 10))).slice(0, 32);
+    const { success } = await env.CHECK_LIMIT.limit({ key });
     if (!success) { await send(env, chat, t(lang, "err.rate")); return new Response("ok"); }
   }
   // Antwort sofort, Prüfung im Hintergrund — Telegram wartet höchstens ein paar Sekunden.
