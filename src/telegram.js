@@ -10,7 +10,8 @@ const TTL = 90 * 86400;
 
 export async function handleTelegram(req, env, ctx, { runCheck, resultText }) {
   if (!env.TELEGRAM_TOKEN) return new Response("Telegram nicht eingerichtet", { status: 404 });
-  if (env.TELEGRAM_SECRET && req.headers.get("x-telegram-bot-api-secret-token") !== env.TELEGRAM_SECRET) {
+  // Ohne Geheimnis keinen Webhook annehmen — sonst könnte jeder den Bot in unserem Namen füttern
+  if (!env.TELEGRAM_SECRET || req.headers.get("x-telegram-bot-api-secret-token") !== env.TELEGRAM_SECRET) {
     return new Response("forbidden", { status: 403 });
   }
   let upd = {};
@@ -31,6 +32,11 @@ export async function handleTelegram(req, env, ctx, { runCheck, resultText }) {
     await send(env, chat, t(lang, "tg.nolink"));
     return new Response("ok");
   }
+  // Grenze je Chat (vorher keine: jede Nachricht = bis zu 3 volle Prüfungen samt urlscan)
+  if (env.CHECK_LIMIT) {
+    const { success } = await env.CHECK_LIMIT.limit({ key: "tg:" + chat + "|" + new Date().toISOString().slice(0, 10) });
+    if (!success) { await send(env, chat, t(lang, "err.rate")); return new Response("ok"); }
+  }
   // Antwort sofort, Prüfung im Hintergrund — Telegram wartet höchstens ein paar Sekunden.
   ctx.waitUntil((async () => {
     for (const u of urls.slice(0, 3)) {
@@ -40,7 +46,8 @@ export async function handleTelegram(req, env, ctx, { runCheck, resultText }) {
         await env.RESULTS.put("r:" + r.id, JSON.stringify(r), { expirationTtl: TTL });
         await send(env, chat, resultText(r, env, lang));
       } catch (e) {
-        await send(env, chat, t(lang, "tg.fail", { e: String(e).slice(0, 120) }));
+        console.error("Telegram-Prüfung", String(e).slice(0, 200));
+        await send(env, chat, t(lang, "tg.fail", { e: "—" }));
       }
     }
   })());

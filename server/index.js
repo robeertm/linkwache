@@ -43,13 +43,28 @@ setInterval(() => {
 
 // ── Ratelimit-Nachbildung: 20 je Minute je Schlüssel, im Speicher ────────────
 const hits = new Map();
+// Sicherheitsprüfung 16.10.2026: bis dahin nur 20/Minute (= 28 800 Prüfungen am Tag je Adresse). Jetzt zusätzlich
+// eine Tagesgrenze je Schlüssel, und ein gemeinsames Tagesbudget für urlscan (jede Prüfung kostet dort einen Scan).
+const PER_MINUTE = 10, PER_DAY = 150, SCANS_PER_DAY = Number(process.env.SCANS_PER_DAY || 200);
 const CHECK_LIMIT = {
   async limit({ key }) {
     const now = Date.now();
-    const arr = (hits.get(key) || []).filter((t) => now - t < 60000);
-    arr.push(now); hits.set(key, arr);
-    if (hits.size > 5000) for (const [k, v] of hits) if (!v.some((t) => now - t < 60000)) hits.delete(k);
-    return { success: arr.length <= 20 };
+    const arr = (hits.get(key) || []).filter((t) => now - t < 86400000);
+    const minute = arr.filter((t) => now - t < 60000).length;
+    const ok = minute < PER_MINUTE && arr.length < PER_DAY;
+    if (ok) arr.push(now);
+    hits.set(key, arr);
+    if (hits.size > 20000) for (const [k, v] of hits) if (!v.some((t) => now - t < 86400000)) hits.delete(k);
+    return { success: ok };
+  },
+};
+const SCAN_BUDGET = {
+  take() {
+    const d = new Date().toISOString().slice(0, 10);
+    const t = stats[d] || (stats[d] = { requests: 0, checks: 0, results: 0, rejected: 0, errors: 0, bytesIn: 0, bytesOut: 0 });
+    if ((t.scans || 0) >= SCANS_PER_DAY) return false;
+    t.scans = (t.scans || 0) + 1; statsDirty = true;
+    return true;
   },
 };
 
@@ -87,7 +102,7 @@ const env = {
   URLHAUS_KEY: process.env.URLHAUS_KEY || "",
   TELEGRAM_TOKEN: process.env.TELEGRAM_TOKEN || "",
   TELEGRAM_SECRET: process.env.TELEGRAM_SECRET || "",
-  RESULTS, CHECK_LIMIT, ASSETS,
+  RESULTS, CHECK_LIMIT, ASSETS, SCAN_BUDGET,
 };
 
 const SECURITY = {
@@ -95,7 +110,7 @@ const SECURITY = {
   "x-frame-options": "DENY",
   "referrer-policy": "no-referrer",
   "permissions-policy": "camera=(), microphone=(), geolocation=()",
-  "content-security-policy": "default-src 'self'; img-src 'self' https://urlscan.io data:; style-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'",
+  "content-security-policy": "default-src 'self'; img-src 'self' https://urlscan.io data:; style-src 'self'; script-src 'self'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'",
 };
 
 // ── Zähler je Tag (keine Adressen, keine Links): Anfragen, Prüfungen, Abweisungen, Bytes ──
@@ -125,15 +140,23 @@ const COMPRESSIBLE = /^(text\/|application\/(json|javascript|manifest\+json)|ima
 
 http.createServer(async (req, res) => {
   try {
-    const chunks = [];
-    for await (const c of req) chunks.push(c);
+    // Größe beim LESEN begrenzen — vorher wurde alles in den Speicher geholt und erst dann geprüft (300 MB = Absturz).
+    const MAX = 64 * 1024;
+    if (Number(req.headers["content-length"] || 0) > MAX) { res.writeHead(413, SECURITY).end(); req.destroy(); return; }
+    const chunks = []; let size = 0;
+    for await (const c of req) {
+      size += c.length;
+      if (size > MAX) { res.writeHead(413, SECURITY).end(); req.destroy(); return; }
+      chunks.push(c);
+    }
     const body = chunks.length ? Buffer.concat(chunks) : null;
-    if (body && body.length > 64 * 1024) { res.writeHead(413).end(); return; }
-    // Hinter dem Reverse-Proxy: die echte Absenderadresse kommt per X-Forwarded-For.
-    const xff = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
+    // Hinter dem DSM-Proxy: X-Real-IP setzt der Proxy selbst. X-Forwarded-For HÄNGT nur an — der ERSTE Eintrag
+    // kommt vom Absender und hebelte die Grenze aus. IPv6 zählt je /64.
+    let ip = String(req.headers["x-real-ip"] || "").trim() || req.socket.remoteAddress || "0";
+    if (ip.includes(":")) ip = ip.split(":").slice(0, 4).join(":") + "::/64";
     const headers = new Headers();
     for (const [k, v] of Object.entries(req.headers)) if (typeof v === "string") headers.set(k, v);
-    headers.set("cf-connecting-ip", xff || req.socket.remoteAddress || "0");
+    headers.set("cf-connecting-ip", ip);
     const proto = String(req.headers["x-forwarded-proto"] || "http");
     const host = String(req.headers["x-forwarded-host"] || req.headers.host || "localhost");
     // Kommt jemand über http (Port 80 am Reverse-Proxy), schicken wir ihn auf die https-Adresse.

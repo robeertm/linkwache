@@ -43,7 +43,8 @@ export async function runCheck(rawInput, env, { withScan = true } = {}) {
   const v = verdict(findings, { url });
 
   let scan = null;
-  if (withScan && env.URLSCAN_KEY && dns.ok && dns.v.resolves) {
+  // Tagesbudget für urlscan (Node-Betrieb): ist es aufgebraucht, wird ohne Sandbox geprüft
+  if (withScan && env.URLSCAN_KEY && dns.ok && dns.v.resolves && (!env.SCAN_BUDGET || env.SCAN_BUDGET.take())) {
     const s = await settle(urlscanSubmit(url, env.URLSCAN_KEY));
     scan = s.ok && s.v.ok ? { uuid: s.v.uuid, status: "pending", submitted: Date.now() } : { status: "unavailable", why: s.ok ? (s.v.text || s.v.status) : s.e };
   } else if (withScan) {

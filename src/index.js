@@ -31,7 +31,8 @@ export default {
       if (p === "/telegram" && req.method === "POST") return handleTelegram(req, env, ctx, { runCheck, resultText });
       if (p === "/api/health") return json({ ok: true, name: env.SITE_NAME, paypal: paypalLink(env), scan: !!env.URLSCAN_KEY, sb: !!env.SAFE_BROWSING_KEY, telegram: !!env.TELEGRAM_TOKEN });
     } catch (e) {
-      return json({ error: "Interner Fehler: " + String(e).slice(0, 200) }, 500);
+      console.error("Fehler", p, String(e).slice(0, 300));      // Details nur ins Log, nicht nach außen
+      return json({ error: "Interner Fehler" }, 500);
     }
     return staticPage(req, env);
   },
@@ -51,7 +52,18 @@ async function limited(req, env) {
   return !success;
 }
 
+// Fremde Seiten dürfen keine Prüfungen im Namen ihrer Besucher auslösen (kostet urlscan/Safe Browsing).
+function foreign(req) {
+  const site = req.headers.get("sec-fetch-site");
+  if (site && site !== "same-origin" && site !== "none") return true;
+  const origin = req.headers.get("origin");
+  if (!origin) return false;
+  try { return new URL(origin).host !== new URL(req.url).host; } catch { return true; }
+}
+
 async function apiCheck(req, env, ctx, lang) {
+  if (foreign(req)) return json({ error: "forbidden" }, 403);
+  if (!String(req.headers.get("content-type") || "").startsWith("application/json")) return json({ error: "JSON erwartet" }, 415);
   if (await limited(req, env)) return json({ error: t(lang, "err.rate") }, 429);
   let body = {};
   try { body = await req.json(); } catch { /* leer */ }
@@ -80,7 +92,7 @@ async function apiResult(id, env, ctx, lang) {
 
 async function resultPage(id, env, ctx, lang) {
   const r = await load(id, env);
-  if (!r) return html(page({ lang, title: t(lang, "r.nf.h"), env, noindex: true, path: "/r/" + id, body: `<h1>${esc(t(lang, "r.nf.h"))}</h1><p>${esc(t(lang, "r.nf.p"))} <a href="/?lang=${lang}">${esc(t(lang, "r.nf.new"))}</a></p>` }), 404, lang);
+  if (!r) return html(page({ lang, title: t(lang, "r.nf.h"), env, noindex: true, path: "/", body: `<h1>${esc(t(lang, "r.nf.h"))}</h1><p>${esc(t(lang, "r.nf.p"))} <a href="/?lang=${lang}">${esc(t(lang, "r.nf.new"))}</a></p>` }), 404, lang);
   const before = r.scan?.status;
   await refreshScan(r, env);
   if (r.scan?.status !== before) ctx.waitUntil(env.RESULTS.put("r:" + r.id, JSON.stringify(r), { expirationTtl: TTL }));

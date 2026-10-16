@@ -12,7 +12,8 @@ export function paypalLink(env) {
 }
 
 function langSwitch(lang, path) {
-  return `<select class="lang" aria-label="Language" onchange="location.href='${esc(path)}?lang='+this.value">` +
+  // kein Inline-JavaScript mehr: der Pfad steckte in onchange und ließ sich über /r/<id> zu Code machen (XSS)
+  return `<select class="lang" aria-label="Language" data-path="${esc(path)}">` +
     LANGS.map((l) => `<option value="${l}"${l === lang ? " selected" : ""}>${LANG_NAMES[l]}</option>`).join("") + `</select>`;
 }
 
@@ -26,7 +27,7 @@ export function page({ lang, title, body, env, noindex = false, extraHead = "", 
 ${noindex ? '<meta name="robots" content="noindex">' : LANGS.map((l) => `<link rel="alternate" hreflang="${l}" href="${esc(env.SITE_URL)}${esc(path)}?lang=${l}">`).join("")}
 <link rel="stylesheet" href="/style.css?v=${esc(env.ASSET_VER || "1")}"><script src="/theme.js?v=${esc(env.ASSET_VER || "1")}"></script><link rel="icon" href="/icon.svg"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#0c0d16">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(t(lang, "site.desc"))}">
-${extraHead}<script>window.LW=${JSON.stringify(cfg)}</script></head><body>
+${extraHead}<script type="application/json" id="lw">${JSON.stringify(cfg).replace(/</g, "\\u003c")}</script></head><body>
 <header class="top"><a class="brand" href="/?lang=${lang}"><span class="wappen"><img src="/icon.svg" alt=""></span><span>${esc(env.SITE_NAME || "Linkwache")}<small>${esc(t(lang, "site.tagline"))}</small></span></a>
 <nav><a href="/?lang=${lang}#so-gehts">${esc(t(lang, "nav.how"))}</a><a href="/impressum.html">${esc(t(lang, "nav.legal"))}</a><button class="theme" id="theme" type="button" aria-label="Theme">🌙</button>${langSwitch(lang, path)}</nav></header>
 <main>${body}</main>

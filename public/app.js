@@ -1,6 +1,12 @@
 // Startseite: einfügen → /api/check → Karte anzeigen → Sandbox-Bild nachladen.
 (function () {
-  const LW = window.LW || { lang: "de", s: {} };
+  let LW = { lang: "de", s: {} };
+  try { LW = JSON.parse(document.getElementById("lw").textContent); } catch { /* Vorgabe */ }
+  // Sprachwahl: Pfad aus data-path (kein Inline-JavaScript, CSP ohne unsafe-inline)
+  document.querySelectorAll("select.lang").forEach((sel) => sel.addEventListener("change", () => {
+    const p = sel.dataset.path || "/";
+    location.href = (p.startsWith("/") && !p.startsWith("//") ? p : "/") + "?lang=" + encodeURIComponent(sel.value);
+  }));
   const S = LW.s || {};
   const form = document.getElementById("form");
   const out = document.getElementById("out");
