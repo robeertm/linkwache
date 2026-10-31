@@ -2,6 +2,11 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
+## 0.2.1 — 2026-10-31
+
+### Added
+- `/api/health` now reports the running `version` (read from `package.json`), so monitoring can see which release is live.
+
 ## 0.2.0 — 2026-10-16
 
 ### Security

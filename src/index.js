@@ -11,6 +11,7 @@ import { page, homePage, resultCard, resultText, paypalLink, legalPage, privacyP
 import { handleTelegram } from "./telegram.js";
 import { extractUrls, sha256hex, esc } from "./util.js";
 import { pickLang, t, verdictText } from "./i18n.js";
+import { VERSION } from "./version.js";
 
 const TTL = 90 * 86400;
 
@@ -29,7 +30,7 @@ export default {
       if (p === "/kurzbefehl.html") return html(shortcutPage(lang, env), 200, lang);
       if (p === "/share") return share(url);
       if (p === "/telegram" && req.method === "POST") return handleTelegram(req, env, ctx, { runCheck, resultText });
-      if (p === "/api/health") return json({ ok: true, name: env.SITE_NAME, paypal: paypalLink(env), scan: !!env.URLSCAN_KEY, sb: !!env.SAFE_BROWSING_KEY, telegram: !!env.TELEGRAM_TOKEN });
+      if (p === "/api/health") return json({ ok: true, version: VERSION, name: env.SITE_NAME, paypal: paypalLink(env), scan: !!env.URLSCAN_KEY, sb: !!env.SAFE_BROWSING_KEY, telegram: !!env.TELEGRAM_TOKEN });
     } catch (e) {
       console.error("Fehler", p, String(e).slice(0, 300));      // Details nur ins Log, nicht nach außen
       return json({ error: "Interner Fehler" }, 500);

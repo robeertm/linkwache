@@ -69,3 +69,12 @@ test("Jede Sprache hat jeden Schlüssel, Platzhalter bleiben erhalten", () => {
   assert.equal(findingText("tr", { key: "brand-sub", stufe: "rot", p: { brand: "paypal", domain: "x.xyz" } }).titel, "„paypal“ yalnızca gerçek alan adının ÖNÜNDE");
   assert.equal(t("ru", "stufe.rot"), "Не открывать");
 });
+
+test("/api/health reports the package version", async () => {
+  const { default: worker } = await import("../src/index.js");
+  const pkg = JSON.parse((await import("node:fs")).readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+  const res = await worker.fetch(new Request("https://example.test/api/health"), {}, { waitUntil() {} });
+  const body = await res.json();
+  assert.equal(body.ok, true);
+  assert.equal(body.version, pkg.version);
+});
