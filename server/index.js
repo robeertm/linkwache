@@ -12,6 +12,9 @@ import { fileURLToPath } from "node:url";
 import crypto from "node:crypto";
 import zlib from "node:zlib";
 import worker from "../src/index.js";
+import { VERSION } from "../src/version.js";
+import { createLimiter } from "./ratelimit.js";
+import { startUpdateCheck } from "./update.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PUBLIC = path.join(ROOT, "public");
@@ -41,23 +44,10 @@ setInterval(() => {
   }
 }, 86400 * 1000).unref();
 
-// ── Ratelimit-Nachbildung: 20 je Minute je Schlüssel, im Speicher ────────────
-const hits = new Map();
-// Sicherheitsprüfung 16.10.2026: bis dahin nur 20/Minute (= 28 800 Prüfungen am Tag je Adresse). Jetzt zusätzlich
-// eine Tagesgrenze je Schlüssel, und ein gemeinsames Tagesbudget für urlscan (jede Prüfung kostet dort einen Scan).
-const PER_MINUTE = 10, PER_DAY = 150, SCANS_PER_DAY = Number(process.env.SCANS_PER_DAY || 200);
-const CHECK_LIMIT = {
-  async limit({ key }) {
-    const now = Date.now();
-    const arr = (hits.get(key) || []).filter((t) => now - t < 86400000);
-    const minute = arr.filter((t) => now - t < 60000).length;
-    const ok = minute < PER_MINUTE && arr.length < PER_DAY;
-    if (ok) arr.push(now);
-    hits.set(key, arr);
-    if (hits.size > 20000) for (const [k, v] of hits) if (!v.some((t) => now - t < 86400000)) hits.delete(k);
-    return { success: ok };
-  },
-};
+// ── Ratelimit-Nachbildung: 10 je Minute und 150 je Tag je Schlüssel, im Speicher (server/ratelimit.js) ──
+// Sicherheitsprüfung 16.10.2026: zusätzlich zur Minutengrenze eine Tagesgrenze und ein gemeinsames Tagesbudget für urlscan.
+const SCANS_PER_DAY = Number(process.env.SCANS_PER_DAY || 200);
+const CHECK_LIMIT = createLimiter({ perMinute: Number(process.env.PER_MINUTE || 10), perDay: Number(process.env.PER_DAY || 150) });
 const SCAN_BUDGET = {
   take() {
     const d = new Date().toISOString().slice(0, 10);
@@ -87,6 +77,7 @@ const ASSETS = {
 
 // Versionsstempel für style/app/theme: ändert sich mit dem Inhalt, damit kein Handy eine alte Fassung aus dem Cache zieht.
 const ASSET_VER = crypto.createHash("sha1").update(["style.css","app.js","theme.js"].map((f) => { try { return fs.readFileSync(path.join(PUBLIC, f)); } catch { return ""; } }).join("")).digest("hex").slice(0, 8);
+const UPDATE_INFO = {};
 const env = {
   ASSET_VER,
   SITE_NAME: process.env.SITE_NAME || "Linkwache",
@@ -103,6 +94,7 @@ const env = {
   TELEGRAM_TOKEN: process.env.TELEGRAM_TOKEN || "",
   TELEGRAM_SECRET: process.env.TELEGRAM_SECRET || "",
   RESULTS, CHECK_LIMIT, ASSETS, SCAN_BUDGET,
+  UPDATE_INFO,
 };
 
 const SECURITY = {
@@ -186,3 +178,5 @@ http.createServer(async (req, res) => {
     try { res.writeHead(500, { "content-type": "text/plain" }).end("Interner Fehler"); } catch { /* zu spät */ }
   }
 }).listen(PORT, "0.0.0.0", () => console.log(`Linkwache (selbst gehostet) auf :${PORT}, Daten in ${DATA}, Seite ${env.SITE_URL}`));
+
+startUpdateCheck(UPDATE_INFO, { current: VERSION, repo: process.env.UPDATE_REPO || "robeertm/linkwache", enabled: (process.env.UPDATE_CHECK || "on") !== "off" });

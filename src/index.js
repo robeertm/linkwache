@@ -30,7 +30,7 @@ export default {
       if (p === "/kurzbefehl.html") return html(shortcutPage(lang, env), 200, lang);
       if (p === "/share") return share(url);
       if (p === "/telegram" && req.method === "POST") return handleTelegram(req, env, ctx, { runCheck, resultText });
-      if (p === "/api/health") return json({ ok: true, version: VERSION, name: env.SITE_NAME, paypal: paypalLink(env), scan: !!env.URLSCAN_KEY, sb: !!env.SAFE_BROWSING_KEY, telegram: !!env.TELEGRAM_TOKEN });
+      if (p === "/api/health") return json({ ok: true, version: VERSION, name: env.SITE_NAME, paypal: paypalLink(env), scan: !!env.URLSCAN_KEY, sb: !!env.SAFE_BROWSING_KEY, telegram: !!env.TELEGRAM_TOKEN, ...(env.UPDATE_INFO?.latest ? { update: env.UPDATE_INFO.latest } : {}) });
     } catch (e) {
       console.error("Fehler", p, String(e).slice(0, 300));      // Details nur ins Log, nicht nach außen
       return json({ error: "Interner Fehler" }, 500);

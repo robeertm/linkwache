@@ -1,7 +1,7 @@
 # Linkwache einrichten — Schritt für Schritt
 
-Geschrieben für: Robert, der die Linkwache selbst ans Netz bringt. Alles, was ein Konto oder eine
-Zustimmung braucht, musst du selbst machen; alles danach kann ich (oder du mit `wrangler`) erledigen.
+Geschrieben für alle, die die Linkwache selbst ans Netz bringen. Alles, was ein Konto oder eine
+Zustimmung braucht, musst du selbst machen; alles danach geht mit `wrangler` oder `scripts/ausrollen.sh`.
 Reihenfolge einhalten — jeder Block baut auf dem vorigen auf. Gesamtzeit ohne Domain-Freischaltung:
 etwa eine Stunde.
 
@@ -158,5 +158,21 @@ Statt Cloudflare: derselbe Code als Node-Dienst im Container (`server/index.js`,
 | IPv6 | Trägt die DDNS-Adresse auch einen AAAA-Eintrag (die NAS selbst), landen Geräte im eigenen LAN per IPv6 **direkt auf NAS-Port 443** — deshalb die 443-Regel. Ohne sie: falsches Zertifikat + 403 im eigenen Haus, während es von außen (IPv4) läuft. Immer mit `curl -4` **und** `curl -6` prüfen |
 | Ergänzungen | Telegram/Safe Browsing/urlscan sobald die Schlüssel in `linkwache.env` stehen (`docker-compose up -d` danach). iPhone-Kurzbefehl: `public/Linkwache.shortcut` ist mit `shortcuts sign --mode anyone` signiert und zeigt auf die Instanz, für die er gebaut wurde — für eine eigene Instanz neu erzeugen und signieren (macOS) |
 
-**Update einspielen:** neuen Tarball nach `/volume1/docker/linkwache/src`, `docker build …`, `docker-compose up -d`.
+**Update einspielen:** `scripts/ausrollen.sh` (siehe unten). Der Server fragt einmal am Tag bei GitHub nach einer neueren Release und
+zeigt sie in `/api/health` als `"update": "<Version>"` und im Log (nur für den Betreiber, nie auf den öffentlichen Seiten);
+abschaltbar mit `UPDATE_CHECK=off` in `linkwache.env`.
 **Abschalten:** `docker-compose down` im Stack-Ordner + Router-Weiterleitungen deaktivieren.
+
+### Ausrollen mit einem Befehl
+
+```sh
+LINKWACHE_NAS=admin@nas.example.org scripts/ausrollen.sh
+```
+
+Der Befehl läuft auf deinem Rechner, im Repo-Stand (`HEAD`, sauberer Baum nötig). Er führt die Tests aus, packt den Stand,
+legt auf der NAS eine **Sicherung der alten Fassung** an (`src-vor-<Version>-<Zeit>.tar`, dazu das alte Image als
+`linkwache:rollback`), tauscht `src` aus, baut das Image, startet den Container neu und prüft danach `/api/health`
+(Version == erwartete Version) und den Docker-Healthcheck. Schlägt irgendetwas fehl, stellt er **automatisch** die alte
+Fassung wieder her (Quelle, Image, Container) und endet mit Fehlercode. Der Nutzer braucht dort nur `sudo` für `docker` und
+`docker-compose`; alle Dateioperationen laufen in einem Wegwerf-Container als root. Weitere Schalter: `LINKWACHE_DIR`
+(Standard `/volume1/docker/linkwache`), `SKIP_TESTS=1`, `DRY_RUN=1` (nur anzeigen).

@@ -23,7 +23,7 @@ from the browser, a switch is in the header, and a shared result link renders in
 Two ways to run it, same code: a **Cloudflare Worker** (KV, Email Routing) or **self-hosted** as a
 Node 22 container behind any reverse proxy (`server/index.js`, `Dockerfile`, `deploy/nas/`). The
 Impressum/privacy pages take their personal data from environment variables, never from the repo.
-A live instance run by the author for friends: https://linkwache.maro-datacenter01.synology.me
+A live instance run by the author for friends: https://linkwache.example.org
 
 ## Ways in
 

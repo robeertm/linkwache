@@ -2,6 +2,22 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
+## 0.3.0 — 2026-11-11
+
+### Added
+- `scripts/ausrollen.sh`: one-command rollout to the self-hosted container. Runs the tests, backs up the running source
+  and image, swaps the source, builds, restarts, checks `/api/health` (expected version) and the Docker health state,
+  and restores the previous version automatically if anything fails.
+- Update notice for the operator: once a day the server asks GitHub for a newer release and reports it as `update` in
+  `/api/health` and in the log. Never shown on the public pages. Disable with `UPDATE_CHECK=off`.
+- Server tests: rate limiter (per minute, per day, stale keys), forged `X-Forwarded-For`, foreign origin, content type,
+  body size, `/api/health` version, and the update check.
+
+### Changed
+- The rate limiter and the update check live in their own modules (`server/ratelimit.js`, `server/update.js`);
+  limits can be overridden with `PER_MINUTE` / `PER_DAY` (defaults unchanged: 10 and 150).
+- README and setup guide no longer name a private host; the setup guide is written for any operator.
+
 ## 0.2.1 — 2026-10-31
 
 ### Added
