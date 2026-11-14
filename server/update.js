@@ -1,6 +1,7 @@
 // Update notice for the operator: asks GitHub once a day whether a newer release exists.
 // The result only shows up in /api/health ("update") and in the log, never on the public pages.
-// Switch off with UPDATE_CHECK=off. Nothing is installed automatically; roll out with scripts/ausrollen.sh.
+// Switch off with UPDATE_CHECK=off. Nothing is installed automatically; the operator page (/admin, needs ADMIN_TOKEN) can file an update request that
+// scripts/aktualisieren.sh --if-requested picks up on the host.
 export function parseVersion(v) {
   const m = /^v?(\d+)\.(\d+)\.(\d+)/.exec(String(v || "").trim());
   return m ? [Number(m[1]), Number(m[2]), Number(m[3])] : null;
@@ -30,8 +31,9 @@ export function startUpdateCheck(info, { current, repo, enabled = true, fetchFn 
     try {
       const latest = await fetchLatest(repo, fetchFn);
       const was = info.latest;
+      info.checkedAt = new Date().toISOString();
       info.latest = latest && isNewer(latest, current) ? latest : undefined;
-      if (info.latest && info.latest !== was) log(`Update available: ${current} -> ${info.latest} (run scripts/ausrollen.sh)`);
+      if (info.latest && info.latest !== was) log(`Update available: ${current} -> ${info.latest} (run scripts/aktualisieren.sh)`);
     } catch { /* offline or rate-limited: try again tomorrow */ }
   };
   run();

@@ -150,3 +150,10 @@ footer{margin-block:28px 34px;color:var(--leise);font-size:.88rem;border-top:1px
 .legal h1{font-size:1.4rem}
 @media (max-width:520px){html{font-size:16px}.row .btn,.share .btn{flex-basis:100%}.share input{flex-basis:100%}.verdict{padding:12px}.verdict .ampel{font-size:1.8rem}.wappen{width:44px;height:44px}.wappen img{width:26px;height:26px}}
 @media (prefers-reduced-motion:no-preference){.btn{transition:transform .08s,filter .15s}.btn:active{transform:scale(.98)}}
+
+/* Betreiberseite */
+.admin{max-width:560px;margin-inline:auto}
+.admin input{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px solid var(--rand);border-radius:.8rem;background:var(--feld);color:var(--text)}
+.admin .row{margin-top:12px}
+.adm-state{font-weight:600}
+.admin [hidden]{display:none!important}

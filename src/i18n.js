@@ -113,6 +113,20 @@ S.de = {
   "mail.nolink": "Hallo,\n\nin der weitergeleiteten Mail habe ich keinen Link gefunden. Bitte leite die verdächtige Mail so weiter, wie sie ist (nicht als Anhang), oder schick den Link direkt.\n\n– Linkwache",
   "mail.intro1": "Hallo,\n\nich habe den Link aus deiner Mail geprüft — ohne ihn zu öffnen.\n\n", "mail.intron": "Hallo,\n\nich habe {n} Links aus deiner Mail geprüft — ohne sie zu öffnen.\n\n",
   "mail.outro": "\n\nDie Linkwache sucht Warnzeichen, sie beweist keine Unschuld. Bei Rot: nicht öffnen, nichts eingeben, Absender anrufen.\n\n– Linkwache · {site}", "mail.contact": "\nRückfragen: {mail}", "mail.re": "Linkprüfung",
+  "adm.title": "Betrieb",
+  "adm.token": "Zugangsschlüssel des Betreibers",
+  "adm.login": "Anmelden",
+  "adm.version": "Laufende Fassung: {v}",
+  "adm.uptodate": "Auf dem neuesten Stand.",
+  "adm.avail": "Neue Fassung {v} verfügbar.",
+  "adm.request": "Update anfordern",
+  "adm.requested": "Update angefordert. Der Server-Rechner holt es beim nächsten Lauf von scripts/aktualisieren.sh ab.",
+  "adm.off": "Die Update-Suche ist abgeschaltet (UPDATE_CHECK=off).",
+  "adm.bad": "Schlüssel falsch oder zu viele Versuche.",
+  "adm.hint": "Diese Seite installiert nichts selbst: Sie legt nur eine Anfrage ab. Geprüft, gesichert und getauscht wird auf dem Server-Rechner mit scripts/aktualisieren.sh.",
+  "adm.pending": "Anfrage liegt vor für Fassung {v}.",
+  "adm.checked": "Zuletzt geprüft: {t}",
+  "adm.never": "Noch keine Prüfung abgeschlossen.",
 };
 
 S.en = {
@@ -200,6 +214,20 @@ S.en = {
   "mail.nolink": "Hello,\n\nI couldn’t find a link in the forwarded mail. Please forward the suspicious mail as it is (not as an attachment), or send the link directly.\n\n– Linkwache",
   "mail.intro1": "Hello,\n\nI checked the link from your mail — without opening it.\n\n", "mail.intron": "Hello,\n\nI checked {n} links from your mail — without opening them.\n\n",
   "mail.outro": "\n\nLinkwache looks for warning signs, it does not prove innocence. On red: don’t open, don’t enter anything, call the sender.\n\n– Linkwache · {site}", "mail.contact": "\nQuestions: {mail}", "mail.re": "Link check",
+  "adm.title": "Operation",
+  "adm.token": "Operator access key",
+  "adm.login": "Sign in",
+  "adm.version": "Running version: {v}",
+  "adm.uptodate": "Up to date.",
+  "adm.avail": "New version {v} available.",
+  "adm.request": "Request update",
+  "adm.requested": "Update requested. The host picks it up on its next run of the update script.",
+  "adm.off": "The update check is switched off (UPDATE_CHECK=off).",
+  "adm.bad": "Wrong key or too many attempts.",
+  "adm.hint": "This page installs nothing itself: it only files a request. Checking, backing up and swapping happens on the host with scripts/aktualisieren.sh.",
+  "adm.pending": "A request is pending for version {v}.",
+  "adm.checked": "Last checked: {t}",
+  "adm.never": "No check has finished yet.",
 };
 
 Object.assign(S, MORE);

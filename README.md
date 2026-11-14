@@ -67,3 +67,16 @@ Routing, Telegram bot, Safe Browsing and urlscan keys, PayPal button, Impressum)
 
 Source-available — see [LICENSE](LICENSE). All rights reserved; free to run for yourself, not to
 redistribute or host for others without permission.
+
+## Updating (self-hosted)
+
+Set `ADMIN_TOKEN` (e.g. `openssl rand -hex 24`) to enable the operator page at `/admin`: it shows the running version,
+whether a newer release exists, and files an update request with one click. The page installs nothing; on the host run
+
+```
+LINKWACHE_NAS=user@host scripts/aktualisieren.sh              # latest release
+LINKWACHE_NAS=user@host scripts/aktualisieren.sh --if-requested  # only when requested on /admin (cron-friendly)
+```
+
+The script verifies the release (tag matches `package.json`, tests pass), backs up the running version and rolls back
+automatically if the health check fails. Turn the daily release lookup off with `UPDATE_CHECK=off`.

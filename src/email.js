@@ -69,6 +69,8 @@ function guessLang(text) {
 }
 
 function stripHtml(h) {
-  // href-Ziele sichtbar machen, dann Tags entfernen
-  return String(h).replace(/href\s*=\s*["']([^"']+)["']/gi, " $1 ").replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&");
+  // Collect href targets first (removing the tags would drop them), then strip the tags.
+  const hrefs = [...String(h).matchAll(/href\s*=\s*["']([^"']+)["']/gi)].map((m) => m[1].replace(/&amp;/g, "&"));
+  const text = String(h).replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&");
+  return text + "\n" + hrefs.join("\n");
 }

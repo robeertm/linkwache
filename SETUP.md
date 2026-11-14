@@ -158,7 +158,7 @@ Statt Cloudflare: derselbe Code als Node-Dienst im Container (`server/index.js`,
 | IPv6 | Trägt die DDNS-Adresse auch einen AAAA-Eintrag (die NAS selbst), landen Geräte im eigenen LAN per IPv6 **direkt auf NAS-Port 443** — deshalb die 443-Regel. Ohne sie: falsches Zertifikat + 403 im eigenen Haus, während es von außen (IPv4) läuft. Immer mit `curl -4` **und** `curl -6` prüfen |
 | Ergänzungen | Telegram/Safe Browsing/urlscan sobald die Schlüssel in `linkwache.env` stehen (`docker-compose up -d` danach). iPhone-Kurzbefehl: `public/Linkwache.shortcut` ist mit `shortcuts sign --mode anyone` signiert und zeigt auf die Instanz, für die er gebaut wurde — für eine eigene Instanz neu erzeugen und signieren (macOS) |
 
-**Update einspielen:** `scripts/ausrollen.sh` (siehe unten). Der Server fragt einmal am Tag bei GitHub nach einer neueren Release und
+**Update einspielen:** `scripts/aktualisieren.sh` holt die veröffentlichte Fassung, prüft sie und ruft `scripts/ausrollen.sh` (siehe unten) auf; mit `ADMIN_TOKEN` gibt es zusätzlich die Betreiberseite `/admin` mit Ein-Klick-Anfrage (`aktualisieren.sh --if-requested`). Der Server fragt einmal am Tag bei GitHub nach einer neueren Release und
 zeigt sie in `/api/health` als `"update": "<Version>"` und im Log (nur für den Betreiber, nie auf den öffentlichen Seiten);
 abschaltbar mit `UPDATE_CHECK=off` in `linkwache.env`.
 **Abschalten:** `docker-compose down` im Stack-Ordner + Router-Weiterleitungen deaktivieren.

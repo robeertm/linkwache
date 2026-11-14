@@ -2,6 +2,23 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
+## 0.4.0 — 2026-11-14
+
+### Added
+- Updater for the self-hosted build. Operator page `/admin` (enabled by setting `ADMIN_TOKEN`; hidden otherwise) shows the
+  running version and whether a newer release exists, in all eight languages, light and dark. One click files an update
+  request (`update-request.json` in the data directory). The page never installs anything itself.
+- `scripts/aktualisieren.sh`: fetches a published release tag, refuses it unless `package.json` carries the tag's version,
+  runs its tests, then hands over to `scripts/ausrollen.sh` (backup of source and image, health check, automatic rollback).
+  `--if-requested` acts only when the operator page filed a request and removes the request afterwards; `DRY_RUN=1` changes nothing.
+- The daily update check records when it last ran (`checkedAt`, visible on the operator page); still switchable with `UPDATE_CHECK=off`.
+- Tests: worker API (check, result, pages, share target, health), network failure cases (timeout, redirect loop, invalid
+  certificate, failing providers), chat bot webhook (secret, language, per-chat limit), mailbox part with hand-made messages
+  and no real credentials, operator page and API (key, rate limit, request file mode), update script against a local repository.
+
+### Fixed
+- Mailbox: links that appear only as `href` targets in an HTML mail were dropped together with their tag and never checked.
+
 ## 0.3.0 — 2026-11-11
 
 ### Added

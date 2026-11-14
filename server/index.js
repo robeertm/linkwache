@@ -15,6 +15,7 @@ import worker from "../src/index.js";
 import { VERSION } from "../src/version.js";
 import { createLimiter } from "./ratelimit.js";
 import { startUpdateCheck } from "./update.js";
+import { createAdmin } from "./admin.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PUBLIC = path.join(ROOT, "public");
@@ -76,7 +77,7 @@ const ASSETS = {
 };
 
 // Versionsstempel für style/app/theme: ändert sich mit dem Inhalt, damit kein Handy eine alte Fassung aus dem Cache zieht.
-const ASSET_VER = crypto.createHash("sha1").update(["style.css","app.js","theme.js"].map((f) => { try { return fs.readFileSync(path.join(PUBLIC, f)); } catch { return ""; } }).join("")).digest("hex").slice(0, 8);
+const ASSET_VER = crypto.createHash("sha1").update(["style.css","app.js","theme.js","admin.js"].map((f) => { try { return fs.readFileSync(path.join(PUBLIC, f)); } catch { return ""; } }).join("")).digest("hex").slice(0, 8);
 const UPDATE_INFO = {};
 const env = {
   ASSET_VER,
@@ -96,6 +97,9 @@ const env = {
   RESULTS, CHECK_LIMIT, ASSETS, SCAN_BUDGET,
   UPDATE_INFO,
 };
+
+const UPDATE_ENABLED = (process.env.UPDATE_CHECK || "on") !== "off";
+const admin = createAdmin({ token: process.env.ADMIN_TOKEN || "", dataDir: DATA, version: VERSION, info: UPDATE_INFO, checkEnabled: UPDATE_ENABLED });
 
 const SECURITY = {
   "x-content-type-options": "nosniff",
@@ -159,7 +163,7 @@ http.createServer(async (req, res) => {
     const request = new Request(`${proto}://${host}${req.url}`, { method: req.method, headers, body: body && !["GET", "HEAD"].includes(req.method) ? body : undefined });
     const tasks = [];
     const ctx = { waitUntil: (p) => tasks.push(p), passThroughOnException() {} };
-    const r = await worker.fetch(request, env, ctx);
+    const r = (await admin.handle(request, env)) || (await worker.fetch(request, env, ctx));
     const out = Object.fromEntries(r.headers.entries());
     let buf = Buffer.from(await r.arrayBuffer());
     if (buf.length > 1024 && COMPRESSIBLE.test(out["content-type"] || "") && /\bgzip\b/.test(String(req.headers["accept-encoding"] || ""))) {
@@ -179,4 +183,4 @@ http.createServer(async (req, res) => {
   }
 }).listen(PORT, "0.0.0.0", () => console.log(`Linkwache (selbst gehostet) auf :${PORT}, Daten in ${DATA}, Seite ${env.SITE_URL}`));
 
-startUpdateCheck(UPDATE_INFO, { current: VERSION, repo: process.env.UPDATE_REPO || "robeertm/linkwache", enabled: (process.env.UPDATE_CHECK || "on") !== "off" });
+startUpdateCheck(UPDATE_INFO, { current: VERSION, repo: process.env.UPDATE_REPO || "robeertm/linkwache", enabled: UPDATE_ENABLED });
