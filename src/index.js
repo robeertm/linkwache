@@ -12,6 +12,7 @@ import { handleTelegram } from "./telegram.js";
 import { extractUrls, sha256hex, esc } from "./util.js";
 import { pickLang, t, verdictText } from "./i18n.js";
 import { VERSION } from "./version.js";
+import { apiV1Check } from "./api_v1.js";
 
 const TTL = 90 * 86400;
 
@@ -23,6 +24,7 @@ export default {
     try {
       if (p === "/" || p === "/index.html") return html(homePage(lang, env), 200, lang);
       if (p === "/api/check" && req.method === "POST") return apiCheck(req, env, ctx, lang);
+      if (p === "/api/v1/check" && req.method === "POST") return apiV1Check(req, env, ctx, lang);
       if (p.startsWith("/api/result/")) return apiResult(p.slice("/api/result/".length), env, ctx, lang);
       if (p.startsWith("/r/")) return resultPage(p.slice(3), env, ctx, lang);
       if (p === "/impressum.html") return html(legalPage(lang, env), 200, lang);
@@ -30,7 +32,7 @@ export default {
       if (p === "/kurzbefehl.html") return html(shortcutPage(lang, env), 200, lang);
       if (p === "/share") return share(url);
       if (p === "/telegram" && req.method === "POST") return handleTelegram(req, env, ctx, { runCheck, resultText });
-      if (p === "/api/health") return json({ ok: true, version: VERSION, name: env.SITE_NAME, paypal: paypalLink(env), scan: !!env.URLSCAN_KEY, sb: !!env.SAFE_BROWSING_KEY, telegram: !!env.TELEGRAM_TOKEN, ...(env.UPDATE_INFO?.latest ? { update: env.UPDATE_INFO.latest } : {}) });
+      if (p === "/api/health") return json({ ok: true, version: VERSION, api: [1], name: env.SITE_NAME, paypal: paypalLink(env), scan: !!env.URLSCAN_KEY, sb: !!env.SAFE_BROWSING_KEY, telegram: !!env.TELEGRAM_TOKEN, ...(env.UPDATE_INFO?.latest ? { update: env.UPDATE_INFO.latest } : {}) });
     } catch (e) {
       console.error("Fehler", p, String(e).slice(0, 300));      // Details nur ins Log, nicht nach außen
       return json({ error: "Interner Fehler" }, 500);

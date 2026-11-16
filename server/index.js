@@ -49,6 +49,9 @@ setInterval(() => {
 // Sicherheitsprüfung 16.10.2026: zusätzlich zur Minutengrenze eine Tagesgrenze und ein gemeinsames Tagesbudget für urlscan.
 const SCANS_PER_DAY = Number(process.env.SCANS_PER_DAY || 200);
 const CHECK_LIMIT = createLimiter({ perMinute: Number(process.env.PER_MINUTE || 10), perDay: Number(process.env.PER_DAY || 150) });
+// Client API v1: per installation and per IP (the worker hashes the keys with the day).
+const V1_LIMIT = createLimiter({ perMinute: Number(process.env.V1_PER_MINUTE || 60), perDay: Number(process.env.V1_PER_DAY || 3000) });
+const V1_IP_LIMIT = createLimiter({ perMinute: Number(process.env.V1_IP_PER_MINUTE || 120), perDay: Number(process.env.V1_IP_PER_DAY || 10000) });
 const SCAN_BUDGET = {
   take() {
     const d = new Date().toISOString().slice(0, 10);
@@ -94,7 +97,7 @@ const env = {
   URLHAUS_KEY: process.env.URLHAUS_KEY || "",
   TELEGRAM_TOKEN: process.env.TELEGRAM_TOKEN || "",
   TELEGRAM_SECRET: process.env.TELEGRAM_SECRET || "",
-  RESULTS, CHECK_LIMIT, ASSETS, SCAN_BUDGET,
+  RESULTS, CHECK_LIMIT, V1_LIMIT, V1_IP_LIMIT, ASSETS, SCAN_BUDGET,
   UPDATE_INFO,
 };
 
@@ -119,7 +122,7 @@ function count(kind, bytesIn, bytesOut) {
   const d = new Date().toISOString().slice(0, 10);
   const t = stats[d] || (stats[d] = { requests: 0, checks: 0, results: 0, rejected: 0, errors: 0, bytesIn: 0, bytesOut: 0 });
   t.requests++; t.bytesIn += bytesIn; t.bytesOut += bytesOut;
-  if (kind) t[kind]++;
+  if (kind) t[kind] = (t[kind] || 0) + 1;
   statsDirty = true;
 }
 function flushStats() {
@@ -175,7 +178,7 @@ http.createServer(async (req, res) => {
     res.writeHead(r.status, { ...SECURITY, ...out });
     res.end(buf);
     const p = req.url.split("?")[0];
-    count(r.status === 429 ? "rejected" : r.status >= 500 ? "errors" : p === "/api/check" ? "checks" : p.startsWith("/r/") ? "results" : "", body ? body.length : 0, buf.length);
+    count(r.status === 429 ? "rejected" : r.status >= 500 ? "errors" : p === "/api/check" ? "checks" : p === "/api/v1/check" ? "v1" : p.startsWith("/r/") ? "results" : "", body ? body.length : 0, buf.length);
     await Promise.allSettled(tasks);
   } catch (e) {
     console.error(new Date().toISOString(), "fehler", String(e).slice(0, 300));

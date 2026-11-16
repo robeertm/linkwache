@@ -10,7 +10,8 @@ export function createLimiter({ perMinute = 10, perDay = 150, now = () => Date.n
       if (ok) arr.push(t);
       hits.set(key, arr);
       if (hits.size > maxKeys) for (const [k, v] of hits) if (!v.some((x) => t - x < 86400000)) hits.delete(k);
-      return { success: ok };
+      const oldest = arr.find((x) => t - x < 60000);
+      return { success: ok, retryAfter: ok ? 0 : (minute >= perMinute && oldest !== undefined ? Math.max(1, Math.ceil((oldest + 60000 - t) / 1000)) : Math.max(1, Math.ceil((arr[0] + 86400000 - t) / 1000))) };
     },
     size: () => hits.size,
   };
