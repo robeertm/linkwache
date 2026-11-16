@@ -94,7 +94,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: desktop
-          key: ${{ matrix.name }}
+          key: ${{ matrix.name }}-${{ matrix.os }}
 
       # Windows code signing (docs/DESKTOP.md "Windows code signing later"): only when the
       # repository secret WINDOWS_SIGN_MODE is set. Tauri then signs the app binary, the NSIS
