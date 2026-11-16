@@ -7,7 +7,7 @@ Checks, in this order (exit 0 and the line "VOR_AUSLIEFERUNG: GREEN" only if all
   1. versions agree: package.json = desktop/Cargo.toml workspace version = top CHANGELOG section
      (with a date, not "unreleased")
   2. npm test (server, heuristics vectors, i18n of app and extension, download page, extension logic)
-  3. the browser extension builds (npm run build:extension) and the generated desktop strings are current
+  3. the browser extension builds for all three targets (npm run build:extension: two zips + the Safari folder) and the generated desktop strings are current
   4. commit identities of all branches and tags (scripts/check_commit_identity.py --branches --tags)
   5. CI on GitHub is green for HEAD: workflows Desktop (builds + end-to-end tests on Windows, macOS,
      Linux), Android and Commit identity. A workflow that did not run for HEAD (path filter) must have
@@ -78,7 +78,9 @@ def main():
     ok &= step("npm test", t.returncode == 0, " ".join(tail[:3]))
     b = run(["npm", "run", "--silent", "build:extension"])
     zips = sorted(p.name for p in (ROOT / "extension/dist").glob(f"*-{version}.zip")) if b.returncode == 0 else []
-    ok &= step("extension build", b.returncode == 0 and len(zips) == 2, ", ".join(zips) or b.stderr.strip()[-200:])
+    safari = (ROOT / "extension/dist/safari/manifest.json").is_file() and (ROOT / "extension/dist/safari-app-strings.json").is_file()
+    ok &= step("extension build", b.returncode == 0 and len(zips) == 2 and safari,
+               (", ".join(zips) + (" + safari folder" if safari else " — safari folder missing")) if zips else b.stderr.strip()[-200:])
     gen = run(["node", "desktop/scripts/i18n.mjs"])
     diff = run(["git", "status", "--porcelain", "desktop/ui"])
     ok &= step("desktop strings generated and committed", gen.returncode == 0 and not diff.stdout.strip(), diff.stdout.strip()[:200])

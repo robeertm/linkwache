@@ -1,5 +1,5 @@
 // Builds the extension from one source into extension/dist/chromium/, extension/dist/firefox/, extension/dist/safari/
-// (unpacked, loadable) and extension/dist/linkwache-extension-<target>-<version>.zip. The Safari folder is what the Xcode
+// (unpacked, loadable) and extension/dist/linkwache-extension-<chromium|firefox>-<version>.zip. The Safari folder is what the Xcode
 // project in safari/ copies into its app extension; dist/safari-app-strings.json carries the container app's texts.
 //   node extension/scripts/build.mjs [chromium] [firefox] [safari]    (no argument: all three) No runtime bundler: every script is one self-contained file.
 //   LINKWACHE_DEFAULT_SERVER=https://... npm run build:extension    (default server address; empty otherwise)
@@ -103,6 +103,9 @@ async function buildTarget(target) {
       extDesc: { message: S[l]["ext.desc"].slice(0, 132) },
     }, null, 2) + "\n");
   }
+  // Safari has no zip: Safari loads the extension only from the container app (safari/), which copies this folder.
+  // A zip in the release would be of no use to anyone.
+  if (target === "safari") return { out, zip: null };
   const zip = path.join(DIST, `linkwache-extension-${target}-${VERSION}.zip`);
   fs.rmSync(zip, { force: true });
   zipDir(out, zip);
@@ -115,7 +118,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   for (const a of wanted) if (!TARGETS.includes(a)) { console.error(`unknown target ${a} (${TARGETS.join(", ")})`); process.exit(2); }
   for (const target of wanted.length ? wanted : TARGETS) {
     const { out, zip } = await buildTarget(target);
-    console.log(`${target}: ${path.relative(process.cwd(), out)}  ${path.relative(process.cwd(), zip)} (${fs.statSync(zip).size} bytes)`);
+    console.log(zip ? `${target}: ${path.relative(process.cwd(), out)}  ${path.relative(process.cwd(), zip)} (${fs.statSync(zip).size} bytes)` : `${target}: ${path.relative(process.cwd(), out)}  (no zip: loaded through the container app)`);
     if (target === "safari") {
       const f = path.join(DIST, "safari-app-strings.json");
       fs.writeFileSync(f, JSON.stringify({ version: VERSION, langs: LANGS, strings: safariAppStrings() }, null, 2) + "\n");

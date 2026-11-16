@@ -54,8 +54,9 @@ test("no hostname baked into the build when LINKWACHE_DEFAULT_SERVER is empty; s
   assert.match(bg, /v\.gruen/, "verdict texts bundled");
 });
 
-test("zips exist, are valid and carry the manifest at the root", () => {
-  for (const t of ["chromium", "firefox", "safari"]) {
+test("zips exist, are valid and carry the manifest at the root; Safari has none (loaded through its app)", () => {
+  assert.ok(!fs.existsSync(path.join(DIST, `linkwache-extension-safari-${pkg.version}.zip`)), "no safari zip in a release");
+  for (const t of ["chromium", "firefox"]) {
     const z = path.join(DIST, `linkwache-extension-${t}-${pkg.version}.zip`);
     assert.ok(fs.existsSync(z), z);
     const list = execFileSync("unzip", ["-Z1", z]).toString().split("\n");
