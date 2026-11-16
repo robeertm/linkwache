@@ -89,6 +89,7 @@ jobs:
             # sandboxed app: it writes into its own container when the path is outside, and prints where
             "$APP" -LWLanguage $lang -LWAppearance $look -LWSnapshot "$PWD/shots/$F" > "$RUNNER_TEMP/snap.txt" 2>&1 &
             P=$!; for i in $(seq 1 40); do kill -0 $P 2>/dev/null || break; sleep 1; done; kill $P 2>/dev/null || true
+            wait $P && RC=0 || RC=$?; echo "app exit $RC"
             cat "$RUNNER_TEMP/snap.txt"
             OUT=$(sed -n 's/^snapshot: //p' "$RUNNER_TEMP/snap.txt" | tail -1)
             [ -n "$OUT" ] && [ "$OUT" != "$PWD/shots/$F" ] && cp "$OUT" "shots/$F"

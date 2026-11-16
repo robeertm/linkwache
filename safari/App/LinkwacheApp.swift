@@ -40,8 +40,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// The window takes exactly the size of its content and is not resizable (works on macOS 12 too).
     static func fitWindow() {
         guard let win = NSApp.windows.first(where: { $0.isVisible }), let view = win.contentView else { return }
+        let size = view.fittingSize
+        guard size.width >= 200, size.height >= 200 else { return }
         win.styleMask.remove(.resizable)
-        win.setContentSize(view.fittingSize)
+        win.setContentSize(size)
         win.center()
     }
 
@@ -226,22 +228,29 @@ struct ContentView: View {
 }
 
 enum Snapshot {
-    /// Renders the app window (content incl. title bar area) to a PNG at the screen's scale, then quits.
+    private static func fail(_ code: Int32, _ why: String) -> Never {
+        FileHandle.standardError.write("snapshot failed: \(why)\n".data(using: .utf8)!)
+        exit(code)
+    }
+
+    /// Renders the app window's content to a PNG at the screen's scale, then quits.
     static func window(to path: String) {
         AppDelegate.fitWindow()
-        NSApp.windows.first(where: { $0.isVisible })?.contentView?.layoutSubtreeIfNeeded()
-        guard let win = NSApp.windows.first(where: { $0.isVisible }), let view = win.contentView else {
-            FileHandle.standardError.write("snapshot: no window\n".data(using: .utf8)!); exit(3)
+        guard let win = NSApp.windows.first(where: { $0.isVisible }) ?? NSApp.windows.first, let view = win.contentView else {
+            fail(3, "no window (\(NSApp.windows.count) windows)")
         }
-        guard let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { exit(3) }
-        view.cacheDisplay(in: view.bounds, to: rep)
-        guard let png = rep.representation(using: .png, properties: [:]) else { exit(3) }
+        view.layoutSubtreeIfNeeded()
+        let bounds = view.bounds
+        print("snapshot: window \(Int(win.frame.width))x\(Int(win.frame.height)), content \(Int(bounds.width))x\(Int(bounds.height)), fitting \(Int(view.fittingSize.width))x\(Int(view.fittingSize.height))")
+        guard bounds.width > 0, bounds.height > 0, let rep = view.bitmapImageRepForCachingDisplay(in: bounds) else { fail(3, "empty view") }
+        view.cacheDisplay(in: bounds, to: rep)
+        guard let png = rep.representation(using: .png, properties: [:]) else { fail(3, "no png") }
         // The app is sandboxed: when the path is outside its container, write into its own temporary folder instead.
         let wanted = URL(fileURLWithPath: path)
         let fallback = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(wanted.lastPathComponent)
         for url in [wanted, fallback] {
             if (try? png.write(to: url)) != nil { print("snapshot: \(url.path)"); fflush(stdout); exit(0) }
         }
-        exit(4)
+        fail(4, "cannot write \(wanted.path) or \(fallback.path)")
     }
 }
