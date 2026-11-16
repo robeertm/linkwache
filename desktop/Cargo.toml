@@ -1,0 +1,16 @@
+[workspace]
+resolver = "2"
+members = ["core", "src-tauri", "e2e/fakebrowser"]
+default-members = ["core"]
+
+[workspace.package]
+version = "0.5.0"
+edition = "2021"
+publish = false
+
+[profile.release]
+codegen-units = 4
+lto = "thin"
+opt-level = "s"
+strip = true
+panic = "abort"

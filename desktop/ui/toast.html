@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Linkwache</title>
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="toast.css">
+</head>
+<body class="toast" data-state="checking">
+  <main class="t-card" role="status" aria-live="polite">
+    <div class="t-icon">
+      <span class="ring" aria-hidden="true"></span>
+      <span class="t-logo" data-logo></span>
+      <svg class="t-ok" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11"/><path d="M7 12.5l3.2 3.2L17 9"/></svg>
+      <svg class="t-no" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11"/><path d="M8 8l8 8M16 8l-8 8"/></svg>
+    </div>
+    <div class="t-text">
+      <div class="t-label" id="label" data-i18n="dt.toast.checking">Linkwache is checking …</div>
+      <div class="t-domain" id="domain">example.com</div>
+      <div class="t-host leise" id="host"></div>
+    </div>
+  </main>
+  <div class="t-bar" aria-hidden="true"><span></span></div>
+  <script src="i18n.generated.js"></script>
+  <script src="common.js"></script>
+  <script src="toast.js"></script>
+</body>
+</html>

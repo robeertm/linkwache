@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Linkwache</title>
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="warning.css">
+</head>
+<body class="warn" data-stufe="gelb">
+  <div class="band" aria-hidden="true"></div>
+  <main class="w-main">
+    <header class="w-head">
+      <div class="w-icon" aria-hidden="true">
+        <svg class="i-gelb" viewBox="0 0 48 48"><path d="M24 5 2.5 42.5h43z" /><path class="mark" d="M24 18v11M24 35.5v.5"/></svg>
+        <svg class="i-rot" viewBox="0 0 48 48"><circle cx="24" cy="24" r="21"/><path class="mark" d="M15 15l18 18M33 15 15 33"/></svg>
+        <svg class="i-offline" viewBox="0 0 48 48"><circle cx="24" cy="24" r="21"/><path class="mark" d="M18.5 19a5.5 5.5 0 1 1 7.6 5.1c-1.4.6-2.1 1.7-2.1 3.2V29M24 35.5v.5"/></svg>
+      </div>
+      <div class="w-titles">
+        <span class="pill" id="pill"></span>
+        <h1 id="title"></h1>
+      </div>
+    </header>
+
+    <section class="w-link card">
+      <div class="lbl" data-i18n="dt.warn.link">Link</div>
+      <div class="w-domain" id="domain"></div>
+      <div class="w-url mono" id="url"></div>
+      <div id="targetbox" hidden>
+        <div class="lbl lbl2" data-i18n="dt.warn.target"></div>
+        <div class="w-url mono" id="target"></div>
+      </div>
+    </section>
+
+    <p class="w-lead" id="lead"></p>
+    <p class="w-rat leise" id="rat"></p>
+    <div class="status warn" id="reason" hidden></div>
+
+    <div class="w-local" id="localhead" hidden>
+      <span data-i18n="dt.warn.local"></span> <span class="pill" id="localpill"></span>
+    </div>
+    <h2 class="w-h" id="findingshead" data-i18n="dt.warn.findings"></h2>
+    <ul class="findings" id="findings"></ul>
+    <p class="w-note leise small" id="nofindings" hidden></p>
+    <p class="w-source small leise" id="source"></p>
+    <p class="w-foot small leise" data-i18n="dt.warn.footer"></p>
+  </main>
+
+  <footer class="w-actions" id="actions">
+    <button class="btn link" id="know" type="button" data-i18n="dt.btn.know" hidden></button>
+    <button class="btn link" id="retry" type="button" data-i18n="dt.btn.retry" hidden></button>
+    <span class="spacer"></span>
+    <button class="btn ghost" id="open" type="button" hidden disabled></button>
+    <button class="btn big" id="close" type="button" data-i18n="dt.btn.dontopen" autofocus></button>
+  </footer>
+
+  <footer class="w-confirm" id="confirm" hidden>
+    <div class="c-text">
+      <h2 data-i18n="dt.red.title"></h2>
+      <p class="small" data-i18n="dt.red.text"></p>
+    </div>
+    <div class="c-buttons">
+      <button class="btn danger" id="openred" type="button" disabled data-i18n="dt.red.confirm"></button>
+      <span class="spacer"></span>
+      <button class="btn big" id="cancelred" type="button" data-i18n="dt.btn.cancel"></button>
+    </div>
+  </footer>
+
+  <script src="i18n.generated.js"></script>
+  <script src="common.js"></script>
+  <script src="warning.js"></script>
+</body>
+</html>

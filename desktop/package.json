@@ -1,0 +1,13 @@
+{
+  "name": "linkwache-desktop",
+  "private": true,
+  "type": "module",
+  "description": "Build tooling of the Linkwache desktop app (Tauri CLI, string generator).",
+  "scripts": {
+    "i18n": "node scripts/i18n.mjs",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

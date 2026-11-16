@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Linkwache</title>
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="setup.css">
+</head>
+<body class="setup">
+  <header class="s-top">
+    <span class="brandline"><span data-logo></span><span data-i18n="dt.setup.title"></span></span>
+    <span class="spacer"></span>
+    <span class="leise small" id="stepno"></span>
+  </header>
+  <div class="s-dots" id="dots" aria-hidden="true"></div>
+
+  <main class="s-main">
+    <section data-step="welcome">
+      <h1 data-i18n="dt.setup.welcome.h"></h1>
+      <p class="lead leise" data-i18n="dt.setup.welcome.p"></p>
+      <h2 class="s-h" data-i18n="dt.setup.lang"></h2>
+      <div class="langs" id="langs"></div>
+    </section>
+
+    <section data-step="server" hidden>
+      <h1 data-i18n="dt.setup.server.h"></h1>
+      <p class="lead leise" data-i18n="dt.setup.server.p"></p>
+      <label class="s-label" for="server" data-i18n="dt.setup.server.label"></label>
+      <div class="row">
+        <input type="url" id="server" spellcheck="false" autocomplete="off" placeholder="https://">
+        <button class="btn ghost" id="test" type="button" data-i18n="dt.setup.server.test"></button>
+      </div>
+      <div class="status" id="serverstatus" hidden></div>
+    </section>
+
+    <section data-step="browser" hidden>
+      <h1 data-i18n="dt.setup.browser.h"></h1>
+      <p class="lead leise" data-i18n="dt.setup.browser.p"></p>
+      <div class="choices" id="browsers"></div>
+      <div class="status bad" id="nobrowser" hidden data-i18n="dt.setup.browser.none"></div>
+    </section>
+
+    <section data-step="default" hidden>
+      <h1 data-i18n="dt.setup.default.h"></h1>
+      <p class="lead leise" id="defaulttext"></p>
+      <div><button class="btn big" id="makedefault" type="button" data-i18n="dt.setup.default.btn"></button></div>
+      <div class="status" id="defaultstatus" hidden></div>
+    </section>
+
+    <section data-step="extras" hidden>
+      <h1 data-i18n="dt.setup.ext.h"></h1>
+      <p class="lead leise" data-i18n="dt.setup.ext.p"></p>
+      <div class="card opts">
+        <label class="check"><input type="checkbox" id="nm" checked><span data-i18n="dt.setup.ext.nm"></span></label>
+        <label class="check"><input type="checkbox" id="autostart" checked><span data-i18n="dt.setup.autostart"></span></label>
+      </div>
+    </section>
+
+    <section data-step="done" hidden class="done">
+      <svg class="bigok" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11"/><path d="M7 12.5l3.2 3.2L17 9"/></svg>
+      <h1 data-i18n="dt.setup.done.h"></h1>
+      <p class="lead leise" data-i18n="dt.setup.done.p"></p>
+    </section>
+  </main>
+
+  <footer class="s-nav">
+    <button class="btn ghost" id="back" type="button" data-i18n="dt.btn.back"></button>
+    <span class="spacer"></span>
+    <button class="btn big" id="next" type="button" data-i18n="dt.btn.next"></button>
+  </footer>
+  <script src="i18n.generated.js"></script>
+  <script src="common.js"></script>
+  <script src="setup.js"></script>
+</body>
+</html>

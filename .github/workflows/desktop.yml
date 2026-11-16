@@ -1,0 +1,263 @@
+# Linkwache desktop app (docs/DESKTOP.md sections 9 and 10): tests, installers for Windows,
+# macOS and Linux (x64 + arm64), end-to-end tests on the real systems with native screenshots,
+# and — for tags — the pre-release with all installers, updater artefacts, latest.json and
+# SHA256SUMS.txt. The release broker promotes the pre-release; this workflow never marks a
+# release as latest.
+name: Desktop
+
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+    paths:
+      - 'desktop/**'
+      - 'src/**'
+      - 'test/vectors/**'
+      - 'test/desktop_i18n.test.js'
+      - '.github/workflows/desktop.yml'
+  workflow_dispatch:
+    inputs:
+      release_dry_run:
+        description: 'Compose the release assets (latest.json, SHA256SUMS.txt) as an artifact only'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    name: Tests (npm + cargo)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm test
+      - name: Desktop strings bundle up to date
+        run: node desktop/scripts/i18n.mjs --check
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: desktop
+          key: core
+      - name: cargo test (core)
+        working-directory: desktop
+        run: cargo test -p linkwache-core
+
+  # Linux packages are built on Ubuntu 22.04 (glibc 2.35) so they also run on Debian 12 and
+  # Ubuntu 22.04; a 24.04 build would require glibc 2.39.
+  build:
+    name: Build + E2E (${{ matrix.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, name: windows, target: '' }
+          - { os: macos-latest, name: macos, target: universal-apple-darwin }
+          - { os: ubuntu-22.04, name: linux-x64, target: '' }
+          - { os: ubuntu-22.04-arm, name: linux-arm64, target: '' }
+    runs-on: ${{ matrix.os }}
+    env:
+      LINKWACHE_DEFAULT_SERVER: ${{ vars.LINKWACHE_DEFAULT_SERVER }}
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+      WINDOWS_SIGN_MODE: ${{ secrets.WINDOWS_SIGN_MODE }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Node packages (mock server, Tauri CLI)
+        shell: bash
+        run: |
+          npm ci
+          cd desktop && npm ci
+      - name: Linux build and test packages
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libwebkit2gtk-4.1-dev libayatana-appindicator3-dev \
+            librsvg2-dev libxdo-dev patchelf xvfb imagemagick xdg-utils dbus dbus-x11 desktop-file-utils
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.name == 'macos' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: desktop
+          key: ${{ matrix.name }}-${{ matrix.os }}
+
+      # Windows code signing (docs/DESKTOP.md "Windows code signing later"): only when the
+      # repository secret WINDOWS_SIGN_MODE is set. Tauri then signs the app binary, the NSIS
+      # installer and the MSI before it computes the updater signatures.
+      - name: Windows signing hook
+        if: runner.os == 'Windows' && env.WINDOWS_SIGN_MODE != ''
+        shell: pwsh
+        env:
+          WINDOWS_CERT_PFX: ${{ secrets.WINDOWS_CERT_PFX }}
+          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+        run: |
+          $script = Join-Path $env:GITHUB_WORKSPACE 'desktop\scripts\windows-sign.ps1'
+          $cfg = @{ bundle = @{ windows = @{ signCommand = "pwsh -NoProfile -File `"$script`" %1" } } } | ConvertTo-Json -Depth 5
+          Set-Content -Path desktop\src-tauri\tauri.sign.json -Value $cfg -Encoding utf8
+          Write-Host "Windows signing enabled (mode: $env:WINDOWS_SIGN_MODE)"
+
+      - name: Build installers
+        working-directory: desktop
+        shell: bash
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_SIGNING_ENDPOINT: ${{ secrets.AZURE_SIGNING_ENDPOINT }}
+          AZURE_SIGNING_ACCOUNT: ${{ secrets.AZURE_SIGNING_ACCOUNT }}
+          AZURE_SIGNING_PROFILE: ${{ secrets.AZURE_SIGNING_PROFILE }}
+          WINDOWS_CERT_PFX: ${{ secrets.WINDOWS_CERT_PFX }}
+          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+        run: |
+          args=()
+          [ -n "${{ matrix.target }}" ] && args+=(--target "${{ matrix.target }}")
+          [ -f src-tauri/tauri.sign.json ] && args+=(--config src-tauri/tauri.sign.json)
+          npx tauri build "${args[@]}"
+          find target -path '*release/bundle/*' -type f \( -name '*.exe' -o -name '*.msi' -o -name '*.dmg' -o -name '*.tar.gz' -o -name '*.AppImage' -o -name '*.deb' -o -name '*.rpm' -o -name '*.sig' \) -print
+
+      - name: Collect installers
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/bundles"
+          find desktop/target -path '*release/bundle/*' -type f \( -name '*.exe' -o -name '*.msi' -o -name '*.dmg' -o -name '*.app.tar.gz' -o -name '*.AppImage' -o -name '*.deb' -o -name '*.rpm' -o -name '*.sig' \) \
+            -exec cp {} "$RUNNER_TEMP/bundles/" \;
+          ls -la "$RUNNER_TEMP/bundles"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bundles-${{ matrix.name }}
+          path: ${{ runner.temp }}/bundles/*
+          if-no-files-found: error
+
+      # ── End-to-end on the real system ─────────────────────────────────────────
+      # The E2E binary is the same app with the `e2e` feature (state file + command file
+      # for the test driver); release binaries never contain it.
+      - name: E2E binary
+        working-directory: desktop
+        shell: bash
+        run: |
+          if [ "${{ matrix.name }}" = macos ]; then
+            npx tauri build --no-bundle --features e2e --target aarch64-apple-darwin
+          else
+            npx tauri build --no-bundle --features e2e
+          fi
+          cargo build --release -p fakebrowser
+
+      - name: E2E (Linux)
+        if: runner.os == 'Linux'
+        working-directory: desktop
+        run: |
+          mkdir -p "$RUNNER_TEMP/e2e-bin" "$RUNNER_TEMP/deb"
+          cp target/release/linkwache "$RUNNER_TEMP/e2e-bin/linkwache-e2e"
+          dpkg-deb -x target/release/bundle/deb/*.deb "$RUNNER_TEMP/deb"
+          dbus-run-session -- node e2e/run.mjs --app "$RUNNER_TEMP/e2e-bin/linkwache-e2e" \
+            --shipped "$RUNNER_TEMP/deb/usr/bin/linkwache" --out "$RUNNER_TEMP/e2e"
+
+      - name: E2E (macOS)
+        if: runner.os == 'macOS'
+        working-directory: desktop
+        run: |
+          LS=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
+          BUILT=target/universal-apple-darwin/release/bundle/macos/Linkwache.app
+          $LS -u "$BUILT" || true
+          mkdir -p "$RUNNER_TEMP/e2e-app"
+          cp -R "$BUILT" "$RUNNER_TEMP/e2e-app/Linkwache.app"
+          cp target/aarch64-apple-darwin/release/linkwache "$RUNNER_TEMP/e2e-app/Linkwache.app/Contents/MacOS/linkwache"
+          codesign --force --deep -s - "$RUNNER_TEMP/e2e-app/Linkwache.app"
+          sh e2e/macos/build.sh "$RUNNER_TEMP"
+          node e2e/run.mjs --app "$RUNNER_TEMP/e2e-app/Linkwache.app/Contents/MacOS/linkwache" \
+            --bundle "$RUNNER_TEMP/e2e-app/Linkwache.app" --fake "$RUNNER_TEMP/FakeBrowser.app" --out "$RUNNER_TEMP/e2e"
+
+      - name: E2E (Windows)
+        if: runner.os == 'Windows'
+        working-directory: desktop
+        shell: pwsh
+        run: |
+          $bin = Join-Path $env:RUNNER_TEMP 'e2e-bin'
+          New-Item -ItemType Directory -Force $bin | Out-Null
+          Copy-Item target\release\linkwache.exe (Join-Path $bin 'linkwache.exe')
+          # Install the real NSIS installer silently (per user, runs the --register hook).
+          $setup = Get-ChildItem target\release\bundle\nsis\*-setup.exe | Select-Object -First 1
+          Start-Process -FilePath $setup.FullName -ArgumentList '/S' -Wait
+          $installed = Join-Path $env:LOCALAPPDATA 'Linkwache\linkwache.exe'
+          if (-not (Test-Path $installed)) { Get-ChildItem (Join-Path $env:LOCALAPPDATA 'Linkwache') -ErrorAction SilentlyContinue; throw "NSIS install not found at $installed" }
+          node e2e/run.mjs --app (Join-Path $bin 'linkwache.exe') --fake target\release\fakebrowser.exe `
+            --shipped $installed --out (Join-Path $env:RUNNER_TEMP 'e2e')
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-${{ matrix.name }}
+          path: ${{ runner.temp }}/e2e
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        if: always() && runner.os == 'Linux'
+        with:
+          name: e2e-binary-${{ matrix.name }}
+          path: ${{ runner.temp }}/e2e-bin/linkwache-e2e
+
+  release:
+    name: Release assets
+    needs: [test, build]
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      DRY_RUN: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: bundles-*
+          path: dist/raw
+          merge-multiple: true
+      - name: Browser extension packages (if the extension is part of this tree)
+        run: |
+          npm ci
+          npm run build:extension --if-present
+          mkdir -p dist/raw
+          if ls extension/dist/*.zip >/dev/null 2>&1; then cp extension/dist/*.zip dist/raw/; fi
+      - name: Compose release assets
+        run: |
+          VERSION=$(node -p "require('fs').readFileSync('desktop/Cargo.toml','utf8').match(/^version = \"([^\"]+)\"/m)[1]")
+          TAG="v$VERSION"
+          if [ "$DRY_RUN" = false ] && [ "$GITHUB_REF_NAME" != "$TAG" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match the desktop version $VERSION" >&2; exit 1
+          fi
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          node desktop/scripts/release-assets.mjs --in dist/raw --out dist/release --tag "$TAG" --repo "$GITHUB_REPOSITORY"
+      - name: Dry run — upload as artifact
+        if: env.DRY_RUN == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-dry-run
+          path: dist/release
+      - name: Pre-release on GitHub (never "latest")
+        if: env.DRY_RUN == 'false'
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/release/* --clobber
+          else
+            gh release create "$TAG" dist/release/* --prerelease --latest=false --verify-tag \
+              --title "Linkwache $TAG" --notes "Desktop app, browser extension and server $TAG. Checksums: SHA256SUMS.txt."
+          fi
+          bash desktop/scripts/sha256sums.sh "$TAG"

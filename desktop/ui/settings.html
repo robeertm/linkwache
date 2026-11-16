@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Linkwache</title>
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="settings.css">
+</head>
+<body class="settings">
+  <nav class="side">
+    <div class="brandline side-brand"><span data-logo></span><span>Linkwache</span></div>
+    <button type="button" data-tab="general" data-i18n="dt.set.tab.general"></button>
+    <button type="button" data-tab="browser" data-i18n="dt.set.tab.browser"></button>
+    <button type="button" data-tab="allow" data-i18n="dt.set.tab.allow"></button>
+    <button type="button" data-tab="history" data-i18n="dt.set.tab.history"></button>
+    <button type="button" data-tab="updates" data-i18n="dt.set.tab.updates"></button>
+    <button type="button" data-tab="privacy" data-i18n="dt.set.tab.privacy"></button>
+    <span class="spacer"></span>
+    <div class="side-ver leise small" id="version"></div>
+  </nav>
+
+  <main class="pane">
+    <section data-pane="general">
+      <h1 data-i18n="dt.set.tab.general"></h1>
+      <div class="field">
+        <h2 data-i18n="dt.set.pause.h"></h2>
+        <div class="status" id="pausestatus"></div>
+        <p class="leise small" data-i18n="dt.set.pause.p"></p>
+        <div><button class="btn ghost" id="pausebtn" type="button"></button></div>
+      </div>
+      <div class="field">
+        <h2 data-i18n="dt.setup.lang"></h2>
+        <select id="lang"></select>
+      </div>
+      <div class="field">
+        <h2 data-i18n="dt.setup.server.label"></h2>
+        <div class="row">
+          <input type="url" id="server" spellcheck="false" autocomplete="off" placeholder="https://">
+          <button class="btn ghost" id="servertest" type="button" data-i18n="dt.setup.server.test"></button>
+        </div>
+        <div class="status" id="serverstatus" hidden></div>
+      </div>
+      <div class="field"><button class="btn link" id="rerun" type="button" data-i18n="dt.set.setup"></button></div>
+    </section>
+
+    <section data-pane="browser" hidden>
+      <h1 data-i18n="dt.set.tab.browser"></h1>
+      <div class="field">
+        <h2 data-i18n="dt.set.default.h"></h2>
+        <div class="status" id="defstatus"></div>
+        <div><button class="btn ghost" id="makedefault" type="button" data-i18n="dt.setup.default.btn"></button></div>
+      </div>
+      <div class="field">
+        <h2 data-i18n="dt.set.forward"></h2>
+        <div class="choices" id="browsers"></div>
+      </div>
+    </section>
+
+    <section data-pane="allow" hidden>
+      <h1 data-i18n="dt.set.tab.allow"></h1>
+      <p class="leise" data-i18n="dt.set.allow.p"></p>
+      <div class="row">
+        <input type="text" id="allowinput" spellcheck="false" autocomplete="off" data-i18n-ph="dt.set.allow.placeholder">
+        <button class="btn" id="allowadd" type="button" data-i18n="dt.btn.add"></button>
+      </div>
+      <div class="status bad" id="allowerr" hidden data-i18n="dt.set.allow.bad"></div>
+      <ul class="list" id="allowlist"></ul>
+      <p class="leise small" id="allowempty" data-i18n="dt.set.allow.empty"></p>
+      <p class="leise small" data-i18n="dt.set.allow.builtin"></p>
+    </section>
+
+    <section data-pane="history" hidden>
+      <div class="head-row"><h1 data-i18n="dt.set.tab.history"></h1><span class="spacer"></span><button class="btn ghost" id="histclear" type="button" data-i18n="dt.btn.clear"></button></div>
+      <p class="leise small" data-i18n="dt.set.hist.p"></p>
+      <div class="tablewrap card">
+        <table class="hist">
+          <thead><tr><th data-i18n="dt.set.hist.time"></th><th data-i18n="dt.set.hist.domain"></th><th data-i18n="dt.set.hist.result"></th><th data-i18n="dt.set.hist.action"></th></tr></thead>
+          <tbody id="hist"></tbody>
+        </table>
+        <p class="leise small empty" id="histempty" data-i18n="dt.set.hist.empty"></p>
+      </div>
+    </section>
+
+    <section data-pane="updates" hidden>
+      <h1 data-i18n="dt.set.tab.updates"></h1>
+      <p class="leise" id="curversion"></p>
+      <div class="status" id="updstatus"></div>
+      <div class="row-btns">
+        <button class="btn ghost" id="updcheck" type="button" data-i18n="dt.set.upd.now"></button>
+        <button class="btn" id="updinstall" type="button" data-i18n="dt.set.upd.install" hidden></button>
+      </div>
+      <label class="check"><input type="checkbox" id="updauto"><span data-i18n="dt.set.upd.auto"></span></label>
+      <div class="status warn" id="backupnote" hidden></div>
+    </section>
+
+    <section data-pane="privacy" hidden>
+      <h1 data-i18n="dt.set.tab.privacy"></h1>
+      <div class="field">
+        <h2 data-i18n="dt.set.priv.scope"></h2>
+        <label class="choice"><input type="radio" name="scope" value="url"><span><b data-i18n="dt.set.priv.url"></b><span class="leise small block" data-i18n="dt.set.priv.url.p"></span></span></label>
+        <label class="choice"><input type="radio" name="scope" value="domain"><span><b data-i18n="dt.set.priv.domain"></b><span class="leise small block" data-i18n="dt.set.priv.domain.p"></span></span></label>
+      </div>
+      <div class="field">
+        <h2 data-i18n="dt.set.priv.id"></h2>
+        <p class="leise small" data-i18n="dt.set.priv.id.p"></p>
+        <div class="row"><code class="idbox" id="installid"></code><button class="btn ghost" id="resetid" type="button" data-i18n="dt.set.priv.reset"></button></div>
+      </div>
+    </section>
+  </main>
+  <div class="toastmsg" id="saved" hidden data-i18n="dt.set.saved"></div>
+  <script src="i18n.generated.js"></script>
+  <script src="common.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

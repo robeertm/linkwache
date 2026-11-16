@@ -1,0 +1,8 @@
+[package]
+name = "fakebrowser"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "End-to-end test double for the user's real browser: records every URL it is asked to open."
+
+[dependencies]
