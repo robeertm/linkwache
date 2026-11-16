@@ -3,8 +3,9 @@
 import { normalizeInput, hostInfo, shortId } from "./util.js";
 import {
   heuristics, unwrapShortener, dnsFacts, dnsFindings, rdapFacts, rdapFindings, ctFacts,
-  safeBrowsing, urlhaus, phishtank, dbFindings, urlscanSearch, urlscanSubmit, urlscanResult,
+  safeBrowsing, urlhaus, urlhausUrl, phishtank, urlscanSearch, urlscanSubmit, urlscanResult,
 } from "./checks.js";
+import { listFindings, softenHttp, RULES } from "./lists.js";
 import { verdict } from "./verdict.js";
 
 const settle = (p) => p.then((v) => ({ ok: true, v }), (e) => ({ ok: false, e: String(e).slice(0, 120) }));
@@ -28,7 +29,7 @@ export async function runCheck(rawInput, env, { withScan = true, lite = false } 
     : await unwrapShortener(input);
   const url = finalUrl;
   const h = hostInfo(url);
-  const { findings: heur } = heuristics(url);
+  const heur = softenHttp(heuristics(url).findings, h.domain);
   if (chain.length > 1) {
     const th = hostInfo(chain[chain.length - 1]);
     heur.push({ key: "unwrapped", stufe: "info", p: { host: th.host } });
@@ -36,12 +37,13 @@ export async function runCheck(rawInput, env, { withScan = true, lite = false } 
 
   const skipped = { ok: false, e: "lite" };
   const lim = lite ? LITE_BUDGET.first : 0;
-  let [dns, rdap, ct, sb, uh, pt, us] = await Promise.all([
+  let [dns, rdap, ct, sb, uh, uhu, pt, us] = await Promise.all([
     settle(within(dnsFacts(h.host, h.domain), lim)),
     settle(within(rdapFacts(h.domain), lim)),
     lite ? skipped : settle(ctFacts(h.domain)),
     settle(within(safeBrowsing(url, env.SAFE_BROWSING_KEY), lim)),
     settle(within(urlhaus(h.host, env.URLHAUS_KEY), lim)),
+    settle(within(urlhausUrl(url, env.URLHAUS_KEY), lim)),
     settle(within(phishtank(url), lim)),
     lite ? skipped : settle(urlscanSearch(h.domain)),
   ]);
@@ -53,7 +55,7 @@ export async function runCheck(rawInput, env, { withScan = true, lite = false } 
     if (ct.ok && ct.v.ok && ct.v.count === 0 && dns.ok && dns.v.resolves) {
       all.push({ key: "ct-none", stufe: "info", p: {} });
     }
-    all.push(...dbFindings({ sb: sb.ok ? sb.v : null, uh: uh.ok ? uh.v : null, pt: pt.ok ? pt.v : null, us: us.ok ? us.v : null }));
+    all.push(...listFindings({ url, domain: h.domain, sb: sb.ok ? sb.v : null, uh: uh.ok ? uh.v : null, uhu: uhu.ok ? uhu.v : null, pt: pt.ok ? pt.v : null, us: us.ok ? us.v : null }));
     return all;
   };
   let v = verdict(assemble(), { url });
@@ -74,6 +76,7 @@ export async function runCheck(rawInput, env, { withScan = true, lite = false } 
   return {
     id: shortId(),
     version: 1,
+    rules: RULES,
     checked: new Date().toISOString(),
     input, url, chain,
     host: h,
@@ -85,6 +88,7 @@ export async function runCheck(rawInput, env, { withScan = true, lite = false } 
       ct: ct.ok ? ct.v : { error: ct.e },
       safebrowsing: sb.ok ? sb.v : { error: sb.e },
       urlhaus: uh.ok ? uh.v : { error: uh.e },
+      urlhausUrl: uhu.ok ? uhu.v : { error: uhu.e },
       phishtank: pt.ok ? pt.v : { error: pt.e },
       urlscanSearch: us.ok ? us.v : { error: us.e },
     },

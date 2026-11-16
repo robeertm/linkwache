@@ -22,11 +22,16 @@
     <string name="lw_f_dns_error" formatted="false">DNS sorgusu yapılamadı</string>
     <string name="lw_f_dns_error_t" formatted="false">Ad çözümleme yanıt vermedi — kontrolün bu kısmı eksik.</string>
     <string name="lw_f_http" formatted="false">Şifresiz (https yerine http)</string>
+    <string name="lw_f_http_k" formatted="false">Bu bilinen site şifreli sürümüne (https) yönlendiriyor – uyarı işareti değil.</string>
     <string name="lw_f_http_t" formatted="false">Bugün neredeyse her gerçek site şifrelidir. http bağlantısı ya eskidir ya da özensiz.</string>
     <string name="lw_f_idn" formatted="false">Alan adında özel karakterler</string>
     <string name="lw_f_idn_t" formatted="false">Ad, Latin harflerine benzeyen karakterler içeriyor ({host}). „paypal“dan büyük i ile „paypaI“ böyle yapılır.</string>
     <string name="lw_f_ip_host" formatted="false">Alan adı yerine çıplak IP adresi</string>
     <string name="lw_f_ip_host_t" formatted="false">Ciddi sağlayıcılar adlarına bağlantı verir, sayısal adrese değil.</string>
+    <string name="lw_f_list_host" formatted="false">{list} bu ad altında başka sayfaları listeliyor</string>
+    <string name="lw_f_list_host_t" formatted="false">Bu ad altındaki tek tek sayfalar bildirilmiş, tam olarak bu bağlantı değil. Çok bilinen sitelerde bu normaldir (başkalarının içerikleri de orada bulunur); aksi halde dikkatli ol.</string>
+    <string name="lw_f_list_known" formatted="false">{list} içinde eski kayıt</string>
+    <string name="lw_f_list_known_t" formatted="false">{list} bu çok bilinen sitenin ana sayfasını listeliyor. Bu tür kayıtlar eski ya da hatalıdır – Linkwache bunları uyarı işareti saymaz.</string>
     <string name="lw_f_long" formatted="false">Çok uzun bağlantı</string>
     <string name="lw_f_long_t" formatted="false">Uzun dizeler çoğu zaman tam olarak seni tanıyan bir kimlik içerir.</string>
     <string name="lw_f_lure" formatted="false">Bağlantıda yem sözcükler: {words}</string>
@@ -53,6 +58,8 @@
     <string name="lw_f_unwrapped" formatted="false">Kısa bağlantı {host} adresine gidiyor</string>
     <string name="lw_f_unwrapped_t" formatted="false">Hedef açılmadan çözüldü. Değerlendirilen hedeftir.</string>
     <string name="lw_f_urlhaus" formatted="false">URLhaus’ta zararlı yazılım dağıtıcısı olarak listelenmiş</string>
+    <string name="lw_f_urlhaus_url" formatted="false">URLhaus’ta zararlı yazılım adresi olarak listelenmiş</string>
+    <string name="lw_f_urlhaus_url_t" formatted="false">URLhaus’a göre tam olarak bu adres zararlı yazılım dağıtıyor.</string>
     <string name="lw_f_urlhaus_t" formatted="false">Bu sunucu altında {n} bildirilmiş adres.</string>
     <string name="lw_f_urlscan_verdict" formatted="false">Sandbox sayfayı zararlı olarak değerlendiriyor</string>
     <string name="lw_f_urlscan_verdict_b" formatted="false">Taklit ettiği: {brands}</string>

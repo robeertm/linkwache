@@ -22,11 +22,16 @@
     <string name="lw_f_dns_error" formatted="false">DNS lookup unavailable</string>
     <string name="lw_f_dns_error_t" formatted="false">Name resolution didn’t answer — this part of the check is missing.</string>
     <string name="lw_f_http" formatted="false">Unencrypted (http instead of https)</string>
+    <string name="lw_f_http_k" formatted="false">This well-known site forwards to its encrypted version (https) – not a warning sign.</string>
     <string name="lw_f_http_t" formatted="false">Almost every real site is encrypted today. An http link is either old or careless.</string>
     <string name="lw_f_idn" formatted="false">Special characters in the domain name</string>
     <string name="lw_f_idn_t" formatted="false">The name contains characters that look like Latin letters ({host}). That’s how “paypaI” with a capital i is made from “paypal”.</string>
     <string name="lw_f_ip_host" formatted="false">Bare IP address instead of a domain name</string>
     <string name="lw_f_ip_host_t" formatted="false">Serious providers link to their name, not to a numeric address.</string>
+    <string name="lw_f_list_host" formatted="false">{list} names other pages under this name</string>
+    <string name="lw_f_list_host_t" formatted="false">Single pages under this name were reported, not exactly this link. On very well-known sites that is normal (they also host other people’s content); otherwise better be careful.</string>
+    <string name="lw_f_list_known" formatted="false">Outdated entry at {list}</string>
+    <string name="lw_f_list_known_t" formatted="false">{list} names the start page of this very well-known site. Such entries are old or wrong – Linkwache does not count them as a warning sign.</string>
     <string name="lw_f_long" formatted="false">Very long link</string>
     <string name="lw_f_long_t" formatted="false">Long strings often contain an ID that identifies exactly you.</string>
     <string name="lw_f_lure" formatted="false">Bait words in the link: {words}</string>
@@ -53,6 +58,8 @@
     <string name="lw_f_unwrapped" formatted="false">Short link leads to {host}</string>
     <string name="lw_f_unwrapped_t" formatted="false">Resolved without opening the target. The target is what gets judged.</string>
     <string name="lw_f_urlhaus" formatted="false">Listed at URLhaus as a malware distributor</string>
+    <string name="lw_f_urlhaus_url" formatted="false">Listed at URLhaus as a malware address</string>
+    <string name="lw_f_urlhaus_url_t" formatted="false">According to URLhaus, exactly this address spreads malware.</string>
     <string name="lw_f_urlhaus_t" formatted="false">{n} reported address(es) under this host.</string>
     <string name="lw_f_urlscan_verdict" formatted="false">The sandbox rates this page as malicious</string>
     <string name="lw_f_urlscan_verdict_b" formatted="false">It imitates: {brands}</string>

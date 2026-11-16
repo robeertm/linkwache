@@ -5,6 +5,7 @@ import { runCheck } from "./check.js";
 import { normalizeInput, sha256hex } from "./util.js";
 import { pickLang, t, findingText, verdictText } from "./i18n.js";
 import { VERSION } from "./version.js";
+import { RULES } from "./lists.js";
 
 const CACHE_MS = 10 * 60 * 1000;
 const CACHE_MAX = 500;
@@ -68,13 +69,14 @@ export async function apiV1Check(req, env, ctx, lang) {
   if (!url) return json({ error: "err.nolink", message: t(lang, "err.nolink") }, 400);
 
   const now = Date.now();
-  let hit = cache.get(url);
-  if (hit && now - hit.at > CACHE_MS) { cache.delete(url); hit = null; }
+  const key = RULES + "|" + url; // cached results of older rules are never reused
+  let hit = cache.get(key);
+  if (hit && now - hit.at > CACHE_MS) { cache.delete(key); hit = null; }
   let r = hit?.r;
   if (!r) {
     r = await runCheck(url, env, { lite: true });
     if (r.error) return json({ error: r.error, message: t(lang, r.error) }, 400);
-    cache.set(url, { at: now, r });
+    cache.set(key, { at: now, r });
     if (cache.size > CACHE_MAX) for (const k of cache.keys()) { cache.delete(k); if (cache.size <= CACHE_MAX * 0.9) break; }
   }
   return json(shape(r, lang));
@@ -96,5 +98,6 @@ function shape(r, lang) {
     cacheTtl: TTL[v.stufe] || 86400,
     checked: r.checked,
     server: VERSION,
+    rules: RULES,
   };
 }

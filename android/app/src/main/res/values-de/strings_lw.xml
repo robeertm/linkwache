@@ -22,11 +22,16 @@
     <string name="lw_f_dns_error" formatted="false">DNS-Auskunft nicht erreichbar</string>
     <string name="lw_f_dns_error_t" formatted="false">Die Namensauflösung hat nicht geantwortet — dieser Teil der Prüfung fehlt.</string>
     <string name="lw_f_http" formatted="false">Unverschlüsselt (http statt https)</string>
+    <string name="lw_f_http_k" formatted="false">Diese bekannte Seite leitet auf die verschlüsselte Fassung (https) weiter – kein Warnzeichen.</string>
     <string name="lw_f_http_t" formatted="false">Fast jede echte Seite ist heute verschlüsselt. Ein http-Link ist entweder alt oder nachlässig.</string>
     <string name="lw_f_idn" formatted="false">Sonderzeichen im Domainnamen</string>
     <string name="lw_f_idn_t" formatted="false">Der Name enthält Zeichen, die wie lateinische Buchstaben aussehen ({host}). So wird z. B. „paypaI“ mit großem i aus „paypal“.</string>
     <string name="lw_f_ip_host" formatted="false">Nackte IP-Adresse statt Domainname</string>
     <string name="lw_f_ip_host_t" formatted="false">Seriöse Anbieter verlinken auf ihren Namen, nicht auf eine Zahlenadresse.</string>
+    <string name="lw_f_list_host" formatted="false">{list} nennt andere Seiten unter diesem Namen</string>
+    <string name="lw_f_list_host_t" formatted="false">Gemeldet sind einzelne Seiten unter diesem Namen, nicht genau dieser Link. Bei sehr bekannten Seiten ist das normal (dort liegen auch fremde Inhalte), sonst lieber vorsichtig sein.</string>
+    <string name="lw_f_list_known" formatted="false">Veralteter Eintrag bei {list}</string>
+    <string name="lw_f_list_known_t" formatted="false">{list} nennt die Startseite dieser sehr bekannten Seite. Solche Einträge sind alt oder falsch – die Linkwache wertet sie nicht als Warnzeichen.</string>
     <string name="lw_f_long" formatted="false">Sehr langer Link</string>
     <string name="lw_f_long_t" formatted="false">Lange Zeichenketten enthalten oft eine Kennung, die genau dich wiedererkennt.</string>
     <string name="lw_f_lure" formatted="false">Köderwörter im Link: {words}</string>
@@ -53,6 +58,8 @@
     <string name="lw_f_unwrapped" formatted="false">Kurzlink führt zu {host}</string>
     <string name="lw_f_unwrapped_t" formatted="false">Aufgelöst, ohne das Ziel zu öffnen. Beurteilt wird das Ziel.</string>
     <string name="lw_f_urlhaus" formatted="false">Bei URLhaus als Schadsoftware-Verteiler gelistet</string>
+    <string name="lw_f_urlhaus_url" formatted="false">Bei URLhaus als Schadsoftware-Adresse gelistet</string>
+    <string name="lw_f_urlhaus_url_t" formatted="false">Genau diese Adresse verteilt laut URLhaus Schadsoftware.</string>
     <string name="lw_f_urlhaus_t" formatted="false">{n} gemeldete Adresse(n) unter diesem Host.</string>
     <string name="lw_f_urlscan_verdict" formatted="false">Die Sandbox stuft die Seite als bösartig ein</string>
     <string name="lw_f_urlscan_verdict_b" formatted="false">Sie ahmt nach: {brands}</string>

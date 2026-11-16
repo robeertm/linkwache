@@ -22,11 +22,16 @@
     <string name="lw_f_dns_error" formatted="false">Interrogazione DNS non disponibile</string>
     <string name="lw_f_dns_error_t" formatted="false">La risoluzione dei nomi non ha risposto — manca questa parte del controllo.</string>
     <string name="lw_f_http" formatted="false">Non cifrato (http invece di https)</string>
+    <string name="lw_f_http_k" formatted="false">Questo sito noto reindirizza alla sua versione cifrata (https) – non è un segnale d’allarme.</string>
     <string name="lw_f_http_t" formatted="false">Quasi ogni sito vero oggi è cifrato. Un link http è vecchio o trascurato.</string>
     <string name="lw_f_idn" formatted="false">Caratteri speciali nel nome di dominio</string>
     <string name="lw_f_idn_t" formatted="false">Il nome contiene caratteri che sembrano lettere latine ({host}). Così da «paypal» nasce «paypaI» con la i maiuscola.</string>
     <string name="lw_f_ip_host" formatted="false">Indirizzo IP nudo invece di un nome di dominio</string>
     <string name="lw_f_ip_host_t" formatted="false">I fornitori seri rimandano al loro nome, non a un indirizzo numerico.</string>
+    <string name="lw_f_list_host" formatted="false">{list} indica altre pagine sotto questo nome</string>
+    <string name="lw_f_list_host_t" formatted="false">Sono state segnalate singole pagine sotto questo nome, non esattamente questo link. Sui siti molto noti è normale (ospitano anche contenuti altrui); altrimenti meglio fare attenzione.</string>
+    <string name="lw_f_list_known" formatted="false">Voce obsoleta in {list}</string>
+    <string name="lw_f_list_known_t" formatted="false">{list} indica la pagina iniziale di questo sito molto noto. Voci del genere sono vecchie o sbagliate – Linkwache non le considera un segnale d’allarme.</string>
     <string name="lw_f_long" formatted="false">Link molto lungo</string>
     <string name="lw_f_long_t" formatted="false">Le stringhe lunghe contengono spesso un identificativo che riconosce proprio te.</string>
     <string name="lw_f_lure" formatted="false">Parole esca nel link: {words}</string>
@@ -53,6 +58,8 @@
     <string name="lw_f_unwrapped" formatted="false">Il link breve porta a {host}</string>
     <string name="lw_f_unwrapped_t" formatted="false">Risolto senza aprire la destinazione. Viene valutata la destinazione.</string>
     <string name="lw_f_urlhaus" formatted="false">In lista su URLhaus come distributore di malware</string>
+    <string name="lw_f_urlhaus_url" formatted="false">Elencato in URLhaus come indirizzo di malware</string>
+    <string name="lw_f_urlhaus_url_t" formatted="false">Secondo URLhaus, esattamente questo indirizzo diffonde malware.</string>
     <string name="lw_f_urlhaus_t" formatted="false">{n} indirizzo/i segnalato/i sotto questo host.</string>
     <string name="lw_f_urlscan_verdict" formatted="false">La sandbox giudica la pagina dannosa</string>
     <string name="lw_f_urlscan_verdict_b" formatted="false">Imita: {brands}</string>

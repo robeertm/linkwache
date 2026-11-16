@@ -2,13 +2,22 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
-## Unreleased
+## 0.5.3 — 2026-11-16
 
-### Fixed
+### Fixed — server
+- False alarm on real sites: a fraud list now makes a link red only when it names exactly this URL (scheme ignored,
+  host lower case, path and query as reported). PhishTank still lists the plain start page of a large payment
+  provider from 2016 as a verified phish, and that entry turned every check of the site red. Start pages of
+  well-known sites (popularity list plus banks, payment, parcel and public services) listed in a fraud list are now
+  an informational "outdated entry"; phishing pages hosted on big platforms stay red because they are exact URLs.
+- URLhaus is asked for the exact URL as well; its host lookup and urlscan.io verdicts for other pages of the same
+  domain are a hint (amber, on well-known sites info), never red on their own.
+- `http://` links to well-known sites are an informational hint instead of amber.
+- Results carry a rules version (`rules` in `/api/v1/check` and `/api/health`); the server cache never reuses results
+  of older rules.
 - Download page: the release date is shown in the reader's language (for example `16. Nov. 2026`, `Nov 16, 2026`)
   instead of ISO, in the version line and on every package card, in all 8 languages (`Intl`, UTC so the day never
-  shifts). Server and page only; the apps are unchanged. Not released on its own because a tag would rebuild and
-  republish every app package; it ships with the next Linkwache release.
+  shifts).
 
 ## 0.5.2 — 2026-11-16
 

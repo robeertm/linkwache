@@ -22,11 +22,16 @@
     <string name="lw_f_dns_error" formatted="false">Zapytanie DNS niedostępne</string>
     <string name="lw_f_dns_error_t" formatted="false">Rozwiązywanie nazw nie odpowiedziało — tej części sprawdzenia brakuje.</string>
     <string name="lw_f_http" formatted="false">Bez szyfrowania (http zamiast https)</string>
+    <string name="lw_f_http_k" formatted="false">Ta znana witryna przekierowuje na wersję szyfrowaną (https) – to nie sygnał ostrzegawczy.</string>
     <string name="lw_f_http_t" formatted="false">Prawie każda prawdziwa strona jest dziś szyfrowana. Link http jest stary albo niedbały.</string>
     <string name="lw_f_idn" formatted="false">Znaki specjalne w nazwie domeny</string>
     <string name="lw_f_idn_t" formatted="false">Nazwa zawiera znaki wyglądające jak litery łacińskie ({host}). Tak z „paypal“ powstaje „paypaI“ z dużym i.</string>
     <string name="lw_f_ip_host" formatted="false">Goły adres IP zamiast nazwy domeny</string>
     <string name="lw_f_ip_host_t" formatted="false">Poważni dostawcy linkują do swojej nazwy, nie do adresu liczbowego.</string>
+    <string name="lw_f_list_host" formatted="false">{list} wymienia inne strony pod tą nazwą</string>
+    <string name="lw_f_list_host_t" formatted="false">Zgłoszono pojedyncze strony pod tą nazwą, a nie dokładnie ten link. Na bardzo znanych witrynach to normalne (są tam też cudze treści); w innym razie lepiej uważaj.</string>
+    <string name="lw_f_list_known" formatted="false">Nieaktualny wpis w {list}</string>
+    <string name="lw_f_list_known_t" formatted="false">{list} wymienia stronę główną tej bardzo znanej witryny. Takie wpisy są stare lub błędne – Linkwache nie traktuje ich jako sygnału ostrzegawczego.</string>
     <string name="lw_f_long" formatted="false">Bardzo długi link</string>
     <string name="lw_f_long_t" formatted="false">Długie ciągi często zawierają identyfikator rozpoznający dokładnie Ciebie.</string>
     <string name="lw_f_lure" formatted="false">Słowa-przynęty w linku: {words}</string>
@@ -53,6 +58,8 @@
     <string name="lw_f_unwrapped" formatted="false">Skrócony link prowadzi do {host}</string>
     <string name="lw_f_unwrapped_t" formatted="false">Rozwinięty bez otwierania celu. Oceniany jest cel.</string>
     <string name="lw_f_urlhaus" formatted="false">Na liście URLhaus jako dystrybutor złośliwego oprogramowania</string>
+    <string name="lw_f_urlhaus_url" formatted="false">Wymieniony w URLhaus jako adres złośliwego oprogramowania</string>
+    <string name="lw_f_urlhaus_url_t" formatted="false">Według URLhaus dokładnie ten adres rozsyła złośliwe oprogramowanie.</string>
     <string name="lw_f_urlhaus_t" formatted="false">{n} zgłoszonych adresów pod tym hostem.</string>
     <string name="lw_f_urlscan_verdict" formatted="false">Sandbox ocenia stronę jako złośliwą</string>
     <string name="lw_f_urlscan_verdict_b" formatted="false">Podszywa się pod: {brands}</string>

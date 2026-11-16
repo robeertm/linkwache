@@ -13,6 +13,7 @@ import { extractUrls, sha256hex, esc } from "./util.js";
 import { pickLang, t, verdictText } from "./i18n.js";
 import { VERSION } from "./version.js";
 import { apiV1Check } from "./api_v1.js";
+import { RULES } from "./lists.js";
 
 const TTL = 90 * 86400;
 
@@ -33,7 +34,7 @@ export default {
       if (p === "/download" || p === "/download/" || p === "/download.html") return html(downloadPage(lang, env, { ua: req.headers.get("user-agent") || "", os: url.searchParams.get("os") || "" }), 200, lang, "user-agent");
       if (p === "/share") return share(url);
       if (p === "/telegram" && req.method === "POST") return handleTelegram(req, env, ctx, { runCheck, resultText });
-      if (p === "/api/health") return json({ ok: true, version: VERSION, api: [1], name: env.SITE_NAME, paypal: paypalLink(env), scan: !!env.URLSCAN_KEY, sb: !!env.SAFE_BROWSING_KEY, telegram: !!env.TELEGRAM_TOKEN, ...(env.UPDATE_INFO?.latest ? { update: env.UPDATE_INFO.latest } : {}) });
+      if (p === "/api/health") return json({ ok: true, version: VERSION, api: [1], rules: RULES, name: env.SITE_NAME, paypal: paypalLink(env), scan: !!env.URLSCAN_KEY, sb: !!env.SAFE_BROWSING_KEY, telegram: !!env.TELEGRAM_TOKEN, ...(env.UPDATE_INFO?.latest ? { update: env.UPDATE_INFO.latest } : {}) });
     } catch (e) {
       console.error("Fehler", p, String(e).slice(0, 300));      // Details nur ins Log, nicht nach außen
       return json({ error: "Interner Fehler" }, 500);

@@ -109,6 +109,9 @@ S.de = {
   "f.phishtank": "Bei PhishTank als Phishing gemeldet", "f.phishtank.t.v": "Von Freiwilligen bestätigt.", "f.phishtank.t.u": "Gemeldet, noch nicht bestätigt.",
   "f.urlscan-verdict": "Die Sandbox stuft die Seite als bösartig ein", "f.urlscan-verdict.t": "Automatische Einstufung von urlscan.io.", "f.urlscan-verdict.b": "Sie ahmt nach: {brands}",
   "f.db-clean": "In {n} Betrugsdatenbank(en) nicht gelistet", "f.db-clean.t": "Das ist kein Freispruch: neue Betrugsseiten stehen die ersten Stunden nirgends.",
+  "f.list-known": "Veralteter Eintrag bei {list}", "f.list-known.t": "{list} nennt die Startseite dieser sehr bekannten Seite. Solche Einträge sind alt oder falsch – die Linkwache wertet sie nicht als Warnzeichen.",
+  "f.list-host": "{list} nennt andere Seiten unter diesem Namen", "f.list-host.t": "Gemeldet sind einzelne Seiten unter diesem Namen, nicht genau dieser Link. Bei sehr bekannten Seiten ist das normal (dort liegen auch fremde Inhalte), sonst lieber vorsichtig sein.",
+  "f.urlhaus-url": "Bei URLhaus als Schadsoftware-Adresse gelistet", "f.urlhaus-url.t": "Genau diese Adresse verteilt laut URLhaus Schadsoftware.", "f.http.k": "Diese bekannte Seite leitet auf die verschlüsselte Fassung (https) weiter – kein Warnzeichen.",
   "tg.start": "Hallo! Schick mir einen verdächtigen Link — oder leite mir die Nachricht weiter, in der er steckt. Ich prüfe ihn, ohne ihn zu öffnen, und sage dir in einfachen Worten, was dran ist.\n\nIch speichere keine Namen und keine Nummern, nur den geprüften Link.",
   "tg.nolink": "Ich habe in der Nachricht keinen Link gefunden. Schick mir den Link selbst oder leite die Nachricht weiter, in der er steht.",
   "tg.wait1": "Einen Moment, ich prüfe den Link …", "tg.waitn": "Einen Moment, ich prüfe {n} Links …", "tg.fail": "Die Prüfung ist fehlgeschlagen: {e}",
@@ -211,6 +214,9 @@ S.en = {
   "f.phishtank": "Reported to PhishTank as phishing", "f.phishtank.t.v": "Confirmed by volunteers.", "f.phishtank.t.u": "Reported, not yet confirmed.",
   "f.urlscan-verdict": "The sandbox rates this page as malicious", "f.urlscan-verdict.t": "Automatic rating by urlscan.io.", "f.urlscan-verdict.b": "It imitates: {brands}",
   "f.db-clean": "Not listed in {n} fraud database(s)", "f.db-clean.t": "That is not an acquittal: new scam sites aren’t listed anywhere for the first hours.",
+  "f.list-known": "Outdated entry at {list}", "f.list-known.t": "{list} names the start page of this very well-known site. Such entries are old or wrong – Linkwache does not count them as a warning sign.",
+  "f.list-host": "{list} names other pages under this name", "f.list-host.t": "Single pages under this name were reported, not exactly this link. On very well-known sites that is normal (they also host other people’s content); otherwise better be careful.",
+  "f.urlhaus-url": "Listed at URLhaus as a malware address", "f.urlhaus-url.t": "According to URLhaus, exactly this address spreads malware.", "f.http.k": "This well-known site forwards to its encrypted version (https) – not a warning sign.",
   "tg.start": "Hi! Send me a suspicious link — or forward me the message it’s in. I check it without opening it and tell you in plain words what’s going on.\n\nI store no names and no numbers, only the checked link.",
   "tg.nolink": "I couldn’t find a link in that message. Send me the link itself or forward the message it’s in.",
   "tg.wait1": "One moment, checking the link …", "tg.waitn": "One moment, checking {n} links …", "tg.fail": "The check failed: {e}",
@@ -246,6 +252,7 @@ export function findingText(lang, f) {
   if (f.key === "phishtank") text = t(lang, f.p?.verified ? "f.phishtank.t.v" : "f.phishtank.t.u");
   else if (f.key === "urlscan-verdict") text = f.p?.brands ? t(lang, "f.urlscan-verdict.b", f.p) : t(lang, "f.urlscan-verdict.t");
   else if (f.key === "age-fresh") text = t(lang, "f.age-fresh.t");
+  else if (f.key === "http" && f.p?.known) text = t(lang, "f.http.k");
   else text = t(lang, k + ".t", f.p || {});
   let titel;
   if (f.key === "age-fresh") titel = t(lang, "f.age-fresh", { age: f.p.days === 0 ? t(lang, "age.hours") : t(lang, "age.days", { n: f.p.days }) });

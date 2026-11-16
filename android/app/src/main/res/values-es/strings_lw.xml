@@ -22,11 +22,16 @@
     <string name="lw_f_dns_error" formatted="false">Consulta DNS no disponible</string>
     <string name="lw_f_dns_error_t" formatted="false">La resolución de nombres no respondió — falta esta parte de la comprobación.</string>
     <string name="lw_f_http" formatted="false">Sin cifrar (http en lugar de https)</string>
+    <string name="lw_f_http_k" formatted="false">Este sitio conocido redirige a su versión cifrada (https) – no es una señal de alarma.</string>
     <string name="lw_f_http_t" formatted="false">Casi toda web real está cifrada hoy. Un enlace http es viejo o descuidado.</string>
     <string name="lw_f_idn" formatted="false">Caracteres especiales en el nombre de dominio</string>
     <string name="lw_f_idn_t" formatted="false">El nombre contiene caracteres que parecen letras latinas ({host}). Así «paypal» se convierte en «paypaI» con i mayúscula.</string>
     <string name="lw_f_ip_host" formatted="false">Dirección IP desnuda en lugar de un nombre de dominio</string>
     <string name="lw_f_ip_host_t" formatted="false">Los proveedores serios enlazan a su nombre, no a una dirección numérica.</string>
+    <string name="lw_f_list_host" formatted="false">{list} cita otras páginas bajo este nombre</string>
+    <string name="lw_f_list_host_t" formatted="false">Se denunciaron páginas sueltas bajo este nombre, no exactamente este enlace. En sitios muy conocidos es normal (también alojan contenido ajeno); si no, mejor ten cuidado.</string>
+    <string name="lw_f_list_known" formatted="false">Entrada obsoleta en {list}</string>
+    <string name="lw_f_list_known_t" formatted="false">{list} cita la página principal de este sitio muy conocido. Esas entradas son antiguas o erróneas – Linkwache no las cuenta como señal de alarma.</string>
     <string name="lw_f_long" formatted="false">Enlace muy largo</string>
     <string name="lw_f_long_t" formatted="false">Las cadenas largas suelen llevar un identificador que te reconoce exactamente a ti.</string>
     <string name="lw_f_lure" formatted="false">Palabras cebo en el enlace: {words}</string>
@@ -53,6 +58,8 @@
     <string name="lw_f_unwrapped" formatted="false">El enlace corto lleva a {host}</string>
     <string name="lw_f_unwrapped_t" formatted="false">Resuelto sin abrir el destino. Se valora el destino.</string>
     <string name="lw_f_urlhaus" formatted="false">Listado en URLhaus como distribuidor de malware</string>
+    <string name="lw_f_urlhaus_url" formatted="false">Listado en URLhaus como dirección de malware</string>
+    <string name="lw_f_urlhaus_url_t" formatted="false">Según URLhaus, exactamente esta dirección distribuye malware.</string>
     <string name="lw_f_urlhaus_t" formatted="false">{n} dirección(es) denunciadas bajo este host.</string>
     <string name="lw_f_urlscan_verdict" formatted="false">El sandbox califica la página como maliciosa</string>
     <string name="lw_f_urlscan_verdict_b" formatted="false">Imita a: {brands}</string>

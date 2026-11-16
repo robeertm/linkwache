@@ -232,7 +232,17 @@ export async function phishtank(url) {
   if (!r.ok) return { ok: false, status: r.status };
   const j = await r.json();
   const res = j.results || {};
-  return { ok: true, listed: !!res.in_database, valid: !!res.valid, verified: !!res.verified };
+  return { ok: true, listed: !!res.in_database, valid: !!res.valid, verified: !!res.verified, url: typeof res.url === "string" ? res.url : "" };
+}
+
+/** URLhaus — exactly this URL (the host lookup above also counts other URLs under the host). */
+export async function urlhausUrl(url, key) {
+  const headers = { "content-type": "application/x-www-form-urlencoded" };
+  if (key) headers["Auth-Key"] = key;
+  const r = await fetchTimeout("https://urlhaus-api.abuse.ch/v1/url/", { method: "POST", headers, body: "url=" + encodeURIComponent(url) }, 6000);
+  if (!r.ok) return { ok: false, status: r.status };
+  const j = await r.json();
+  return { ok: true, listed: j.query_status === "ok", status: j.url_status || "" };
 }
 
 export function dbFindings({ sb, uh, pt, us }) {

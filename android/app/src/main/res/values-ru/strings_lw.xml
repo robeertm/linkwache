@@ -22,11 +22,16 @@
     <string name="lw_f_dns_error" formatted="false">DNS-запрос недоступен</string>
     <string name="lw_f_dns_error_t" formatted="false">Разрешение имён не ответило — этой части проверки нет.</string>
     <string name="lw_f_http" formatted="false">Без шифрования (http вместо https)</string>
+    <string name="lw_f_http_k" formatted="false">Этот известный сайт перенаправляет на зашифрованную версию (https) – это не тревожный признак.</string>
     <string name="lw_f_http_t" formatted="false">Почти каждый настоящий сайт сегодня зашифрован. Ссылка http — либо старая, либо небрежная.</string>
     <string name="lw_f_idn" formatted="false">Специальные символы в доменном имени</string>
     <string name="lw_f_idn_t" formatted="false">Имя содержит символы, похожие на латинские буквы ({host}). Так из «paypal» получается «paypaI» с большой i.</string>
     <string name="lw_f_ip_host" formatted="false">Голый IP-адрес вместо доменного имени</string>
     <string name="lw_f_ip_host_t" formatted="false">Серьёзные компании ссылаются на своё имя, а не на числовой адрес.</string>
+    <string name="lw_f_list_host" formatted="false">{list} указывает другие страницы под этим именем</string>
+    <string name="lw_f_list_host_t" formatted="false">Сообщалось об отдельных страницах под этим именем, а не именно об этой ссылке. Для очень известных сайтов это нормально (там есть и чужой контент); иначе лучше быть осторожнее.</string>
+    <string name="lw_f_list_known" formatted="false">Устаревшая запись в {list}</string>
+    <string name="lw_f_list_known_t" formatted="false">{list} указывает главную страницу этого очень известного сайта. Такие записи устарели или ошибочны – Linkwache не считает их тревожным признаком.</string>
     <string name="lw_f_long" formatted="false">Очень длинная ссылка</string>
     <string name="lw_f_long_t" formatted="false">Длинные строки часто содержат идентификатор, узнающий именно вас.</string>
     <string name="lw_f_lure" formatted="false">Слова-приманки в ссылке: {words}</string>
@@ -53,6 +58,8 @@
     <string name="lw_f_unwrapped" formatted="false">Короткая ссылка ведёт на {host}</string>
     <string name="lw_f_unwrapped_t" formatted="false">Раскрыта без открытия цели. Оценивается цель.</string>
     <string name="lw_f_urlhaus" formatted="false">В списке URLhaus как распространитель вредоносного ПО</string>
+    <string name="lw_f_urlhaus_url" formatted="false">Указан в URLhaus как адрес вредоносной программы</string>
+    <string name="lw_f_urlhaus_url_t" formatted="false">По данным URLhaus, именно этот адрес распространяет вредоносные программы.</string>
     <string name="lw_f_urlhaus_t" formatted="false">{n} заявленных адресов на этом хосте.</string>
     <string name="lw_f_urlscan_verdict" formatted="false">Песочница считает страницу вредоносной</string>
     <string name="lw_f_urlscan_verdict_b" formatted="false">Подделывает: {brands}</string>

@@ -22,11 +22,16 @@
     <string name="lw_f_dns_error" formatted="false">Requête DNS indisponible</string>
     <string name="lw_f_dns_error_t" formatted="false">La résolution de noms n’a pas répondu — cette partie de la vérification manque.</string>
     <string name="lw_f_http" formatted="false">Non chiffré (http au lieu de https)</string>
+    <string name="lw_f_http_k" formatted="false">Ce site connu redirige vers sa version chiffrée (https) – pas un signe d’alerte.</string>
     <string name="lw_f_http_t" formatted="false">Presque tout site réel est chiffré aujourd’hui. Un lien http est ancien ou négligé.</string>
     <string name="lw_f_idn" formatted="false">Caractères spéciaux dans le nom de domaine</string>
     <string name="lw_f_idn_t" formatted="false">Le nom contient des caractères qui ressemblent à des lettres latines ({host}). C’est ainsi que « paypal » devient « paypaI » avec un i majuscule.</string>
     <string name="lw_f_ip_host" formatted="false">Adresse IP brute au lieu d’un nom de domaine</string>
     <string name="lw_f_ip_host_t" formatted="false">Les prestataires sérieux renvoient vers leur nom, pas vers une adresse chiffrée.</string>
+    <string name="lw_f_list_host" formatted="false">{list} cite d’autres pages sous ce nom</string>
+    <string name="lw_f_list_host_t" formatted="false">Des pages isolées sous ce nom ont été signalées, pas exactement ce lien. Sur les sites très connus, c’est normal (ils hébergent aussi le contenu d’autres personnes) ; sinon, mieux vaut rester prudent.</string>
+    <string name="lw_f_list_known" formatted="false">Entrée obsolète chez {list}</string>
+    <string name="lw_f_list_known_t" formatted="false">{list} cite la page d’accueil de ce site très connu. De telles entrées sont anciennes ou erronées – Linkwache ne les compte pas comme signe d’alerte.</string>
     <string name="lw_f_long" formatted="false">Lien très long</string>
     <string name="lw_f_long_t" formatted="false">Les longues chaînes contiennent souvent un identifiant qui vous reconnaît, vous précisément.</string>
     <string name="lw_f_lure" formatted="false">Mots-appâts dans le lien : {words}</string>
@@ -53,6 +58,8 @@
     <string name="lw_f_unwrapped" formatted="false">Le lien court mène à {host}</string>
     <string name="lw_f_unwrapped_t" formatted="false">Résolu sans ouvrir la cible. C’est la cible qui est évaluée.</string>
     <string name="lw_f_urlhaus" formatted="false">Listé chez URLhaus comme diffuseur de logiciels malveillants</string>
+    <string name="lw_f_urlhaus_url" formatted="false">Listé chez URLhaus comme adresse de logiciel malveillant</string>
+    <string name="lw_f_urlhaus_url_t" formatted="false">Selon URLhaus, exactement cette adresse diffuse des logiciels malveillants.</string>
     <string name="lw_f_urlhaus_t" formatted="false">{n} adresse(s) signalée(s) sous cet hôte.</string>
     <string name="lw_f_urlscan_verdict" formatted="false">Le bac à sable juge la page malveillante</string>
     <string name="lw_f_urlscan_verdict_b" formatted="false">Elle imite : {brands}</string>
