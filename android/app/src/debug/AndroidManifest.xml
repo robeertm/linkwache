@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug builds only: configuration hook for the emulator tests and a gallery of all sheet
+     states for screenshots. Neither exists in the release APK. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <application>
+        <receiver
+            android:name=".DebugConfigReceiver"
+            android:exported="true"
+            tools:ignore="ExportedReceiver" />
+        <activity
+            android:name=".DemoActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Linkwache" />
+    </application>
+</manifest>

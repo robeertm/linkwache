@@ -1,0 +1,116 @@
+name: Android
+
+# Tests, lint, debug + unsigned release build, emulator end-to-end test and screenshots.
+# The release APK is signed outside CI on the maintainer's build host
+# (android/scripts/sign-release.sh); the signing key never reaches GitHub.
+on:
+  push:
+    branches: [main, "auftrag/**"]
+    tags: ["v*"]
+    paths: ["android/**", ".github/workflows/android.yml", "src/i18n.js", "test/vectors/**", "package.json"]
+  pull_request:
+    paths: ["android/**", ".github/workflows/android.yml", "src/i18n.js", "test/vectors/**", "package.json"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Version
+        id: v
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: String resources are generated from the sources
+        run: node android/scripts/gen-strings.mjs --check
+      - name: Unit tests, lint, builds
+        working-directory: android
+        env:
+          LINKWACHE_DEFAULT_SERVER: ${{ vars.LINKWACHE_DEFAULT_SERVER }}
+        run: >
+          ./gradlew --no-daemon --stacktrace
+          :core:test :app:testDebugUnitTest :app:lintDebug :app:lintRelease
+          :app:assembleDebug :app:assembleRelease :fakebrowser:assembleDebug
+      - name: Newer debug build for the updater test (same debug key)
+        working-directory: android
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk /tmp/app-debug.apk
+          ./gradlew --no-daemon :app:assembleDebug -PversionOverride=99.0.0
+          mkdir -p ../dist
+          mv app/build/outputs/apk/debug/app-debug.apk ../dist/app-debug-99.0.0.apk
+          mv /tmp/app-debug.apk ../dist/app-debug.apk
+          cp fakebrowser/build/outputs/apk/debug/fakebrowser-debug.apk ../dist/
+      - name: Unsigned release APK
+        run: |
+          V=${{ steps.v.outputs.version }}
+          cp android/app/build/outputs/apk/release/app-release-unsigned.apk "dist/Linkwache-android-$V-unsigned.apk"
+          ( cd dist && sha256sum "Linkwache-android-$V-unsigned.apk" > "Linkwache-android-$V-unsigned.apk.sha256" )
+          echo "default server set: ${{ vars.LINKWACHE_DEFAULT_SERVER != '' }}" > dist/build-info.txt
+          echo "commit: ${{ github.sha }}" >> dist/build-info.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-apks
+          path: dist/
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: android-reports
+          path: |
+            android/**/build/reports/
+            android/**/build/test-results/
+          retention-days: 7
+
+  e2e:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: android-apks
+          path: dist
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Emulator test (Android 14)
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          APK_APP: ${{ github.workspace }}/dist/app-debug.apk
+          APK_APP_NEXT: ${{ github.workspace }}/dist/app-debug-99.0.0.apk
+          APK_FB: ${{ github.workspace }}/dist/fakebrowser-debug.apk
+          OUT: ${{ github.workspace }}/e2e-out
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash android/e2e/run.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-e2e
+          path: e2e-out/
+          retention-days: 30

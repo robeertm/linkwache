@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Linkwache</string>
+    <color name="lw_violet">#A78BFA</color>
+    <color name="lw_ink">#1C1038</color>
+    <color name="lw_ground_light">#F4F1FC</color>
+    <color name="lw_ground_dark">#15112B</color>
+
+    <style name="Theme.Linkwache" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/lw_ground_light</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <!-- The check sheet: transparent window over the calling app, no animation of its own. -->
+    <style name="Theme.Linkwache.Sheet" parent="Theme.Linkwache">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+</resources>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shield with a check mark (same mark as the website icon), inside the 66dp safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <group android:translateX="22" android:translateY="22">
+        <path android:fillColor="#1C1038" android:fillAlpha="0.95"
+            android:pathData="M32,10 L14,17 L14,31 C14,42 21.6,50.6 32,54 C42.4,50.6 50,42 50,31 L50,17 Z" />
+        <path android:strokeColor="#A78BFA" android:strokeWidth="5"
+            android:strokeLineCap="round" android:strokeLineJoin="round"
+            android:pathData="M23,33.5 L29,39.5 L41,26.5" />
+    </group>
+</vector>
