@@ -76,6 +76,7 @@ async function apiCheck(req, env, ctx, lang) {
   const input = String(body.url || body.text || "").slice(0, 4000);
   const r = await runCheck(input, env);
   if (r.error) return json({ error: t(lang, r.error) }, 400);
+  env.METRICS?.work({ channel: "web", verdict: r.verdict?.stufe });
   ctx.waitUntil(env.RESULTS.put("r:" + r.id, JSON.stringify(r), { expirationTtl: TTL }));
   return json(strip(r, env, lang));
 }

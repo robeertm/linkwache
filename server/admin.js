@@ -40,14 +40,21 @@ export function createAdmin({ token, dataDir, version, info, checkEnabled, now =
     const p = url.pathname;
     if (p === "/admin" || p === "/admin/") {
       const lang = pickLang(req, url.searchParams.get("lang"));
-      const s = Object.fromEntries(["title", "token", "login", "version", "uptodate", "avail", "request", "requested", "off", "bad", "hint", "pending", "checked", "never"].map((k) => [k, t(lang, "adm." + k)]));
+      const s = Object.fromEntries(["title", "token", "login", "version", "uptodate", "avail", "request", "requested", "off", "bad", "hint", "pending", "checked", "never",
+        "st.h", "st.days", "st.day", "st.real", "st.bg", "st.checks", "st.users", "st.p95", "st.peak", "st.rl", "st.cpu", "st.chart", "st.ch", "st.none", "st.bgnote",
+        "ch.web", "ch.desktop", "ch.extension", "ch.android", "ch.telegram", "ch.mail", "ch.v1_other"].map((k) => [k, t(lang, "adm." + k)]));
       const body = `<section class="admin"><h1>${esc(s.title)}</h1>
   <form id="adm-login" class="paste"><label class="small" for="adm-token">${esc(s.token)}</label>
   <input id="adm-token" type="password" autocomplete="current-password" spellcheck="false">
   <div class="row"><button class="btn big" type="submit">${esc(s.login)}</button></div></form>
   <div id="adm-box" hidden><p id="adm-ver"></p><p id="adm-state" class="adm-state"></p>
   <div class="row"><button class="btn big" id="adm-req" type="button" hidden>${esc(s.request)}</button></div>
-  <p id="adm-meta" class="hint"></p></div>
+  <p id="adm-meta" class="hint"></p>
+  <div id="adm-stats" hidden><h2>${esc(s["st.h"])}</h2>
+  <h3 class="small">${esc(s["st.chart"])}</h3><div id="adm-chart" class="adm-chart"></div>
+  <h3 class="small">${esc(s["st.days"])}</h3><div class="adm-scroll"><table class="adm-table" id="adm-days"></table></div>
+  <p class="hint">${esc(s["st.bgnote"])}</p>
+  <h3 class="small">${esc(s["st.ch"])}</h3><div id="adm-ch" class="adm-ch"></div></div></div>
   <p id="adm-msg" class="error" hidden></p><p class="hint">${esc(s.hint)}</p></section>`;
       const html = page({ lang, title: s.title, body, env, noindex: true, path: "/admin", extraHead: `<script src="/admin.js?v=${esc(env.ASSET_VER || "1")}" defer></script>`, client: { adm: s } });
       return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } });

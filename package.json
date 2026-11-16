@@ -1,6 +1,6 @@
 {
   "name": "linkwache",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
   "description": "Linkwache \u2014 pr\u00fcft verd\u00e4chtige Links, ohne sie zu \u00f6ffnen. Cloudflare Worker.",
   "type": "module",

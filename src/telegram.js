@@ -45,6 +45,7 @@ export async function handleTelegram(req, env, ctx, { runCheck, resultText }) {
       try {
         const r = await runCheck(u, env);
         if (r.error) { await send(env, chat, t(lang, r.error)); continue; }
+        env.METRICS?.work({ channel: "telegram", verdict: r.verdict?.stufe });
         await env.RESULTS.put("r:" + r.id, JSON.stringify(r), { expirationTtl: TTL });
         await send(env, chat, resultText(r, env, lang));
       } catch (e) {

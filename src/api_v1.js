@@ -17,6 +17,13 @@ export const clearV1Cache = () => cache.clear();
 
 const json = (o, status = 200, headers = {}) => new Response(JSON.stringify(o), { status, headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...headers } });
 
+/** Usage-metrics channel from the x-linkwache-client header ("desktop/0.5.1" → "desktop"); only the kind is counted. */
+export function v1Channel(client) {
+  const c = String(client || "").split("/")[0].toLowerCase();
+  if (c === "safari") return "extension";
+  return ["desktop", "extension", "android"].includes(c) ? c : "v1_other";
+}
+
 const EXT_ORIGIN = /^(chrome-extension|moz-extension|safari-web-extension):\/\//;
 
 /** Origin policy: no Origin = desktop/native client; extension origins are fine; a web page of another site is refused. */
@@ -79,6 +86,7 @@ export async function apiV1Check(req, env, ctx, lang) {
     cache.set(key, { at: now, r });
     if (cache.size > CACHE_MAX) for (const k of cache.keys()) { cache.delete(k); if (cache.size <= CACHE_MAX * 0.9) break; }
   }
+  env.METRICS?.work({ channel: v1Channel(req.headers.get("x-linkwache-client")), verdict: r.verdict?.stufe, cached: !!hit });
   return json(shape(r, lang));
 }
 

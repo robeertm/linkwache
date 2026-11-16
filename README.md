@@ -177,3 +177,10 @@ LINKWACHE_NAS=user@host scripts/aktualisieren.sh --if-requested  # only when req
 
 The script verifies the release (tag matches `package.json`, tests pass), backs up the running version and rolls back
 automatically if the health check fails. Turn the daily release lookup off with `UPDATE_CHECK=off`.
+
+### Usage figures
+
+The self-hosted build keeps aggregated usage figures (requests by group, checks by channel, verdicts, response times,
+busiest minute, CPU time, approximate senders per day; no addresses or links) in `data/metrics.json`. The operator page
+shows them after signing in; `GET /api/stats` returns them as JSON for dashboards with the read-only `STATS_TOKEN`
+(or `ADMIN_TOKEN`). See [docs/STATS.md](docs/STATS.md).

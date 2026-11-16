@@ -2,6 +2,28 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
+## 0.7.0 — 2026-11-16
+
+### Added — usage figures for the operator (self-hosted build)
+- Aggregated usage metrics in `data/metrics.json`: per hour (kept 30 days) and per day (kept 2 years) the requests by
+  group (health check, operator, Telegram webhook, API, bots, static files, unknown paths, pages), checks by channel
+  (website, desktop app, browser extension, Android, Telegram, mail, other apps) with the part answered from the app
+  API cache, verdicts green/amber/red, rate-limit answers, server errors, response times (p50/p95 of checks and of
+  everything except health checks), the busiest minute (all and real use only), CPU time and memory of the server
+  process, bytes in and out, and an approximate number of different senders per day.
+- Every check path now counts: the previous daily counter only saw website checks; app API, Telegram and mail checks
+  are counted per channel. Health checks, bots and static files are reported apart from real use.
+- `GET /api/stats` (contract `dienst-stats/1`, `docs/STATS.md`): read-only token `STATS_TOKEN` (or `ADMIN_TOKEN`),
+  through the reverse proxy only from a private or VPN address unless `STATS_PUBLIC=on`, disabled without a token.
+- Operator page `/admin`: after signing in it also shows the real requests of the last 48 hours, a table of the last
+  14 days (real requests, background, checks, senders, p95, busiest minute, rejected, CPU) and the checks by channel,
+  in all eight languages.
+
+### Privacy
+- Nothing personal is stored: no addresses, links, query strings, user agents or chat ids. The distinct-sender count
+  uses a keyed hash with a random key per day that exists only in memory; only the number is written. The privacy
+  page says so in all eight languages.
+
 ## 0.6.0 — 2026-11-16
 
 ### Added — Safari

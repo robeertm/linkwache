@@ -153,6 +153,22 @@ footer{margin-block:28px 34px;color:var(--leise);font-size:.88rem;border-top:1px
 
 /* Betreiberseite */
 .admin{max-width:560px;margin-inline:auto}
+.admin:has(#adm-stats:not([hidden])){max-width:none}
+.admin h2{margin-top:28px}.admin h3.small{margin:18px 0 6px;font-weight:600;color:var(--leise)}
+.adm-scroll{overflow-x:auto}
+.adm-table{border-collapse:collapse;width:100%;font-size:.88rem;font-variant-numeric:tabular-nums}
+.adm-table th,.adm-table td{padding:6px 6px;border-bottom:1px solid var(--rand);text-align:right;white-space:nowrap}
+.adm-table th{white-space:normal;vertical-align:bottom;font-size:.8rem;line-height:1.2}
+.adm-table th:first-child,.adm-table td:first-child{text-align:left}
+.adm-table th{color:var(--leise);font-weight:600}
+.adm-chart svg{display:block;width:100%;height:124px}
+.adm-lab{display:flex;justify-content:space-between;font-size:.75rem;color:var(--leise);margin-top:4px;font-variant-numeric:tabular-nums}
+.adm-chart .r{fill:var(--akzent)}.adm-chart .b{fill:var(--leise);opacity:.35}.adm-chart .ax{stroke:var(--rand)}
+.adm-chart text{fill:var(--leise);font-size:11px}
+.adm-ch{display:grid;gap:6px}
+.adm-ch div{display:grid;grid-template-columns:minmax(120px,1fr) auto;gap:8px;font-size:.9rem;position:relative;padding:4px 0 8px}
+.adm-ch div b{font-variant-numeric:tabular-nums}
+.adm-ch div i{position:absolute;left:0;bottom:0;height:4px;border-radius:2px;background:var(--akzent);width:var(--w)}
 .admin input{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px solid var(--rand);border-radius:.8rem;background:var(--feld);color:var(--text)}
 .admin .row{margin-top:12px}
 .adm-state{font-weight:600}

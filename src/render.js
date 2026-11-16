@@ -157,7 +157,7 @@ export function privacyPage(lang, env) {
   <h1>${P("privacy.h1")}</h1><p>${P("privacy.resp")}</p>
   <h2>${P("privacy.host.h")}</h2><p>${P("privacy.host.p")}</p>
   <h2>${P("privacy.store.h")}</h2><ul><li>${P("privacy.store.1")}</li><li>${P("privacy.store.2")}</li><li>${P("privacy.store.3")}</li></ul>
-  <h2>${P("privacy.logs.h")}</h2><p>${P("privacy.logs.p")}</p>
+  <h2>${P("privacy.logs.h")}</h2><p>${P("privacy.logs.p")}</p><p>${P("privacy.stats.p")}</p>
   <h2>${P("privacy.flow.h")}</h2><p>${P("privacy.flow.p")}</p><ul><li>${P("privacy.flow.1")}</li><li>${P("privacy.flow.2")}</li><li>${P("privacy.flow.3")}</li><li>${P("privacy.flow.4")}</li><li>${P("privacy.flow.5")}</li></ul><p>${P("privacy.basis")}</p>
   <h2>${P("privacy.app.h")}</h2><p>${P("privacy.app.p")}</p><ul><li>${P("privacy.app.1")}</li><li>${P("privacy.app.2")}</li><li>${P("privacy.app.3")}</li><li>${P("privacy.app.4")}</li><li>${P("privacy.app.5")}</li></ul>
   <h2>${P("privacy.dl.h")}</h2><p>${P("privacy.dl.p")}</p>

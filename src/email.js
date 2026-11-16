@@ -30,6 +30,7 @@ export async function handleEmail(message, env, ctx, { runCheck, resultText }) {
       try {
         const r = await runCheck(u, env, { withScan: true });
         if (r.error) { parts.push(t(lang, r.error)); continue; }
+        env.METRICS?.work({ channel: "mail", verdict: r.verdict?.stufe });
         await env.RESULTS.put("r:" + r.id, JSON.stringify(r), { expirationTtl: TTL });
         parts.push(resultText(r, env, lang));
       } catch (e) {

@@ -16,6 +16,7 @@ import { VERSION } from "../src/version.js";
 import { createLimiter } from "./ratelimit.js";
 import { startUpdateCheck } from "./update.js";
 import { createAdmin } from "./admin.js";
+import { createMetrics, privateSource } from "./metrics.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PUBLIC = path.join(ROOT, "public");
@@ -48,9 +49,11 @@ setInterval(() => {
 // ── Ratelimit-Nachbildung: 10 je Minute und 150 je Tag je Schlüssel, im Speicher (server/ratelimit.js) ──
 // Sicherheitsprüfung 16.10.2026: zusätzlich zur Minutengrenze eine Tagesgrenze und ein gemeinsames Tagesbudget für urlscan.
 const SCANS_PER_DAY = Number(process.env.SCANS_PER_DAY || 200);
-const CHECK_LIMIT = createLimiter({ perMinute: Number(process.env.PER_MINUTE || 10), perDay: Number(process.env.PER_DAY || 150) });
+const CHECK_LIMIT_CFG = { perMinute: Number(process.env.PER_MINUTE || 10), perDay: Number(process.env.PER_DAY || 150) };
+const CHECK_LIMIT = createLimiter(CHECK_LIMIT_CFG);
 // Client API v1: per installation and per IP (the worker hashes the keys with the day).
-const V1_LIMIT = createLimiter({ perMinute: Number(process.env.V1_PER_MINUTE || 60), perDay: Number(process.env.V1_PER_DAY || 3000) });
+const V1_CFG = { perMinute: Number(process.env.V1_PER_MINUTE || 60), perDay: Number(process.env.V1_PER_DAY || 3000) };
+const V1_LIMIT = createLimiter(V1_CFG);
 const V1_IP_LIMIT = createLimiter({ perMinute: Number(process.env.V1_IP_PER_MINUTE || 120), perDay: Number(process.env.V1_IP_PER_DAY || 10000) });
 const SCAN_BUDGET = {
   take() {
@@ -101,6 +104,9 @@ const env = {
   RESULTS, CHECK_LIMIT, V1_LIMIT, V1_IP_LIMIT, ASSETS, SCAN_BUDGET,
   UPDATE_INFO,
 };
+// Aggregated usage metrics (data/metrics.json, contract dienst-stats/1): counters per hour and day, no addresses, no links.
+const metrics = createMetrics({ dataDir: DATA });
+env.METRICS = { work: (w) => metrics.work(w) };
 
 const UPDATE_ENABLED = (process.env.UPDATE_CHECK || "on") !== "off";
 const admin = createAdmin({ token: process.env.ADMIN_TOKEN || "", dataDir: DATA, version: VERSION, info: UPDATE_INFO, checkEnabled: UPDATE_ENABLED });
@@ -132,8 +138,39 @@ function flushStats() {
   for (const d of Object.keys(stats)) if (Date.now() - Date.parse(d) > 400 * 86400 * 1000) delete stats[d];
   try { fs.writeFileSync(STATS_FILE, JSON.stringify(stats, null, 1)); } catch (e) { console.error("stats", String(e).slice(0, 100)); }
 }
-setInterval(flushStats, 60 * 1000).unref();
-for (const sig of ["SIGTERM", "SIGINT"]) process.on(sig, () => { flushStats(); process.exit(0); });
+setInterval(() => { flushStats(); metrics.flush(); }, 60 * 1000).unref();
+for (const sig of ["SIGTERM", "SIGINT"]) process.on(sig, () => { flushStats(); metrics.flush(); process.exit(0); });
+
+// ── GET /api/stats: the usage metrics for the operator (and the operator's own dashboards) ─────────────────────
+// Read-only token STATS_TOKEN (or ADMIN_TOKEN). Through the reverse proxy only from a private/Tailscale address
+// (X-Real-IP), unless STATS_PUBLIC=on. Disabled (404) without any token.
+const STATS_TOKENS = [process.env.STATS_TOKEN, process.env.ADMIN_TOKEN].filter((x) => x && String(x).length >= 16);
+const STATS_PUBLIC = process.env.STATS_PUBLIC === "on";
+const STATS_LIMIT = createLimiter({ perMinute: 30, perDay: 5000 });
+const sameKey = (a, b) => crypto.timingSafeEqual(crypto.createHash("sha256").update(String(a)).digest(), crypto.createHash("sha256").update(String(b)).digest());
+async function statsResponse(req, ip) {
+  const head = { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" };
+  const out = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: head });
+  if (!STATS_TOKENS.length) return out({ error: "not found" }, 404);
+  if (req.method !== "GET") return out({ error: "method" }, 405);
+  if (!STATS_PUBLIC && !privateSource(req.headers.get("x-real-ip"))) return out({ error: "forbidden" }, 403);
+  if (!(await STATS_LIMIT.limit({ key: "st:" + crypto.createHash("sha256").update(ip).digest("hex").slice(0, 32) })).success) return out({ error: "rate" }, 429);
+  const m = /^Bearer (.+)$/.exec(req.headers.get("authorization") || "");
+  if (!m || !STATS_TOKENS.some((t) => sameKey(m[1], t))) return out({ error: "unauthorized" }, 401);
+  const u = new URL(req.url);
+  const snap = metrics.snapshot({ hours: u.searchParams.get("hours"), days: u.searchParams.get("days") });
+  const today = new Date().toISOString().slice(0, 10);
+  return out({
+    schema: "dienst-stats/1", service: "linkwache", version: VERSION, work_unit: "check",
+    ...snap,
+    limits: {
+      per_minute: CHECK_LIMIT_CFG.perMinute, per_day: CHECK_LIMIT_CFG.perDay,
+      v1_per_minute: V1_CFG.perMinute, v1_per_day: V1_CFG.perDay,
+      scan_budget_per_day: SCANS_PER_DAY, scans_today: stats[today]?.scans || 0,
+    },
+    legacy_days: Object.keys(stats).sort().map((d) => ({ d, requests: stats[d].requests || 0 })),
+  });
+}
 
 // Textantworten ab 1 KB gzip-komprimiert ausliefern (der DSM-Proxy komprimiert nicht).
 const COMPRESSIBLE = /^(text\/|application\/(json|javascript|manifest\+json)|image\/svg)/;
@@ -157,6 +194,7 @@ function legacyRedirect(method, host, url, legacy = LEGACY_HOSTS, site = env.SIT
 }
 
 http.createServer(async (req, res) => {
+  const t0 = process.hrtime.bigint();
   try {
     // Größe beim LESEN begrenzen — vorher wurde alles in den Speicher geholt und erst dann geprüft (300 MB = Absturz).
     const MAX = 64 * 1024;
@@ -182,17 +220,23 @@ http.createServer(async (req, res) => {
     const legacyTarget = legacyRedirect(req.method, host, req.url);
     if (legacyTarget) {
       res.writeHead(301, { ...SECURITY, location: legacyTarget, "cache-control": "max-age=3600" });
-      res.end(); return;
+      res.end();
+      metrics.request({ path: req.url.split("?")[0], ua: req.headers["user-agent"] || "", status: 301, ms: Number(process.hrtime.bigint() - t0) / 1e6, addr: ip });
+      return;
     }
     // Kommt jemand über http (Port 80 am Reverse-Proxy), schicken wir ihn auf die https-Adresse.
     if (req.headers["x-forwarded-proto"] === "http" && env.SITE_URL.startsWith("https://") && !req.url.startsWith("/api/health")) {
       res.writeHead(["GET", "HEAD"].includes(req.method) ? 301 : 308, { ...SECURITY, location: env.SITE_URL + req.url });
-      res.end(); return;
+      res.end();
+      metrics.request({ path: req.url.split("?")[0], ua: req.headers["user-agent"] || "", status: 301, ms: Number(process.hrtime.bigint() - t0) / 1e6, addr: ip });
+      return;
     }
     const request = new Request(`${proto}://${host}${req.url}`, { method: req.method, headers, body: body && !["GET", "HEAD"].includes(req.method) ? body : undefined });
     const tasks = [];
     const ctx = { waitUntil: (p) => tasks.push(p), passThroughOnException() {} };
-    const r = (await admin.handle(request, env)) || (await worker.fetch(request, env, ctx));
+    const r = request.url && new URL(request.url).pathname === "/api/stats"
+      ? await statsResponse(request, ip)
+      : (await admin.handle(request, env)) || (await worker.fetch(request, env, ctx));
     const out = Object.fromEntries(r.headers.entries());
     let buf = Buffer.from(await r.arrayBuffer());
     if (buf.length > 1024 && COMPRESSIBLE.test(out["content-type"] || "") && /\bgzip\b/.test(String(req.headers["accept-encoding"] || ""))) {
@@ -205,6 +249,7 @@ http.createServer(async (req, res) => {
     res.end(buf);
     const p = req.url.split("?")[0];
     count(r.status === 429 ? "rejected" : r.status >= 500 ? "errors" : p === "/api/check" ? "checks" : p === "/api/v1/check" ? "v1" : p.startsWith("/r/") ? "results" : "", body ? body.length : 0, buf.length);
+    metrics.request({ path: p, ua: req.headers["user-agent"] || "", status: r.status, ms: Number(process.hrtime.bigint() - t0) / 1e6, bytesIn: body ? body.length : 0, bytesOut: buf.length, addr: ip });
     await Promise.allSettled(tasks);
   } catch (e) {
     console.error(new Date().toISOString(), "fehler", String(e).slice(0, 300));
