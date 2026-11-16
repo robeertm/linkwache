@@ -33,7 +33,7 @@ async function main() {
   const h = hostInfo(d.u);
   const domain = h.domain;
 
-  $("badge").textContent = level === "off" ? "?" : t(lang, "stufe." + (level === "rot" ? "rot" : "gelb"));
+  if (level === "off") $("badge").hidden = true; else $("badge").textContent = t(lang, "stufe." + (level === "rot" ? "rot" : "gelb"));
   $("title").textContent = t(lang, "ext.w.title." + level);
   document.title = "Linkwache – " + t(lang, "ext.w.title." + level);
   $("lead").textContent = t(lang, "ext.w.lead." + level);

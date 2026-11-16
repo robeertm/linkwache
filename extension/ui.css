@@ -48,3 +48,4 @@ input[type=url],input[type=text],select{width:100%;font:inherit;padding:.65rem .
 .log{list-style:none;padding:0;margin:.3rem 0;font-size:.9rem}.log li{padding:.3rem 0;border-bottom:1px solid var(--rand);overflow-wrap:anywhere}
 .error{color:var(--rot);font-size:.9rem}.ok{color:var(--ok);min-height:1.2em}
 @media (max-width:520px){h1{font-size:1.35rem}.domain{font-size:1.25rem}.card{padding:1rem}.btn{flex:1 1 100%;text-align:center}.actions{gap:.5rem}}
+[hidden]{display:none!important}
