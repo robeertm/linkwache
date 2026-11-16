@@ -41,7 +41,7 @@ if [ -z "$DEV" ] || [ ! -d "$DEV/Platforms" ]; then
     die "Xcode is needed (free in the App Store). The Command Line Tools alone cannot build Safari extensions."
   fi
 fi
-xcodebuild -version | head -1
+xcodebuild -version | sed -n 1p   # sed reads everything: no broken pipe under pipefail
 if ! xcodebuild -checkFirstLaunchStatus >/dev/null 2>&1; then
   die "Xcode has not finished its first start. Open Xcode once (or run: sudo xcodebuild -runFirstLaunch), then try again."
 fi
@@ -65,10 +65,10 @@ else
     # The free Personal Team appears as "Apple Development: <name> (TEAMID)" once you are signed in in Xcode
     # and Xcode has created a development certificate (first build from Xcode or -allowProvisioningUpdates).
     TEAM="$(security find-certificate -a -c "Apple Development" -p 2>/dev/null \
-      | openssl x509 -noout -subject 2>/dev/null | sed -n 's/.*OU *= *\([A-Z0-9]\{10\}\).*/\1/p' | head -1 || true)"
+      | openssl x509 -noout -subject 2>/dev/null | sed -n 's/.*OU *= *\([A-Z0-9]\{10\}\).*/\1/p' | sed -n 1p || true)"
   fi
   if [ -z "$TEAM" ]; then
-    TEAM="$(defaults read com.apple.dt.Xcode IDEProvisioningTeamByIdentifier 2>/dev/null | sed -n 's/.*teamID = \([A-Z0-9]\{10\}\);.*/\1/p' | head -1 || true)"
+    TEAM="$(defaults read com.apple.dt.Xcode IDEProvisioningTeamByIdentifier 2>/dev/null | sed -n 's/.*teamID = \([A-Z0-9]\{10\}\);.*/\1/p' | sed -n 1p || true)"
   fi
   if [ -z "$TEAM" ]; then
     cat >&2 <<'MSG'
