@@ -2,7 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>CFBundleIdentifier</key><string>test.linkwache.fakebrowser</string>
+  <key>CFBundleIdentifier</key><string>test.e2e.fakebrowser</string>
   <key>CFBundleName</key><string>FakeBrowser</string>
   <key>CFBundleExecutable</key><string>FakeBrowser</string>
   <key>CFBundlePackageType</key><string>APPL</string>

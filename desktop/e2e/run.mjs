@@ -163,7 +163,7 @@ function setupFake() {
     const dst = path.join(FAKE_DIR, "FakeBrowser.app");
     fs.cpSync(FAKE_IN, dst, { recursive: true });
     lsregister(dst);
-    fakeId = "test.linkwache.fakebrowser";
+    fakeId = "test.e2e.fakebrowser";
     forwardSpec = `mac-bundle:${fakeId}`;
   } else {
     const dst = path.join(FAKE_DIR, "fakebrowser.exe");
@@ -393,6 +393,10 @@ async function main() {
   log("platform", PLATFORM, "app", APP);
   if (PLATFORM === "linux") await linuxEnv();
   if (PLATFORM === "macos" && BUNDLE) lsregister(BUNDLE);
+  if (PLATFORM === "macos") {
+    // Browser profile folders, so the native-messaging manifests have somewhere to go.
+    for (const d of ["Google/Chrome", "Mozilla"]) fs.mkdirSync(path.join(os.homedir(), "Library/Application Support", d), { recursive: true });
+  }
   setupFake();
   await startMock();
 
@@ -410,7 +414,10 @@ async function main() {
   record("register handler + native-messaging hosts", reg.code === 0, JSON.stringify(reg.json));
   await makeDefault();
   const status = cli(["--status"]).json || {};
-  fs.writeFileSync(path.join(OUT, "status.json"), JSON.stringify(status, null, 2));
+  // Artifacts are public: never keep a server address other than the local mock.
+  const redact = (o) => JSON.stringify(o, (k, v) => (k === "server" && v && v !== SERVER ? "(build default, redacted)" : v), 2);
+  fs.writeFileSync(path.join(OUT, "status.json"), redact(status));
+  fs.writeFileSync(path.join(OUT, "cli-status.json"), redact(status));
   record("native-messaging host manifests installed", Array.isArray(status.nativeHosts) && status.nativeHosts.length > 0, JSON.stringify(status.nativeHosts), PLATFORM !== "macos");
   record("forward target is the fake browser, never Linkwache", status.forward && status.forward.id === fakeId);
 
