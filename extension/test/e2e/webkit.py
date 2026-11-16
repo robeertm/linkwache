@@ -37,8 +37,8 @@ STUB = """
 def b64url(obj):
     return base64.urlsafe_b64encode(json.dumps(obj, ensure_ascii=False).encode()).decode().rstrip("=")
 
-RED = {"u": "https://paypal.secure-login.example/konto", "s": "rot", "w": False, "m": "new",
-       "f": [{"key": "brand-sub", "stufe": "rot", "p": {"brand": "paypal", "domain": "secure-login.example"}}, {"key": "http", "stufe": "gelb", "p": {}}]}
+RED = {"u": "https://bank.secure-login.example/konto", "s": "rot", "w": False, "m": "new",
+       "f": [{"key": "brand-sub", "stufe": "rot", "p": {"brand": "bank", "domain": "secure-login.example"}}, {"key": "http", "stufe": "gelb", "p": {}}]}
 AMBER = {"u": "http://offer-parcel.example/track", "s": "gelb", "w": True, "m": "new", "f": [{"key": "http", "stufe": "gelb", "p": {}}]}
 
 def page(b, lang, look, w, h):
@@ -54,7 +54,7 @@ def main():
         b = p.webkit.launch()
         for lang, look in (("de", "light"), ("en", "dark"), ("fr", "light")):
             for name, data in (("red", RED), ("amber", AMBER)):
-                ctx, pg, errs = page(b, lang, look, 1100, 860)
+                ctx, pg, errs = page(b, lang, look, 1100, 720)
                 pg.goto("file://" + os.path.join(DIST, "warning.html") + "#d=" + b64url(data))
                 pg.wait_for_selector("#title:not(:empty)")
                 title = pg.text_content("#title")

@@ -273,6 +273,18 @@ packages (`node extension/scripts/build.mjs safari` → `extension/dist/safari/`
 container app **Linkwache for Safari** (`safari/Linkwache.xcodeproj`, bundle ids `app.linkwache.safari`
 and `app.linkwache.safari.extension`, macOS 12+, Safari 16.4+).
 
+<p>
+<img src="screenshots/safari/safari-app-en-light.png" width="330" alt="Linkwache for Safari: container app with the steps to switch the extension on">
+<img src="screenshots/safari/safari-app-de-dark.png" width="330" alt="Container app in German, dark mode">
+</p>
+<p>
+<img src="screenshots/safari/safari-webkit-warning-red-de-light.png" width="400" alt="Safari build: dangerous link blocked (WebKit)">
+<img src="screenshots/safari/safari-webkit-warning-amber-en-dark.png" width="400" alt="Safari build: suspicious link, dark mode (WebKit)">
+</p>
+
+The container app screenshots come from the `Safari` workflow (macOS runner); the warning pages are the Safari
+build rendered in WebKit, Safari's engine.
+
 ### Why build it yourself, and why not in a store
 
 A downloadable Safari extension must be signed with a Developer ID and notarised by Apple, and the Mac

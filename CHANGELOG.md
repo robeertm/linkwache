@@ -2,6 +2,34 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
+## 0.6.0 — 2026-11-16
+
+### Added — Safari
+- Browser extension for Safari on the Mac, built from the same source as the Chromium and Firefox extension
+  (`node extension/scripts/build.mjs safari`): same rules, same warning page, same eight languages.
+- "Linkwache for Safari": a small container app (`safari/`, Xcode project, macOS 12+, Safari 16.4+) that carries the
+  extension, shows whether Safari reports it as switched on, opens Safari's extension settings and explains the
+  steps in all eight languages.
+- Free, build-it-yourself variant without a paid developer account: `safari/scripts/build-local.sh` builds the
+  app with the free "Personal Team" of an Apple ID (or ad hoc with `--adhoc`), verifies the signature, replaces the
+  installed copy with a backup until the copy succeeded and opens it. No team id or Apple ID is stored in the
+  repository.
+- Update notice: the container app asks the public release list once a day (switchable) and announces a newer
+  version with a link to the guide; rebuilding is one script run. The free build cannot replace itself.
+- Download page: Safari section "build it yourself" with the steps and a link to the guide, all eight languages.
+- `Safari` workflow on a macOS runner (on demand and for changes under `safari/` or `extension/` on main):
+  extension tests, Swift tests of the update check, unsigned and ad-hoc builds, bundle, version, sandbox and
+  signature checks, registration of the extension with the system, window screenshots of the container app, the
+  ad-hoc signed app as a zip artifact.
+
+### Changed — extension
+- The extension decides per browser what it can use: Safari never asks for native messaging (Safari only reaches
+  the extension's own app, not the desktop app) and does not use `declarativeNetRequest`; known-red domains are
+  still caught by the navigation fallback. New tabs are retried without opener fields where a browser rejects them;
+  request timeouts fall back to an `AbortController`. The settings page explains in Safari why the desktop app
+  cannot be connected.
+- WebKit check of the Safari build's pages (`extension/test/e2e/webkit.py`).
+
 ## 0.5.3 — 2026-11-16
 
 ### Fixed — server
