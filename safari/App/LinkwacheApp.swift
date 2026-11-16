@@ -207,6 +207,12 @@ enum Snapshot {
         guard let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { exit(3) }
         view.cacheDisplay(in: view.bounds, to: rep)
         guard let png = rep.representation(using: .png, properties: [:]) else { exit(3) }
-        do { try png.write(to: URL(fileURLWithPath: path)); exit(0) } catch { exit(4) }
+        // The app is sandboxed: when the path is outside its container, write into its own temporary folder instead.
+        let wanted = URL(fileURLWithPath: path)
+        let fallback = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(wanted.lastPathComponent)
+        for url in [wanted, fallback] {
+            if (try? png.write(to: url)) != nil { print("snapshot: \(url.path)"); fflush(stdout); exit(0) }
+        }
+        exit(4)
     }
 }

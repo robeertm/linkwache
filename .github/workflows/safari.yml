@@ -85,9 +85,14 @@ jobs:
           APP="$PWD/safari/build/Release/Linkwache for Safari.app/Contents/MacOS/Linkwache for Safari"
           mkdir -p shots
           for lang in en de; do for look in light dark; do
-            "$APP" -LWLanguage $lang -LWAppearance $look -LWSnapshot "$PWD/shots/safari-app-$lang-$look.png" &
-            P=$!; for i in $(seq 1 30); do kill -0 $P 2>/dev/null || break; sleep 1; done; kill $P 2>/dev/null || true
-            test -s "shots/safari-app-$lang-$look.png" || { echo "no screenshot $lang $look"; exit 1; }
+            F="safari-app-$lang-$look.png"
+            # sandboxed app: it writes into its own container when the path is outside, and prints where
+            "$APP" -LWLanguage $lang -LWAppearance $look -LWSnapshot "$PWD/shots/$F" > "$RUNNER_TEMP/snap.txt" 2>&1 &
+            P=$!; for i in $(seq 1 40); do kill -0 $P 2>/dev/null || break; sleep 1; done; kill $P 2>/dev/null || true
+            cat "$RUNNER_TEMP/snap.txt"
+            OUT=$(sed -n 's/^snapshot: //p' "$RUNNER_TEMP/snap.txt" | tail -1)
+            [ -n "$OUT" ] && [ "$OUT" != "$PWD/shots/$F" ] && cp "$OUT" "shots/$F"
+            test -s "shots/$F" || { echo "no screenshot $lang $look"; exit 1; }
           done; done
           ls -la shots
       - name: Zip the app (ad-hoc signed)
