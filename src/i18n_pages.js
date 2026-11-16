@@ -4,6 +4,8 @@
 // {mail} {site} {host} {lang} werden beim Rendern eingesetzt (Werte escaped).
 // Das Impressum ist eine deutsche Rechtspflicht: die Anschrift bleibt so, wie
 // sie ist; Überschriften und Erklärungen werden übersetzt.
+import { DOWNLOAD } from "./i18n_download.js";
+
 export const PAGES = {};
 
 PAGES.de = {
@@ -437,3 +439,6 @@ PAGES.it = {
   "nf.p": "Forse il link del risultato ha più di 90 giorni — i risultati vengono allora cancellati automaticamente. Verifica semplicemente di nuovo il link.",
   "nf.back": "A Linkwache",
 };
+
+// Download page, home hint and the desktop/extension privacy paragraphs (src/i18n_download.js).
+for (const [l, d] of Object.entries(DOWNLOAD)) Object.assign(PAGES[l], d);

@@ -9,7 +9,10 @@ import { verdict } from "./verdict.js";
 
 const settle = (p) => p.then((v) => ({ ok: true, v }), (e) => ({ ok: false, e: String(e).slice(0, 120) }));
 
-export async function runCheck(rawInput, env, { withScan = true } = {}) {
+// lite (client API v1): never submits a sandbox scan, searches urlscan only when the first pass is not green,
+// and gives crt.sh a short timeout. The website path (lite = false) behaves exactly as before.
+export async function runCheck(rawInput, env, { withScan = true, lite = false } = {}) {
+  if (lite) withScan = false;
   const input = normalizeInput(rawInput);
   if (!input) return { error: "err.nolink" };
 
@@ -22,25 +25,32 @@ export async function runCheck(rawInput, env, { withScan = true } = {}) {
     heur.push({ key: "unwrapped", stufe: "info", p: { host: th.host } });
   }
 
-  const [dns, rdap, ct, sb, uh, pt, us] = await Promise.all([
+  const skipped = { ok: false, e: "lite" };
+  let [dns, rdap, ct, sb, uh, pt, us] = await Promise.all([
     settle(dnsFacts(h.host, h.domain)),
     settle(rdapFacts(h.domain)),
-    settle(ctFacts(h.domain)),
+    settle(ctFacts(h.domain, lite ? 1500 : undefined)),
     settle(safeBrowsing(url, env.SAFE_BROWSING_KEY)),
     settle(urlhaus(h.host, env.URLHAUS_KEY)),
     settle(phishtank(url)),
-    settle(urlscanSearch(h.domain)),
+    lite ? skipped : settle(urlscanSearch(h.domain)),
   ]);
 
-  const findings = [...heur];
-  findings.push(...dnsFindings(dns.ok ? dns.v : { error: dns.e }, h.host));
-  if (rdap.ok) findings.push(...rdapFindings(rdap.v));
-  if (ct.ok && ct.v.ok && ct.v.count === 0 && dns.ok && dns.v.resolves) {
-    findings.push({ key: "ct-none", stufe: "info", p: {} });
+  const assemble = () => {
+    const all = [...heur];
+    all.push(...dnsFindings(dns.ok ? dns.v : { error: dns.e }, h.host));
+    if (rdap.ok) all.push(...rdapFindings(rdap.v));
+    if (ct.ok && ct.v.ok && ct.v.count === 0 && dns.ok && dns.v.resolves) {
+      all.push({ key: "ct-none", stufe: "info", p: {} });
+    }
+    all.push(...dbFindings({ sb: sb.ok ? sb.v : null, uh: uh.ok ? uh.v : null, pt: pt.ok ? pt.v : null, us: us.ok ? us.v : null }));
+    return all;
+  };
+  let v = verdict(assemble(), { url });
+  if (lite && v.stufe !== "gruen") {
+    us = await settle(urlscanSearch(h.domain));
+    v = verdict(assemble(), { url });
   }
-  findings.push(...dbFindings({ sb: sb.ok ? sb.v : null, uh: uh.ok ? uh.v : null, pt: pt.ok ? pt.v : null, us: us.ok ? us.v : null }));
-
-  const v = verdict(findings, { url });
 
   let scan = null;
   // Tagesbudget für urlscan (Node-Betrieb): ist es aufgebraucht, wird ohne Sandbox geprüft

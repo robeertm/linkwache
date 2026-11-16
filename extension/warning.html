@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Linkwache</title><link rel="stylesheet" href="ui.css"></head>
+<body class="warn"><main id="app" class="wrap" hidden>
+  <header class="brand"><img src="icons/icon-48.png" alt="" width="32" height="32"><span>Linkwache</span></header>
+  <section id="card" class="card">
+    <span id="badge" class="badge"></span>
+    <h1 id="title"></h1>
+    <p id="lead" class="lead"></p>
+    <div class="target"><span class="lbl" id="targetLbl"></span><b id="domain" class="domain"></b><code id="url"></code><span id="wrapped" class="small" hidden></span></div>
+    <h2 id="findLbl"></h2>
+    <ul id="findings" class="findings"></ul>
+    <p id="none" class="small" hidden></p>
+    <div id="actions" class="actions">
+      <button id="back" class="btn primary" type="button"></button>
+      <button id="open" class="btn ghost" type="button" disabled></button>
+      <button id="step" class="linkbtn" type="button" hidden></button>
+    </div>
+    <label id="alwaysRow" class="check" hidden><input id="always" type="checkbox"><span id="alwaysLbl"></span></label>
+    <div id="confirm" class="confirm" hidden>
+      <h2 id="confH"></h2><p id="confP"></p>
+      <div class="actions"><button id="confNo" class="btn primary" type="button"></button><button id="confYes" class="btn danger" type="button"></button></div>
+    </div>
+  </section>
+</main><script src="warning.js"></script></body></html>

@@ -3,6 +3,7 @@ import { esc, defang } from "./util.js";
 import { STUFE_EMOJI } from "./verdict.js";
 import { t, findingText, verdictText, LANGS, LANG_NAMES } from "./i18n.js";
 import { PAGES } from "./i18n_pages.js";
+import { classify, detectOS, recommend, formatSize, REPO_RELEASES } from "./downloads.js";
 
 /** Spendenlink: PayPal.me-Name oder eine PayPal-Mailadresse (klassischer Zahlungslink, geht mit jedem Konto). */
 export function paypalLink(env) {
@@ -29,7 +30,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : LANGS.map((l) => `<link r
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(t(lang, "site.desc"))}">
 ${extraHead}<script type="application/json" id="lw">${JSON.stringify(cfg).replace(/</g, "\\u003c")}</script></head><body>
 <header class="top"><a class="brand" href="/?lang=${lang}"><span class="wappen"><img src="/icon.svg" alt=""></span><span>${esc(env.SITE_NAME || "Linkwache")}<small>${esc(t(lang, "site.tagline"))}</small></span></a>
-<nav><a href="/?lang=${lang}#so-gehts">${esc(t(lang, "nav.how"))}</a><a href="/impressum.html">${esc(t(lang, "nav.legal"))}</a><button class="theme" id="theme" type="button" aria-label="Theme">🌙</button>${langSwitch(lang, path)}</nav></header>
+<nav><a href="/?lang=${lang}#so-gehts">${esc(t(lang, "nav.how"))}</a><a href="/download?lang=${lang}">${tp(lang, "dl.nav", env)}</a><a href="/impressum.html">${esc(t(lang, "nav.legal"))}</a><button class="theme" id="theme" type="button" aria-label="Theme">🌙</button>${langSwitch(lang, path)}</nav></header>
 <main>${body}</main>
 <footer><p>${esc(t(lang, "foot.note"))}</p>
 ${paypalLink(env) ? `<p><a class="btn coffee" href="${esc(paypalLink(env))}" rel="noopener" target="_blank">${esc(t(lang, "foot.coffee"))}</a></p>` : ""}
@@ -62,6 +63,7 @@ export function homePage(lang, env) {
       ${env.MAIL_IN !== "off" ? step("home.mail.h", esc(t(lang, "home.mail.p", { mail: "{m}" })).replace("{m}", `<a href="mailto:${esc(mail)}">${esc(mail)}</a>`)) : ""}
       ${env.TELEGRAM_BOT ? step("home.tg.h", esc(t(lang, "home.tg.p", { bot: "{b}" })).replace("{b}", bot)) : ""}
     </div>
+    <p class="appnote">${tp(lang, "home.app.p", env)}</p>
     <h2>${esc(t(lang, "home.what.h"))}</h2>
     <p class="small">${esc(t(lang, "home.what.p"))}</p>
   </section>`;
@@ -152,6 +154,8 @@ export function privacyPage(lang, env) {
   <h2>${P("privacy.store.h")}</h2><ul><li>${P("privacy.store.1")}</li><li>${P("privacy.store.2")}</li><li>${P("privacy.store.3")}</li></ul>
   <h2>${P("privacy.logs.h")}</h2><p>${P("privacy.logs.p")}</p>
   <h2>${P("privacy.flow.h")}</h2><p>${P("privacy.flow.p")}</p><ul><li>${P("privacy.flow.1")}</li><li>${P("privacy.flow.2")}</li><li>${P("privacy.flow.3")}</li><li>${P("privacy.flow.4")}</li><li>${P("privacy.flow.5")}</li></ul><p>${P("privacy.basis")}</p>
+  <h2>${P("privacy.app.h")}</h2><p>${P("privacy.app.p")}</p><ul><li>${P("privacy.app.1")}</li><li>${P("privacy.app.2")}</li><li>${P("privacy.app.3")}</li><li>${P("privacy.app.4")}</li></ul>
+  <h2>${P("privacy.dl.h")}</h2><p>${P("privacy.dl.p")}</p>
   <h2>${P("privacy.paypal.h")}</h2><p>${P("privacy.paypal.p")}</p>
   <h2>${P("privacy.cookies.h")}</h2><p>${P("privacy.cookies.p")}</p>
   <h2>${P("privacy.rights.h")}</h2><p>${P("privacy.rights.p")}</p>
@@ -177,4 +181,103 @@ export function notFoundPage(lang, env) {
   const P = (k) => tp(lang, k, env);
   const body = `<div class="legal"><h1>${P("nf.h1")}</h1><p>${P("nf.p")}</p><p><a class="btn" href="/?lang=${lang}">${P("nf.back")}</a></p></div>`;
   return page({ lang, title: `${P("nf.title")} · ${env.SITE_NAME || "Linkwache"}`, body, env, noindex: true, path: "/" });
+}
+
+// ── Download page ────────────────────────────────────────────────────────────
+const SYSTEMS = ["windows", "macos", "linux"];
+
+function pkgLabel(lang, p, env) {
+  const base = tp(lang, "dl.pkg." + p.id, env);
+  return p.arch ? `${base} · ${tp(lang, "dl.arch." + p.arch, env)}` : base;
+}
+
+function shaBlock(lang, p, env, n) {
+  if (!p.sha256) return "";
+  return `<div class="sha"><span class="lbl">${tp(lang, "dl.sha", env)}</span><code class="shaval" id="sha${n}">${esc(p.sha256)}</code><button class="btn ghost small" type="button" data-copy="#sha${n}" data-label="${tp(lang, "dl.copy", env)}" data-done="${tp(lang, "dl.copied", env)}">${tp(lang, "dl.copy", env)}</button></div>`;
+}
+
+function pkgCard(lang, p, env, rel, n, { primary = false, label = "" } = {}) {
+  const meta = [formatSize(p.size), rel.version ? "v" + rel.version : "", rel.date].filter(Boolean).join(" · ");
+  return `<div class="pkg${primary ? " primary" : ""}">
+  <div class="pkg-head"><div><b>${esc(label || pkgLabel(lang, p, env))}</b><span class="small">${esc(p.name)}${meta ? " · " + esc(meta) : ""}</span></div>
+  <a class="btn${primary ? " big" : " ghost"}" href="${esc(p.url)}" rel="noopener" download>${tp(lang, "dl.get", env)}</a></div>
+  ${shaBlock(lang, p, env, n)}</div>`;
+}
+
+const cmd = (s) => `<pre class="cmd"><code>${esc(s)}</code></pre>`;
+const steps = (lang, env, keys) => `<ol class="how">${keys.map((k) => `<li>${tp(lang, k, env)}</li>`).join("")}</ol>`;
+
+/** Illustration of the SmartScreen notice as HTML/CSS (not a screenshot), localized and labelled as an illustration. */
+function smartscreenMock(lang, env) {
+  const P = (k) => tp(lang, k, env);
+  return `<figure class="ss" aria-label="${esc(String(P("dl.win.mock.label")).replace(/<[^>]*>/g, ""))}">
+  <div class="ss-win"><div class="ss-bar"></div>
+  <div class="ss-body"><h4>${P("dl.win.mock.title")}</h4><p>${P("dl.win.mock.body")}</p><p class="ss-more"><u>${P("dl.win.mock.more")}</u></p>
+  <p class="ss-pub">${P("dl.win.mock.pub")}</p>
+  <div class="ss-btns"><span class="ss-btn on">${P("dl.win.mock.run")}</span><span class="ss-btn">${P("dl.win.mock.dont")}</span></div></div></div>
+  <figcaption class="small">${P("dl.win.mock.label")}</figcaption></figure>`;
+}
+
+function helpFor(sys, lang, env, pkgs) {
+  const P = (k) => tp(lang, k, env);
+  const by = (g) => pkgs.filter((p) => p.group === g);
+  const name = (id) => (pkgs.find((p) => p.id === id) || {}).name;
+  if (sys === "windows") {
+    const f = name("win-exe") || name("win-msi") || "Linkwache-setup.exe";
+    return `<div class="help"><h3>${P("dl.win.h")}</h3><p>${P("dl.win.p")}</p>${smartscreenMock(lang, env)}${steps(lang, env, ["dl.win.s1", "dl.win.s2"])}
+    <h4>${P("dl.verify.h")}</h4><p class="small">${P("dl.verify.win")}</p>${cmd("Get-FileHash .\\" + f + " -Algorithm SHA256")}<p class="small">${P("dl.verify.p")}</p></div>`;
+  }
+  if (sys === "macos") {
+    const f = (by("macos")[0] || {}).name || "Linkwache.dmg";
+    return `<div class="help"><h3>${P("dl.mac.h")}</h3><p>${P("dl.mac.p")}</p>${steps(lang, env, ["dl.mac.s1", "dl.mac.s2"])}
+    <h4>${P("dl.verify.h")}</h4><p class="small">${P("dl.verify.mac")}</p>${cmd("shasum -a 256 " + f)}<p class="small">${P("dl.verify.p")}</p></div>`;
+  }
+  const app = name("linux-appimage-x64") || name("linux-appimage-arm64") || "Linkwache.AppImage";
+  const deb = name("linux-deb-x64") || name("linux-deb-arm64") || "linkwache.deb";
+  const rpm = name("linux-rpm-x64") || name("linux-rpm-arm64") || "linkwache.rpm";
+  return `<div class="help"><h3>${P("dl.linux.h")}</h3>
+    <p class="small">${P("dl.linux.appimage")}</p>${cmd("chmod +x " + app + "\n./" + app)}
+    <p class="small">${P("dl.linux.deb")}</p>${cmd("sudo apt install ./" + deb)}
+    <p class="small">${P("dl.linux.rpm")}</p>${cmd("sudo dnf install ./" + rpm)}
+    <h4>${P("dl.verify.h")}</h4><p class="small">${P("dl.verify.linux")}</p>${cmd("sha256sum " + app)}<p class="small">${P("dl.verify.p")}</p></div>`;
+}
+
+export function downloadPage(lang, env, { ua = "", os = "" } = {}) {
+  const P = (k) => tp(lang, k, env);
+  const rel = env.UPDATE_INFO?.release;
+  const pkgs = rel ? classify(rel.assets) : [];
+  const sys = ["windows", "macos", "linux", "android", "ios"].includes(os) ? os : detectOS(ua);
+  let n = 0;
+  let body = `<div class="dl"><h1>${P("dl.h1")}</h1><p class="lead">${P("dl.lead")}</p>`;
+  if (!rel || !pkgs.length) {
+    body += `<div class="karte none"><h2>${P("dl.none.h")}</h2><p>${P("dl.none.p")}</p><p><a class="btn" href="${esc(REPO_RELEASES)}" rel="noopener">${P("dl.none.link")}</a></p></div></div>`;
+    return page({ lang, title: `${P("dl.title")} · ${env.SITE_NAME || "Linkwache"}`, body, env, path: "/download" });
+  }
+  body += `<p class="small rel">${tp(lang, "dl.rel", env, { v: rel.version, d: rel.date })}</p>`;
+  const rec = recommend(sys, pkgs, ua);
+  if (rec) body += `<h2>${P("dl.rec")}</h2>` + pkgCard(lang, rec, env, rel, ++n, { primary: true, label: P("dl.for." + rec.group) });
+  else if (sys === "android") body += `<div class="karte note"><h3>${P("dl.android.soon")}</h3><p class="small">${P("dl.android.soon.p")}</p></div>`;
+  else if (sys === "ios") body += `<div class="karte note"><h3>${P("dl.ios.h")}</h3><p>${P("dl.ios.p")}</p><p><a class="btn" href="/kurzbefehl.html?lang=${lang}">${P("dl.ios.link")}</a></p></div>`;
+  // help for the detected system first, the others folded
+  const order = SYSTEMS.includes(sys) ? [sys, ...SYSTEMS.filter((s) => s !== sys)] : SYSTEMS;
+  body += `<h2>${P("dl.all.h")}</h2>`;
+  const groups = ["windows", "macos", "linux", "extension", "android"];
+  for (const g of groups) {
+    const list = pkgs.filter((p) => p.group === g);
+    if (g === "android" && !list.length) { body += `<section class="grp"><h3>${P("dl.grp.android")}</h3><p class="small">${P("dl.android.soon")}</p></section>`; continue; }
+    if (!list.length) continue;
+    body += `<section class="grp"><h3>${P("dl.grp." + g)}</h3>${list.map((p) => pkgCard(lang, p, env, rel, ++n)).join("")}</section>`;
+  }
+  body += `<section class="helps">`;
+  for (const s of order) {
+    if (!pkgs.some((p) => p.group === s)) continue;
+    body += `<details class="karte helpbox"${s === sys ? " open" : ""}><summary>${P(s === "windows" ? "dl.win.h" : s === "macos" ? "dl.mac.h" : "dl.linux.h")}</summary>${helpFor(s, lang, env, pkgs)}</details>`;
+  }
+  if (pkgs.some((p) => p.group === "extension")) {
+    body += `<details class="karte helpbox"><summary>${P("dl.ext.h")}</summary><div class="help"><p>${P("dl.ext.lead")}</p>
+    <h4>${P("dl.ext.chrome.h")}</h4>${steps(lang, env, ["dl.ext.c1", "dl.ext.c2", "dl.ext.c3", "dl.ext.c4"])}
+    <h4>${P("dl.ext.firefox.h")}</h4>${steps(lang, env, ["dl.ext.f1", "dl.ext.f2", "dl.ext.f3"])}<p class="small">${P("dl.ext.f.note")}</p></div></details>`;
+  }
+  body += `</section><p class="small">${P("dl.ios.p")} <a href="/kurzbefehl.html?lang=${lang}">${P("dl.ios.link")}</a></p></div>`;
+  return page({ lang, title: `${P("dl.title")} · ${env.SITE_NAME || "Linkwache"}`, body, env, path: "/download" });
 }

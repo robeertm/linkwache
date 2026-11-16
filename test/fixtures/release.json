@@ -1,0 +1,115 @@
+{
+ "tag_name": "v0.5.0",
+ "name": "Linkwache 0.5.0",
+ "published_at": "2026-11-16T12:00:00Z",
+ "draft": false,
+ "prerelease": false,
+ "assets": [
+  {
+   "name": "Linkwache_0.5.0_x64-setup.exe",
+   "size": 5242880,
+   "browser_download_url": "https://github.com/robeertm/linkwache/releases/download/v0.5.0/Linkwache_0.5.0_x64-setup.exe",
+   "content_type": "application/octet-stream",
+   "digest": "sha256:a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1"
+  },
+  {
+   "name": "Linkwache_0.5.0_x64-setup.exe.sig",
+   "size": 400,
+   "browser_download_url": "https://github.com/robeertm/linkwache/releases/download/v0.5.0/Linkwache_0.5.0_x64-setup.exe.sig",
+   "content_type": "application/octet-stream",
+   "digest": "sha256:b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1"
+  },
+  {
+   "name": "Linkwache_0.5.0_x64_en-US.msi",
+   "size": 6815744,
+   "browser_download_url": "https://github.com/robeertm/linkwache/releases/download/v0.5.0/Linkwache_0.5.0_x64_en-US.msi",
+   "content_type": "application/octet-stream",
+   "digest": "sha256:a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2"
+  },
+  {
+   "name": "Linkwache_0.5.0_universal.dmg",
+   "size": 11534336,
+   "browser_download_url": "https://github.com/robeertm/linkwache/releases/download/v0.5.0/Linkwache_0.5.0_universal.dmg",
+   "content_type": "application/octet-stream",
+   "digest": "sha256:a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3"
+  },
+  {
+   "name": "Linkwache_universal.app.tar.gz",
+   "size": 11000000,
+   "browser_download_url": "https://github.com/robeertm/linkwache/releases/download/v0.5.0/Linkwache_universal.app.tar.gz",
+   "content_type": "application/octet-stream"
+  },
+  {
+   "name": "Linkwache_universal.app.tar.gz.sig",
+   "size": 400,
+   "browser_download_url": "https://github.com/robeertm/linkwache/releases/download/v0.5.0/Linkwache_universal.app.tar.gz.sig",
+   "content_type": "application/octet-stream"
+  },
+  {
+   "name": "Linkwache_0.5.0_amd64.AppImage",
+   "size": 78643200,
+   "browser_download_url": "https://github.com/robeertm/linkwache/releases/download/v0.5.0/Linkwache_0.5.0_amd64.AppImage",
+   "content_type": "application/octet-stream",
+   "digest": "sha256:a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4"
+  },
+  {
+   "name": "Linkwache_0.5.0_aarch64.AppImage",
+   "size": 75497472,
+   "browser_download_url": "https://github.com/robeertm/linkwache/releases/download/v0.5.0/Linkwache_0.5.0_aarch64.AppImage",
+   "content_type": "application/octet-stream",
+   "digest": "sha256:a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+  },
+  {
+   "name": "Linkwache_0.5.0_amd64.deb",
+   "size": 5767168,
+   "browser_download_url": "https://github.com/robeertm/linkwache/releases/download/v0.5.0/Linkwache_0.5.0_amd64.deb",
+   "content_type": "application/octet-stream",
+   "digest": "sha256:a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6"
+  },
+  {
+   "name": "Linkwache_0.5.0_arm64.deb",
+   "size": 5500000,
+   "browser_download_url": "https://github.com/robeertm/linkwache/releases/download/v0.5.0/Linkwache_0.5.0_arm64.deb",
+   "content_type": "application/octet-stream",
+   "digest": "sha256:a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7"
+  },
+  {
+   "name": "Linkwache-0.5.0-1.x86_64.rpm",
+   "size": 5800000,
+   "browser_download_url": "https://github.com/robeertm/linkwache/releases/download/v0.5.0/Linkwache-0.5.0-1.x86_64.rpm",
+   "content_type": "application/octet-stream",
+   "digest": "sha256:a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8"
+  },
+  {
+   "name": "Linkwache-0.5.0-1.aarch64.rpm",
+   "size": 5500000,
+   "browser_download_url": "https://github.com/robeertm/linkwache/releases/download/v0.5.0/Linkwache-0.5.0-1.aarch64.rpm",
+   "content_type": "application/octet-stream"
+  },
+  {
+   "name": "linkwache-extension-chromium-0.5.0.zip",
+   "size": 92160,
+   "browser_download_url": "https://github.com/robeertm/linkwache/releases/download/v0.5.0/linkwache-extension-chromium-0.5.0.zip",
+   "content_type": "application/octet-stream",
+   "digest": "sha256:a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9"
+  },
+  {
+   "name": "linkwache-extension-firefox-0.5.0.zip",
+   "size": 91136,
+   "browser_download_url": "https://github.com/robeertm/linkwache/releases/download/v0.5.0/linkwache-extension-firefox-0.5.0.zip",
+   "content_type": "application/octet-stream"
+  },
+  {
+   "name": "latest.json",
+   "size": 900,
+   "browser_download_url": "https://github.com/robeertm/linkwache/releases/download/v0.5.0/latest.json",
+   "content_type": "application/octet-stream"
+  },
+  {
+   "name": "SHA256SUMS.txt",
+   "size": 1200,
+   "browser_download_url": "https://github.com/robeertm/linkwache/releases/download/v0.5.0/SHA256SUMS.txt",
+   "content_type": "application/octet-stream"
+  }
+ ]
+}

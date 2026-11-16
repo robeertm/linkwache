@@ -157,3 +157,46 @@ footer{margin-block:28px 34px;color:var(--leise);font-size:.88rem;border-top:1px
 .admin .row{margin-top:12px}
 .adm-state{font-weight:600}
 .admin [hidden]{display:none!important}
+
+/* Download */
+.appnote{margin:14px 0 0;color:var(--leise);font-size:.9rem}
+.dl .rel{margin:.2rem 0 0}
+.dl .karte{padding:1rem 1.1rem;margin:12px 0}
+.dl .karte h2,.dl .karte h3{margin-top:0}
+.dl .karte.note h3{font-size:1.05rem;margin:0 0 .3rem}
+.dl .grp{margin:14px 0}
+.dl .grp>h3{font-size:.92rem;margin:0 0 6px;color:var(--text)}
+.pkg{background:var(--karte);border:1px solid var(--rand);border-radius:var(--r);padding:.85rem 1rem;margin:8px 0;box-shadow:var(--schatten)}
+.pkg.primary{border-color:var(--akzent);box-shadow:0 0 0 1px var(--akzent-glow),0 10px 30px var(--akzent-glow);padding:1.1rem 1.2rem}
+.pkg-head{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.pkg-head>div{flex:1 1 16rem;min-width:0}
+.pkg-head b{display:block;font-size:1rem}
+.pkg.primary .pkg-head b{font-size:1.15rem}
+.pkg-head .small{display:block;overflow-wrap:anywhere}
+.pkg-head .btn{flex:0 0 auto}
+.sha{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.sha .lbl{font-size:.72rem;color:var(--leise);text-transform:uppercase;letter-spacing:.06em;flex:0 0 auto}
+.shaval{display:block;flex:1 1 18rem;min-width:0;word-break:break-all;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.78rem;padding:7px 9px;border:1px solid var(--rand);border-radius:.6rem;background:var(--feld);color:var(--text);overflow-wrap:anywhere}
+.btn.small{font-size:.82rem;padding:7px 12px;font-weight:600}
+.helps{margin-top:18px}
+.helpbox>summary{cursor:pointer;color:var(--akzent);font-weight:650}
+.helpbox[open]>summary{margin-bottom:.5rem}
+.help h3{display:none}
+.help h4{margin:1.1em 0 .3em;font-size:.95rem}
+.how{padding-left:1.3rem;margin:.4rem 0}
+.how li{margin:.3rem 0}
+pre.cmd{margin:.3rem 0 .6rem;padding:.6rem .8rem;border:1px solid var(--rand);border-radius:.7rem;background:var(--feld);overflow-x:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.84rem}
+/* SmartScreen illustration (HTML/CSS, not a screenshot) */
+.ss{margin:12px 0}
+.ss-win{max-width:30rem;border-radius:.5rem;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.35);background:#1f5fa8;color:#fff;font-family:"Segoe UI",system-ui,sans-serif}
+.ss-bar{height:1.6rem;background:#17497f}
+.ss-body{padding:1.1rem 1.3rem 1.2rem}
+.ss-body h4{margin:0 0 .6rem;font-size:1.25rem;font-weight:600;color:#fff}
+.ss-body p{margin:.4rem 0;font-size:.88rem;line-height:1.4;color:#fff}
+.ss-more u{font-weight:600}
+.ss-pub{opacity:.85}
+.ss-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:1rem}
+.ss-btn{padding:.45rem 1rem;border:1px solid rgba(255,255,255,.75);font-size:.88rem}
+.ss-btn.on{background:#fff;color:#17497f;font-weight:600}
+.ss figcaption{margin-top:6px;font-style:italic}
+@media (max-width:520px){.pkg-head .btn{flex:1 1 100%}.ss-body{padding:.9rem 1rem 1rem}}

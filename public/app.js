@@ -38,7 +38,8 @@
     if (!b) return;
     const inp = document.querySelector(b.dataset.copy);
     if (!inp) return;
-    navigator.clipboard.writeText(inp.value).then(() => { b.textContent = S.copied || "✓"; setTimeout(() => (b.textContent = S.copy || "Copy"), 1800); }).catch(() => { inp.select(); });
+    const label = b.dataset.label || S.copy || "Copy";
+    navigator.clipboard.writeText(inp.value !== undefined ? inp.value : inp.textContent).then(() => { b.textContent = b.dataset.done || S.copied || "✓"; setTimeout(() => (b.textContent = label), 1800); }).catch(() => { if (inp.select) inp.select(); });
   });
 
   function showError(msg) {

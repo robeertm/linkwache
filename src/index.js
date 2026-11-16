@@ -7,11 +7,12 @@
 //   email()                  Mail-Eingang (Cloudflare Email Routing)
 // Alles andere sind statische Dateien aus public/.
 import { runCheck, refreshScan } from "./check.js";
-import { page, homePage, resultCard, resultText, paypalLink, legalPage, privacyPage, shortcutPage, notFoundPage } from "./render.js";
+import { page, homePage, resultCard, resultText, paypalLink, legalPage, privacyPage, shortcutPage, notFoundPage, downloadPage } from "./render.js";
 import { handleTelegram } from "./telegram.js";
 import { extractUrls, sha256hex, esc } from "./util.js";
 import { pickLang, t, verdictText } from "./i18n.js";
 import { VERSION } from "./version.js";
+import { apiV1Check } from "./api_v1.js";
 
 const TTL = 90 * 86400;
 
@@ -23,14 +24,16 @@ export default {
     try {
       if (p === "/" || p === "/index.html") return html(homePage(lang, env), 200, lang);
       if (p === "/api/check" && req.method === "POST") return apiCheck(req, env, ctx, lang);
+      if (p === "/api/v1/check" && req.method === "POST") return apiV1Check(req, env, ctx, lang);
       if (p.startsWith("/api/result/")) return apiResult(p.slice("/api/result/".length), env, ctx, lang);
       if (p.startsWith("/r/")) return resultPage(p.slice(3), env, ctx, lang);
       if (p === "/impressum.html") return html(legalPage(lang, env), 200, lang);
       if (p === "/datenschutz.html") return html(privacyPage(lang, env), 200, lang);
       if (p === "/kurzbefehl.html") return html(shortcutPage(lang, env), 200, lang);
+      if (p === "/download" || p === "/download/" || p === "/download.html") return html(downloadPage(lang, env, { ua: req.headers.get("user-agent") || "", os: url.searchParams.get("os") || "" }), 200, lang, "user-agent");
       if (p === "/share") return share(url);
       if (p === "/telegram" && req.method === "POST") return handleTelegram(req, env, ctx, { runCheck, resultText });
-      if (p === "/api/health") return json({ ok: true, version: VERSION, name: env.SITE_NAME, paypal: paypalLink(env), scan: !!env.URLSCAN_KEY, sb: !!env.SAFE_BROWSING_KEY, telegram: !!env.TELEGRAM_TOKEN, ...(env.UPDATE_INFO?.latest ? { update: env.UPDATE_INFO.latest } : {}) });
+      if (p === "/api/health") return json({ ok: true, version: VERSION, api: [1], name: env.SITE_NAME, paypal: paypalLink(env), scan: !!env.URLSCAN_KEY, sb: !!env.SAFE_BROWSING_KEY, telegram: !!env.TELEGRAM_TOKEN, ...(env.UPDATE_INFO?.latest ? { update: env.UPDATE_INFO.latest } : {}) });
     } catch (e) {
       console.error("Fehler", p, String(e).slice(0, 300));      // Details nur ins Log, nicht nach außen
       return json({ error: "Interner Fehler" }, 500);
@@ -119,7 +122,7 @@ function strip(r, env, lang) {
 }
 
 const json = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" } });
-const html = (s, status = 200, lang = "de") => new Response(s, { status, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", "content-language": lang, "vary": "accept-language" } });
+const html = (s, status = 200, lang = "de", vary = "") => new Response(s, { status, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", "content-language": lang, "vary": "accept-language" + (vary ? ", " + vary : "") } });
 
 
 async function staticPage(req, env) {

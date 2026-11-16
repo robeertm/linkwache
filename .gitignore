@@ -6,3 +6,4 @@ node_modules/
 data/
 deploy/nas/linkwache.env
 pruefstaende/
+extension/dist/

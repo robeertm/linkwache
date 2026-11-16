@@ -187,8 +187,8 @@ export function rdapFindings(rd) {
 }
 
 /** Zertifikatslisten (crt.sh): wann tauchte der Name zum ersten Mal auf? */
-export async function ctFacts(domain) {
-  const r = await fetchTimeout(`https://crt.sh/?q=${encodeURIComponent("%." + domain)}&output=json`, {}, 8000);
+export async function ctFacts(domain, timeoutMs = 8000) {
+  const r = await fetchTimeout(`https://crt.sh/?q=${encodeURIComponent("%." + domain)}&output=json`, {}, timeoutMs);
   if (!r.ok) return { ok: false };
   const j = await r.json();
   if (!Array.isArray(j) || !j.length) return { ok: true, count: 0, first: null };
