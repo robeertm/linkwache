@@ -162,8 +162,14 @@ LINKWACHE_DEFAULT_SERVER=https://example.org ./gradlew :app:assembleRelease   # 
 CI never sees the signing key. For a release, the unsigned APK from the tag's CI run is
 signed on the maintainer's build host with `android/scripts/sign-release.sh`, which checks
 the CI checksum and zip alignment, signs with APK signature scheme v2 + v3, verifies the
-result and refuses any certificate other than the one above. The signed APK is attached to
-the GitHub release; the download page and the in-app updater pick it up from there.
+result and refuses any certificate other than the one above. `android/scripts/publish-apk.sh
+vX.Y.Z` attaches it to the existing GitHub release — only if the Android workflow of the tag's
+commit (tests, lint, emulator test) succeeded — and compares the digest GitHub reports with the
+local SHA-256. It never creates tags or releases. The download page and the in-app updater
+pick the APK up from the release.
+
+Emulator CI also installs the minified release build (signed with the public debug key, for
+this test only) and checks that the sheet renders and a link gets a verdict.
 
 ## Languages
 

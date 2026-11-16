@@ -61,6 +61,8 @@ if [ "$CERT" != "$EXPECTED_CERT" ]; then
   exit 4
 fi
 (cd "$OUT" && sha256sum "Linkwache-android-$V.apk" > "Linkwache-android-$V.apk.sha256")
+# Run through sudo: hand the result back to the calling user.
+if [ -n "${SUDO_UID:-}" ]; then chown -R "$SUDO_UID:${SUDO_GID:-$SUDO_UID}" "$OUT"; fi
 echo "signed: $DST"
 echo "certificate: $CERT"
 cat "$OUT/Linkwache-android-$V.apk.sha256"

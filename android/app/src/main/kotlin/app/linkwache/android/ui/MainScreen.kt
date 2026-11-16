@@ -276,14 +276,11 @@ private fun ServerEditor(m: HomeModel) {
         modifier = Modifier.fillMaxWidth().testTag("server-field"),
     )
     Spacer(Modifier.height(10.dp))
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        FilledTonalButton(onClick = {
-            if (m.host.setServer(text)) m.host.testServer(text) else m.serverTest = HomeModel.ServerTest.Invalid
-        }) { Text(t("setup.server.test")) }
-        if (!m.serverIsPreset && m.server.isNotEmpty()) {
-            Spacer(Modifier.size(8.dp))
-            TextButton(onClick = { m.host.resetServer() }) { Text(t("android.set.server.reset"), maxLines = 1, overflow = TextOverflow.Ellipsis) }
-        }
+    FilledTonalButton(onClick = {
+        if (m.host.setServer(text)) m.host.testServer(text) else m.serverTest = HomeModel.ServerTest.Invalid
+    }) { Text(t("setup.server.test")) }
+    if (!m.serverIsPreset && m.server.isNotEmpty()) {
+        TextButton(onClick = { m.host.resetServer() }, contentPadding = PaddingValues(horizontal = 4.dp)) { Text(t("android.set.server.reset")) }
     }
     val sig = LocalSignal.current
     when (val s = m.serverTest) {
