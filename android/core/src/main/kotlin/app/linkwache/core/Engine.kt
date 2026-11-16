@@ -109,8 +109,11 @@ class Engine(
         fun merge(p: Prepared, v: ServerVerdict, source: Source): CheckResult {
             val r = baseResult(p)
             val keys = v.findings.map { it.key }.toSet()
-            val findings = (v.findings + p.local.findings.filter { it.key !in keys }).sortedBy { it.level.order }
-            val worse = p.local.level.severity > v.level.severity
+            val localOnly = p.local.findings.filter { it.key !in keys }
+            val findings = (v.findings + localOnly).sortedBy { it.level.order }
+            // When the server reported every local finding itself, its level decides (it runs the same
+            // heuristics and may soften one with more knowledge, e.g. http to a well-known site, 0.5.3).
+            val worse = localOnly.isNotEmpty() && p.local.level.severity > v.level.severity
             return if (worse) {
                 r.copy(findings = findings, source = source, chain = v.chain)
             } else {

@@ -288,7 +288,7 @@ export function downloadPage(lang, env, { ua = "", os = "" } = {}) {
     body += `<details class="karte helpbox"${s === sys ? " open" : ""}><summary>${P(s === "windows" ? "dl.win.h" : s === "macos" ? "dl.mac.h" : "dl.linux.h")}</summary>${helpFor(s, lang, env, pkgs)}</details>`;
   }
   if (pkgs.some((p) => p.group === "extension")) {
-    body += `<details class="karte helpbox"><summary>${P("dl.ext.h")}</summary><div class="help"><p>${P("dl.ext.lead")}</p>
+    body += `<details class="karte helpbox" id="ext"><summary>${P("dl.ext.h")}</summary><div class="help"><p>${P("dl.ext.lead")}</p>
     <h4>${P("dl.ext.chrome.h")}</h4>${steps(lang, env, ["dl.ext.c1", "dl.ext.c2", "dl.ext.c3", "dl.ext.c4"])}
     <h4>${P("dl.ext.firefox.h")}</h4>${steps(lang, env, ["dl.ext.f1", "dl.ext.f2", "dl.ext.f3"])}<p class="small">${P("dl.ext.f.note")}</p></div></details>`;
   }

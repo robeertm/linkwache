@@ -117,6 +117,7 @@
     catch (e) { status("serverstatus", "bad", LW.t(String(e) === "invalid" ? "dt.setup.server.invalid" : "dt.setup.server.fail")); }
   });
   $("rerun").addEventListener("click", () => LW.invoke("open_window", { which: "setup" }));
+  $("extguide").addEventListener("click", () => LW.invoke("open_guide", { which: "extension" }).catch(() => {}));
   $("makedefault").addEventListener("click", async () => { await LW.invoke("make_default").catch(() => {}); setTimeout(browser, 1500); });
   $("allowadd").addEventListener("click", async () => {
     try { await LW.invoke("allow_add", { domain: $("allowinput").value }); $("allowinput").value = ""; $("allowerr").hidden = true; flash(); load(); }

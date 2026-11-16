@@ -19,6 +19,22 @@ All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
   instead of ISO, in the version line and on every package card, in all 8 languages (`Intl`, UTC so the day never
   shifts).
 
+### Fixed — apps
+- Desktop app, browser extension and Android app never use cached answers of older server rules: a false alarm
+  fixed on the server no longer lives on for up to 24 hours (installations from 0.5.2 and older drop their cache
+  entries on the update; a newer rules version from the server drops older entries at once).
+- The apps follow the server's level when the server reported every local finding itself (so an `http` hint the
+  server softened no longer turns the result amber locally).
+- Desktop: the warning for a dangerous link comes to the front even though Linkwache is not the active app. On
+  macOS the app is activated and the window joins every Space including full-screen ones (before, the window could
+  stay invisible behind or beside a full-screen browser); on Windows and Linux it stays on top and asks for
+  attention when the system refuses the focus.
+
+### Added
+- Desktop: the setup assistant and the settings (Browser tab) explain that clicks inside the browser need the
+  browser extension and open the installation guide on the download page, in all eight languages. `/download#ext`
+  opens that guide directly.
+
 ## 0.5.2 — 2026-11-16
 
 ### Fixed

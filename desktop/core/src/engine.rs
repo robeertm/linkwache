@@ -101,6 +101,8 @@ fn base_result(p: &Prepared) -> CheckResult {
 
 /// Combine the server answer with the local assessment: the worse level wins, server
 /// findings (translated) first, local findings the server did not report are added.
+/// When the server reported every local finding itself (same keys), its level decides: it runs the
+/// same heuristics and may soften one with more knowledge (e.g. `http` to a well-known site, 0.5.3).
 pub fn merge(p: &Prepared, server: &Value, source: &str) -> CheckResult {
     let mut r = base_result(p);
     let s_stufe = server.get("stufe").and_then(|x| x.as_str()).unwrap_or("gelb").to_string();
@@ -109,16 +111,18 @@ pub fn merge(p: &Prepared, server: &Value, source: &str) -> CheckResult {
         .and_then(|f| f.as_array())
         .map(|a| a.iter().filter_map(|x| serde_json::from_value::<Finding>(x.clone()).ok()).collect())
         .unwrap_or_default();
+    let mut local_only = false;
     for lf in &p.local.findings {
         if !findings.iter().any(|f| f.key == lf.key) {
             findings.push(lf.clone());
+            local_only = true;
         }
     }
     findings.sort_by_key(|f| level_order(&f.stufe));
     r.findings = findings;
     r.source = source.into();
     r.server = Some(server.clone());
-    if severity(&p.local.stufe) > severity(&s_stufe) {
+    if local_only && severity(&p.local.stufe) > severity(&s_stufe) {
         r.stufe = p.local.stufe.clone();
     } else {
         r.stufe = s_stufe;
@@ -179,6 +183,7 @@ impl<'a, A: CheckApi> Engine<'a, A> {
                 let s_stufe = v.get("stufe").and_then(|x| x.as_str()).unwrap_or("gelb").to_string();
                 let mut c = Cache::load(&self.paths.cache());
                 let now = now_secs();
+                c.note_rules(cache::rules_of(&v));
                 c.put(cache::key(&p.target, self.settings.scope), &s_stufe, v, ttl, now);
                 let _ = c.save(&self.paths.cache(), now);
                 r

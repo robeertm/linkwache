@@ -2132,6 +2132,7 @@ dependencies = [
  "core-foundation 0.10.1",
  "core-foundation-sys",
  "linkwache-core",
+ "objc2",
  "serde",
  "serde_json",
  "sys-locale",

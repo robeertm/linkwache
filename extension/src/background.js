@@ -6,7 +6,7 @@ import { getAll, set, installId, validServer, DEFAULTS } from "./store.js";
 import { t, pickLang } from "./i18n.js";
 import * as native from "./native.js";
 import { hostInfo } from "../../src/util.js";
-import { prepare, isAllowed, localAssess, reduceForSend, cacheKey, cacheFresh, ttlFor, decide, b64urlEncode, slimFindings, normalizeHttp } from "./logic.js";
+import { prepare, isAllowed, localAssess, reduceForSend, cacheKey, cacheFresh, ttlFor, decide, b64urlEncode, slimFindings, normalizeHttp, RULES, purgeOlderRules } from "./logic.js";
 
 const TIMEOUT_MS = 6000;
 const CACHE_MAX = 400;
@@ -51,24 +51,27 @@ export async function evaluate(raw) {
 
   const local = localAssess(target);
   if (local.stufe === "rot") {
-    await remember(key, domain, "rot", local.findings, 86400);
+    await remember(key, domain, "rot", local.findings, 86400, RULES);
     return { ...base, stufe: "rot", findings: local.findings, source: "local" };
   }
 
   let res = null;
   if (native.appInfo() || (await native.hello(VERSION))) res = await native.check(reduceForSend(target, st.settings.scope), lang);
+  const fromApp = !!res;
   if (res && res.offline) return { ...base, stufe: "off", findings: slimFindings(res.local && res.local.findings), source: "app" };
   if (!res) res = await serverCheck(target, st, lang);
   if (!res) return { ...base, stufe: "off", findings: local.findings.filter((f) => f.stufe !== "info"), source: "local" };
 
   const findings = slimFindings(res.findings);
-  await remember(key, domain, res.stufe, findings, ttlFor(res.stufe, res.cacheTtl));
+  const rules = Number(res.rules) || (fromApp ? RULES : 1);
+  if (rules > RULES) await newerRules(rules);
+  await remember(key, domain, res.stufe, findings, ttlFor(res.stufe, res.cacheTtl), rules);
   return { ...base, stufe: res.stufe, findings, source: res.source || "server" };
 }
 
-async function remember(key, domain, stufe, findings, ttl) {
+async function remember(key, domain, stufe, findings, ttl, rules) {
   const { cache } = await getAll();
-  cache[key] = { st: stufe, f: findings, at: Date.now(), ttl, d: domain };
+  cache[key] = { st: stufe, f: findings, at: Date.now(), ttl, d: domain, r: rules };
   const keys = Object.keys(cache);
   if (keys.length > CACHE_MAX) for (const k of keys.sort((a, b) => cache[a].at - cache[b].at).slice(0, keys.length - CACHE_MAX)) delete cache[k];
   await set({ cache });
@@ -91,6 +94,23 @@ async function blockDomain(domain) {
 async function unblockDomain(domain) {
   try { if (DNR && DNR.updateSessionRules) await DNR.updateSessionRules({ removeRuleIds: [ruleId(domain)] }); } catch { /* none */ }
 }
+/** Drop cached results of older rules and the domain blocks built from them (after an update or when the
+ * server answers with newer rules) — a fixed false alarm must not live on in the cache. */
+async function dropOlderRules(minRules) {
+  const { cache } = await getAll();
+  const gone = purgeOlderRules(cache, minRules);
+  if (!gone.length) return;
+  await set({ cache });
+  try { const rules = await DNR.getSessionRules(); await DNR.updateSessionRules({ removeRuleIds: rules.map((x) => x.id) }); } catch { /* none */ }
+  await rebuildRules();
+}
+async function newerRules(r) {
+  const seen = Number((await api.storage.local.get("rulesSeen")).rulesSeen) || RULES;
+  if (r <= seen) return;
+  await api.storage.local.set({ rulesSeen: r });
+  await dropOlderRules(r);
+}
+
 async function rebuildRules() {
   const { cache, allow } = await getAll();
   const once = (await api.storage.local.get("once")).once || {};
@@ -185,7 +205,7 @@ api.runtime.onMessage.addListener((m, sender, reply) => {
 });
 
 if (api.action && api.action.onClicked) api.action.onClicked.addListener(() => api.runtime.openOptionsPage());
-if (api.runtime.onInstalled) api.runtime.onInstalled.addListener(async () => { await installId(); await set({ settings: (await getAll()).settings }); });
+if (api.runtime.onInstalled) api.runtime.onInstalled.addListener(async () => { await installId(); await set({ settings: (await getAll()).settings }); await dropOlderRules(RULES); });
 if (api.runtime.onStartup) api.runtime.onStartup.addListener(() => { rebuildRules(); });
 rebuildRules();
 native.hello(VERSION);

@@ -25,6 +25,8 @@ data class ServerVerdict(
     val findings: List<Finding>,
     val cacheTtl: Long?,
     val raw: String,
+    /** Rules version of the server (0.5.3 = 2); answers before that carry none (= 1). */
+    val rules: Int = 1,
 )
 
 sealed class ApiError(val reason: String) : Exception(reason) {
@@ -64,7 +66,7 @@ object V1 {
         val chain = ArrayList<String>()
         j.optJSONArray("chain")?.let { a -> for (i in 0 until a.length()) a.optString(i)?.let { chain += it } }
         val ttl = if (j.has("cacheTtl")) j.optLong("cacheTtl", -1).takeIf { it > 0 } else null
-        return ServerVerdict(level, j.str("kurzKey"), j.str("ratKey"), j.str("kurz"), j.str("rat"), j.str("url"), chain, findings, ttl, body)
+        return ServerVerdict(level, j.str("kurzKey"), j.str("ratKey"), j.str("kurz"), j.str("rat"), j.str("url"), chain, findings, ttl, body, j.optInt("rules", 1).coerceAtLeast(1))
     }
 
     fun body(req: CheckRequest): String = JSONObject()

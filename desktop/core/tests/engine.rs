@@ -29,7 +29,7 @@ impl CheckApi for Mock {
 }
 
 fn green() -> Value {
-    json!({"api":1,"stufe":"gruen","score":0,"kurzKey":"v.gruen","ratKey":"v.gruen.rat","kurz":"No warning signs found","rat":"…","findings":[{"key":"db-clean","stufe":"info","p":{"n":3},"titel":"Not listed","text":"…"}],"cacheTtl":21600})
+    json!({"api":1,"rules":2,"stufe":"gruen","score":0,"kurzKey":"v.gruen","ratKey":"v.gruen.rat","kurz":"No warning signs found","rat":"…","findings":[{"key":"db-clean","stufe":"info","p":{"n":3},"titel":"Not listed","text":"…"}],"cacheTtl":21600})
 }
 
 fn setup() -> (tempfile::TempDir, Paths, Settings) {
@@ -237,4 +237,35 @@ fn host_invocation_detection() {
     let m = nm::chrome_manifest("/opt/linkwache");
     assert_eq!(m["allowed_origins"][0], "chrome-extension://ldehleohedacddboipopkjkphjnphine/");
     assert_eq!(nm::firefox_manifest("/x")["allowed_extensions"][0], "{ef1e5d25-3e24-4517-a534-dad3a936dcb3}");
+}
+
+#[test]
+fn server_may_soften_a_local_finding_it_reported_itself() {
+    let (_d, paths, s) = setup();
+    // http:// to a well-known site: the server reports `http` as info and answers green (0.5.3)
+    let soft = json!({"api":1,"rules":2,"stufe":"gruen","score":0,"kurzKey":"v.gruen","ratKey":"v.gruen.rat","findings":[{"key":"http","stufe":"info","p":{"known":true}}],"cacheTtl":21600});
+    let api = Mock::new(Ok(soft));
+    let e = Engine { paths: &paths, settings: &s, api: &api };
+    let (_, r) = e.check("http://www.example.com/", "en");
+    assert_eq!(r.unwrap().stufe, "gruen");
+    // a local finding the server did not report still counts
+    let api2 = Mock::new(Ok(green()));
+    let e2 = Engine { paths: &paths, settings: &s, api: &api2 };
+    let (_, r2) = e2.check("http://plain.example.net/", "en");
+    assert_eq!(r2.unwrap().stufe, "gelb");
+}
+
+#[test]
+fn cached_answer_of_older_rules_is_asked_again() {
+    let (_d, paths, s) = setup();
+    let mut c = linkwache_core::cache::Cache::default();
+    let u = url::Url::parse("https://shop.example.com/a").unwrap();
+    // a red answer cached by 0.5.1 (no rules field)
+    c.put(linkwache_core::cache::key(&u, Scope::Url), "rot", json!({"api":1,"stufe":"rot","findings":[]}), None, linkwache_core::store::now_secs());
+    c.save(&paths.cache(), linkwache_core::store::now_secs()).unwrap();
+    let api = Mock::new(Ok(green()));
+    let e = Engine { paths: &paths, settings: &s, api: &api };
+    let (_, r) = e.check("https://shop.example.com/a", "en");
+    let r = r.unwrap();
+    assert_eq!((r.stufe.as_str(), r.source.as_str()), ("gruen", "server"));
 }

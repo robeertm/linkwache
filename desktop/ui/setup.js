@@ -104,6 +104,7 @@
 
   $("test").addEventListener("click", testServer);
   $("makedefault").addEventListener("click", makeDefault);
+  $("extguide").addEventListener("click", () => LW.invoke("open_guide", { which: "extension" }).catch(() => {}));
   $("back").addEventListener("click", () => { if (step > 0) { step--; show(); } });
   $("next").addEventListener("click", async () => {
     const name = STEPS[step];

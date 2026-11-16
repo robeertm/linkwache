@@ -34,6 +34,7 @@ windows-sys = { version = "0.59", features = ["Win32_UI_Shell", "Win32_Foundatio
 [target.'cfg(target_os = "macos")'.dependencies]
 core-foundation = "0.10"
 core-foundation-sys = "0.8"
+objc2 = "0.6"
 
 [features]
 # Test hook for the end-to-end tests (writes UI state to $LINKWACHE_E2E_STATE_FILE).

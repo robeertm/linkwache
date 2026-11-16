@@ -267,6 +267,18 @@ pub async fn install_update(app: AppHandle) -> R<()> {
     updates::install(&app).await
 }
 
+/// Open a guide in the real browser (never through the check): `extension` = how to install the
+/// browser extension, on the download page of the configured server.
+#[tauri::command]
+pub async fn open_guide(app: AppHandle, which: String) -> R<()> {
+    let s = app.state::<AppState>().settings();
+    let url = match which.as_str() {
+        "extension" if !s.server.is_empty() => format!("{}/download?lang={}#ext", s.server.trim_end_matches('/'), s.lang),
+        _ => "https://github.com/robeertm/linkwache/releases/latest".to_string(),
+    };
+    flow::forward(&app, &s, &url)
+}
+
 #[tauri::command]
 pub async fn open_window(app: AppHandle, which: String, tab: Option<String>) -> R<()> {
     match which.as_str() {

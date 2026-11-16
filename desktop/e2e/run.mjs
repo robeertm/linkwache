@@ -326,6 +326,14 @@ async function caseRed() {
   record("red link shows the warning window", !!w, w ? `findings ${w.data.findings}` : "");
   if (!w) return;
   await waitState("window-ready", (d) => d.label === `warn-${w.data.id}`, 5000, before);
+  // 0.5.3: the red warning must come to the front although Linkwache is not the active app
+  const rv = await waitState("revealed", (d) => d.label === `warn-${w.data.id}`, 5000, before);
+  record("red: warning window shown in front (visible, always on top)", !!rv && rv.data.visible && rv.data.onTop, rv ? JSON.stringify(rv.data) : "no reveal");
+  record("red: warning window has the focus", !!rv && rv.data.focused, rv ? JSON.stringify(rv.data) : "", false);
+  if (PLATFORM === "macos") {
+    const front = spawnSync("osascript", ["-e", 'tell application "System Events" to get name of first application process whose frontmost is true'], { encoding: "utf8", timeout: 10000 });
+    record("red (macOS): Linkwache is the frontmost app", /linkwache/i.test(front.stdout || ""), (front.stdout || front.stderr || "").trim(), false);
+  }
   await sleep(3500);
   screenshot("warning-red");
   record("red link: the real browser received nothing", !received().includes(url), received().join(" "));

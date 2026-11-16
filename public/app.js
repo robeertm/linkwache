@@ -99,3 +99,11 @@
 
   function esc(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 })();
+
+// /download#ext (link from the desktop app): open that help box and scroll to it.
+(function openHashedHelp() {
+  const id = decodeURIComponent((location.hash || "").slice(1));
+  if (!/^[a-z][a-z0-9-]{0,30}$/.test(id)) return;
+  const d = document.getElementById(id);
+  if (d && d.tagName === "DETAILS") { d.open = true; d.scrollIntoView({ block: "start" }); }
+})();

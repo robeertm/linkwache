@@ -79,12 +79,26 @@ test("cache: ttl by level, freshness, key without query", () => {
   assert.equal(ttlFor("rot"), 86400);
   assert.equal(ttlFor("gruen", 100), 100);
   assert.equal(ttlFor("rot", 10 ** 9), 86400);
-  assert.ok(cacheFresh({ at: Date.now() - 1000, ttl: 10 }));
-  assert.ok(!cacheFresh({ at: Date.now() - 11000, ttl: 10 }));
+  assert.ok(cacheFresh({ at: Date.now() - 1000, ttl: 10, r: 2 }));
+  assert.ok(!cacheFresh({ at: Date.now() - 11000, ttl: 10, r: 2 }));
   assert.equal(cacheKey("https://a.example/p?q=1#f"), "a.example/p");
 });
 
 test("warning payload survives base64url, including non-ASCII", () => {
   const d = { u: "https://bücher.example/ä?x=1&y=2", s: "gelb", f: [{ key: "idn", stufe: "gelb", p: { host: "bücher.example" } }] };
   assert.deepEqual(b64urlDecode(b64urlEncode(d)), d);
+});
+
+test("cache: results of older rules are never fresh and are purged (0.5.3 false-alarm fix)", async () => {
+  const { RULES, purgeOlderRules } = await import("../src/logic.js");
+  const now = Date.now();
+  const old = { st: "rot", f: [], at: now, ttl: 86400, d: "example.org" };            // cached by 0.5.1, no rules
+  const cur = { st: "gruen", f: [], at: now, ttl: 21600, d: "example.net", r: RULES };
+  assert.equal(cacheFresh(old, now), false);
+  assert.equal(cacheFresh(cur, now), true);
+  assert.equal(cacheFresh(cur, now, RULES + 1), false);
+  const cache = { a: old, b: cur };
+  const gone = purgeOlderRules(cache, RULES);
+  assert.deepEqual(gone, [old]);
+  assert.deepEqual(Object.keys(cache), ["b"]);
 });

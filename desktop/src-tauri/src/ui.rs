@@ -91,7 +91,7 @@ pub fn open_warning(app: &AppHandle, id: u64, stufe: &str) {
     let _ = app.run_on_main_thread(move || {
         let label = warning_label(id);
         if let Some(w) = app2.get_webview_window(&label) {
-            let _ = w.set_focus();
+            bring_to_front(&w);
             return;
         }
         let built = WebviewWindowBuilder::new(&app2, &label, WebviewUrl::App(format!("warning.html?id={id}").into()))
@@ -124,9 +124,37 @@ pub fn reveal(app: &AppHandle, label: &str) {
             if !w.is_visible().unwrap_or(true) {
                 let _ = w.show();
             }
-            let _ = w.set_focus();
+            bring_to_front(&w);
         }
     });
+}
+
+/// Put a window in front of everything, also when Linkwache is not the active app (it never is when
+/// a link arrives: the click happened in a browser or mail program). Main thread only.
+/// - macOS: the app runs as an accessory (no Dock icon) and `show`/`set_focus` alone neither activate it
+///   nor bring the window onto a full-screen Space — the warning stayed invisible (0.5.1). So: activate
+///   the app, let the window join every Space including full-screen ones, order it front regardless.
+/// - Windows/Linux: topmost, focus; if the system refuses focus (foreground lock, focus-stealing
+///   prevention) the window stays on top and asks for attention (taskbar flash / urgency hint).
+pub fn bring_to_front(w: &WebviewWindow) {
+    let _ = w.unminimize();
+    if !w.is_visible().unwrap_or(false) {
+        let _ = w.show();
+    }
+    let _ = w.set_always_on_top(true);
+    #[cfg(target_os = "macos")]
+    if let Ok(ns) = w.ns_window() {
+        crate::platform::bring_window_to_front(ns);
+    }
+    let _ = w.set_focus();
+    let focused = w.is_focused().unwrap_or(false);
+    if !focused {
+        let _ = w.request_user_attention(Some(tauri::UserAttentionType::Critical));
+    }
+    crate::e2e::state("revealed", serde_json::json!({
+        "label": w.label(), "visible": w.is_visible().unwrap_or(false), "focused": focused,
+        "onTop": w.is_always_on_top().unwrap_or(false),
+    }));
 }
 
 pub fn close_window(app: &AppHandle, label: &str) {

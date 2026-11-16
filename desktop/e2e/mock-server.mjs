@@ -55,7 +55,7 @@ const server = http.createServer((req, res) => {
     const v = verdict(findings, { url: u.href });
     const vt = verdictText(lang, v);
     const out = {
-      api: 1, stufe: v.stufe, score: v.score, kurzKey: v.kurzKey, ratKey: v.ratKey, kurz: vt.kurz, rat: vt.rat,
+      api: 1, rules: 2, stufe: v.stufe, score: v.score, kurzKey: v.kurzKey, ratKey: v.ratKey, kurz: vt.kurz, rat: vt.rat,
       url: u.href, host: { host: host.host, domain: host.domain, unicodeHost: host.unicodeHost }, chain: [],
       findings: v.findings.map((f) => ({ ...f, ...findingText(lang, f) })),
       cacheTtl: 60, checked: new Date().toISOString(), server: "0.5.0-mock",

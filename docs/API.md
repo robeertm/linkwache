@@ -36,9 +36,20 @@ Response 200:
                   "titel": "<translated>", "text": "<translated>" } ],
   "cacheTtl": 21600,
   "checked": "2026-11-16T12:00:00.000Z",
-  "server": "0.5.0"
+  "server": "0.5.0",
+  "rules": 2
 }
 ```
+
+`rules` (since 0.5.3, also in `/api/health`) is the version of the rules that decide a result. Clients store it
+with every cached answer and never use answers of older rules; when an answer carries a higher version than
+they know, they drop all older cached answers. Answers without the field count as version 1.
+
+Fraud lists (0.5.3): a list makes a link red only when it names exactly this URL (scheme ignored, host lower case,
+path and query as reported). Entries that only name other pages under the same name give `list-host` (amber, on the
+well-known site itself info). A listed start page of a well-known site gives `list-known` (info). `http` to the
+well-known site itself is info. Clients defer to the server's level when the server reported every finding of the
+local heuristics itself.
 
 Errors: `400 {"error":"err.nolink"|"err.install"}`, `403 {"error":"forbidden"}`,
 `413`, `415`, `429 {"error":"err.rate","retryAfter":<s>}`, `500 {"error":"internal"}`.

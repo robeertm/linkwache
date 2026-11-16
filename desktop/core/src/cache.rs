@@ -16,6 +16,14 @@ pub const TTL_GREEN: u64 = 6 * 3600;
 pub const TTL_WARN: u64 = 24 * 3600;
 pub const TTL_MAX: u64 = 48 * 3600;
 pub const MAX_ENTRIES: usize = 2000;
+/// Rules version of the server (field `rules` of a v1 answer, 0.5.3 = 2). Cached answers of older rules
+/// are never used: a fixed false alarm must not live on in the cache.
+pub const RULES: u64 = 2;
+
+/// Rules version of a cached server answer; answers before 0.5.3 carry none (= 1).
+pub fn rules_of(v: &Value) -> u64 {
+    v.get("rules").and_then(|r| r.as_u64()).unwrap_or(1)
+}
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Entry {
@@ -28,6 +36,9 @@ pub struct Entry {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Cache {
     pub entries: HashMap<String, Entry>,
+    /// Highest rules version the server has answered with.
+    #[serde(default)]
+    pub rules: u64,
 }
 
 /// `domain|sha256(host:port/path)` — the query string never takes part (it is never sent).
@@ -53,7 +64,23 @@ pub fn ttl(stufe: &str, server_ttl: Option<u64>) -> u64 {
 
 impl Cache {
     pub fn load(path: &Path) -> Cache {
-        read_json(path).unwrap_or_default()
+        let mut c: Cache = read_json(path).unwrap_or_default();
+        let min = c.min_rules();
+        c.entries.retain(|_, e| rules_of(&e.result) >= min);
+        c
+    }
+
+    fn min_rules(&self) -> u64 {
+        RULES.max(self.rules)
+    }
+
+    /// The server answered with rules version `r`: drop every entry of older rules.
+    pub fn note_rules(&mut self, r: u64) {
+        if r > self.rules {
+            self.rules = r;
+            let min = self.min_rules();
+            self.entries.retain(|_, e| rules_of(&e.result) >= min);
+        }
     }
 
     pub fn save(&mut self, path: &Path, now: u64) -> io::Result<()> {
@@ -62,7 +89,8 @@ impl Cache {
     }
 
     pub fn get(&self, key: &str, now: u64) -> Option<&Entry> {
-        self.entries.get(key).filter(|e| e.expires > now)
+        let min = self.min_rules();
+        self.entries.get(key).filter(|e| e.expires > now && rules_of(&e.result) >= min)
     }
 
     pub fn put(&mut self, key: String, stufe: &str, result: Value, server_ttl: Option<u64>, now: u64) {
@@ -126,8 +154,8 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("cache.json");
         let mut c = Cache::default();
-        c.put("k1".into(), "gruen", json!({"stufe":"gruen"}), None, 1000);
-        c.put("k2".into(), "rot", json!({"stufe":"rot"}), None, 1000);
+        c.put("k1".into(), "gruen", json!({"stufe":"gruen","rules":RULES}), None, 1000);
+        c.put("k2".into(), "rot", json!({"stufe":"rot","rules":RULES}), None, 1000);
         c.put("k3".into(), "gelb", json!({}), Some(0), 1000);
         assert!(c.get("k1", 1000 + TTL_GREEN - 1).is_some());
         assert!(c.get("k1", 1000 + TTL_GREEN).is_none());
@@ -149,5 +177,29 @@ mod tests {
         assert_eq!(c.entries.len(), MAX_ENTRIES);
         assert!(!c.entries.contains_key("k0"));
         assert!(c.entries.contains_key(&format!("k{}", MAX_ENTRIES + 49)));
+    }
+
+    #[test]
+    fn answers_of_older_rules_are_never_used() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("cache.json");
+        let mut c = Cache::default();
+        // as 0.5.1 cached it: no rules field (a false red that was fixed on the server)
+        c.put("old".into(), "rot", json!({"stufe":"rot"}), None, 1000);
+        c.put("new".into(), "gruen", json!({"stufe":"gruen","rules":RULES}), None, 1000);
+        assert!(c.get("old", 1001).is_none(), "pre-0.5.3 answer ignored");
+        assert!(c.get("new", 1001).is_some());
+        c.save(&path, 1001).unwrap();
+        let mut l = Cache::load(&path);
+        assert!(!l.entries.contains_key("old"), "dropped on load");
+        // the server moves to newer rules: everything older goes
+        l.note_rules(RULES + 1);
+        assert!(l.get("new", 1001).is_none());
+        assert!(l.entries.is_empty());
+        l.put("n3".into(), "gruen", json!({"stufe":"gruen","rules":RULES + 1}), None, 1001);
+        l.save(&path, 1002).unwrap();
+        let again = Cache::load(&path);
+        assert_eq!(again.rules, RULES + 1);
+        assert!(again.get("n3", 1003).is_some());
     }
 }

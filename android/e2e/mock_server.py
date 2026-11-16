@@ -32,7 +32,7 @@ def sha(path):
 
 def verdict(url):
     host = (urlsplit(url).hostname or "").lower()
-    base = {"api": 1, "score": 0, "url": url, "host": {"host": host, "domain": host, "unicodeHost": host},
+    base = {"api": 1, "rules": 2, "score": 0, "url": url, "host": {"host": host, "domain": host, "unicodeHost": host},
             "chain": [], "cacheTtl": 60, "checked": "2026-11-16T12:00:00.000Z", "server": "e2e"}
     if host.startswith("rot."):
         return {**base, "stufe": "rot", "score": 13, "kurzKey": "v.rot.one", "ratKey": "v.rot.rat",

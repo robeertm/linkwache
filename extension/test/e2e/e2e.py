@@ -32,7 +32,7 @@ class H(BaseHTTPRequestHandler):
         if DELAY["v"]: time.sleep(DELAY["v"])
         host = body["url"].split("/")[2]
         amber = host.startswith("amber")
-        out = {"api": 1, "stufe": "gelb" if amber else "gruen", "score": 3 if amber else 0, "kurzKey": "v.gelb.one" if amber else "v.gruen", "ratKey": "x", "kurz": "", "rat": "",
+        out = {"api": 1, "rules": 2, "stufe": "gelb" if amber else "gruen", "score": 3 if amber else 0, "kurzKey": "v.gelb.one" if amber else "v.gruen", "ratKey": "x", "kurz": "", "rat": "",
                "url": body["url"], "host": {"host": host, "domain": host, "unicodeHost": host}, "chain": [host],
                "findings": [{"key": "http", "stufe": "gelb", "p": {}, "titel": "", "text": ""}, {"key": "lure", "stufe": "gelb", "p": {"words": "offer"}, "titel": "", "text": ""}] if amber else [],
                "cacheTtl": 21600, "checked": "2026-11-16T12:00:00.000Z", "server": "test"}

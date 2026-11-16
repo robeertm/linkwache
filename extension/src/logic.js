@@ -78,7 +78,16 @@ export function ttlFor(stufe, cacheTtl) {
   const d = stufe === "gruen" ? GREEN_TTL : WARN_TTL;
   return Math.min(Number(cacheTtl) > 0 ? Number(cacheTtl) : d, WARN_TTL);
 }
-export function cacheFresh(entry, now = Date.now()) { return !!entry && now - entry.at < entry.ttl * 1000; }
+/** Rules version of the server (field `rules`, 0.5.3 = 2). Cached results of older rules are never used. */
+export const RULES = 2;
+export const rulesOf = (entry) => Number(entry && entry.r) || 1;
+export function cacheFresh(entry, now = Date.now(), minRules = RULES) { return !!entry && now - entry.at < entry.ttl * 1000 && rulesOf(entry) >= minRules; }
+/** Remove entries of older rules (in place); returns the removed ones. */
+export function purgeOlderRules(cache, minRules = RULES) {
+  const gone = [];
+  for (const [k, e] of Object.entries(cache)) if (rulesOf(e) < minRules) { gone.push(e); delete cache[k]; }
+  return gone;
+}
 
 /** result { stufe: gruen|gelb|rot|off } -> what the click does. Offline never opens silently. */
 export function decide(stufe) {

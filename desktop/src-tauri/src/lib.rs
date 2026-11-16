@@ -103,6 +103,7 @@ pub fn main_entry() {
             commands::check_update,
             commands::install_update,
             commands::open_window,
+            commands::open_guide,
         ])
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::Destroyed = event {

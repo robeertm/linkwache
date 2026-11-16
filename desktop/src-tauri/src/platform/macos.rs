@@ -183,3 +183,26 @@ pub fn write_nm(loc: &Path, manifest: &serde_json::Value) -> Result<(), String> 
 pub fn nm_installed() -> Vec<String> {
     nm_locations().into_iter().filter(|(_, _, p)| p.exists()).map(|(b, _, _)| b.to_string()).collect()
 }
+
+/// Activate Linkwache (an accessory app without Dock icon) and put `ns_window` (an NSWindow) in front
+/// of everything: on every Space including full-screen ones, ordered front even while another app is
+/// active. Main thread only (called from `ui::bring_to_front`).
+pub fn bring_window_to_front(ns_window: *mut std::ffi::c_void) {
+    use objc2::runtime::AnyObject;
+    use objc2::{class, msg_send};
+    // NSWindowCollectionBehaviorCanJoinAllSpaces | NSWindowCollectionBehaviorFullScreenAuxiliary
+    const BEHAVIOR: usize = (1 << 0) | (1 << 8);
+    unsafe {
+        let app: *mut AnyObject = msg_send![class!(NSApplication), sharedApplication];
+        if !app.is_null() {
+            let _: () = msg_send![app, activateIgnoringOtherApps: true];
+        }
+        let w = ns_window as *mut AnyObject;
+        if !w.is_null() {
+            let old: usize = msg_send![w, collectionBehavior];
+            let _: () = msg_send![w, setCollectionBehavior: old | BEHAVIOR];
+            let _: () = msg_send![w, orderFrontRegardless];
+            let _: () = msg_send![w, makeKeyAndOrderFront: std::ptr::null_mut::<AnyObject>()];
+        }
+    }
+}

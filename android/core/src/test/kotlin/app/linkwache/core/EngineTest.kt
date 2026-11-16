@@ -7,7 +7,7 @@ import org.junit.Test
 
 class EngineTest {
     private fun answer(stufe: String, findings: String = "[]", ttl: String = "") =
-        V1.parse("""{"api":1,"stufe":"$stufe","score":0,"kurzKey":"v.$stufe","ratKey":"v.$stufe.rat","kurz":"K-$stufe","rat":"R","url":"x","host":{},"chain":[],"findings":$findings$ttl,"checked":"t","server":"0.5.0"}""")
+        V1.parse("""{"api":1,"rules":2,"stufe":"$stufe","score":0,"kurzKey":"v.$stufe","ratKey":"v.$stufe.rat","kurz":"K-$stufe","rat":"R","url":"x","host":{},"chain":[],"findings":$findings$ttl,"checked":"t","server":"0.5.0"}""")
 
     private class Recorder(var reply: () -> ServerVerdict) : CheckApi {
         val calls = ArrayList<CheckRequest>()
@@ -122,5 +122,32 @@ class EngineTest {
         val d = VerdictCache().apply { load(c.toJson(100), 100) }
         assertEquals(Level.ROT, d.get("k", 200)!!.level)
         assertNull(d.get("k", 100 + VerdictCache.WARN_TTL + 1))
+    }
+
+    @Test
+    fun answersOfOlderRulesAreNotUsed() {
+        // a red answer cached by 0.5.1 (no rules field), as stored on the device
+        val old = V1.parse("""{"api":1,"stufe":"rot","findings":[]}""")
+        assertEquals(1, old.rules)
+        val c = VerdictCache()
+        c.put("k", old, 100)
+        assertNull("pre-0.5.3 answer ignored", c.get("k", 101))
+        val stored = """{"k":{"x":999999,"b":${org.json.JSONObject.quote(old.raw)}}}"""
+        val d = VerdictCache().apply { load(stored, 100) }
+        assertEquals(0, d.size())
+        // newer rules from the server drop everything older
+        d.put("n", answer("gruen"), 100)
+        d.noteRules(3)
+        assertNull(d.get("n", 101))
+    }
+
+    @Test
+    fun serverMaySoftenAFindingItReportedItself() {
+        val soft = V1.parse("""{"api":1,"rules":2,"stufe":"gruen","findings":[{"key":"http","stufe":"info","p":{"known":true}}]}""")
+        val (_, r) = Engine(EngineSettings(), Recorder { soft }, VerdictCache()).check("http://www.example.com/", "en")
+        assertEquals(Outcome.GRUEN, r!!.outcome)
+        // a local finding the server did not report still counts
+        val (_, r2) = Engine(EngineSettings(), Recorder { answer("gruen") }, VerdictCache()).check("http://plain.example.net/", "en")
+        assertEquals(Outcome.GELB, r2!!.outcome)
     }
 }
