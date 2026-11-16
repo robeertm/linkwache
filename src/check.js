@@ -29,7 +29,7 @@ export async function runCheck(rawInput, env, { withScan = true, lite = false } 
     : await unwrapShortener(input);
   const url = finalUrl;
   const h = hostInfo(url);
-  const heur = softenHttp(heuristics(url).findings, h.domain);
+  const heur = softenHttp(heuristics(url).findings, h.domain, h.host);
   if (chain.length > 1) {
     const th = hostInfo(chain[chain.length - 1]);
     heur.push({ key: "unwrapped", stufe: "info", p: { host: th.host } });

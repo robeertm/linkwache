@@ -31,7 +31,7 @@ test("well-known list covers global top sites, big German sites and brand homes;
 
 test("http://www.paypal.de/ listed at PhishTank (stale entry) → not red", () => {
   const url = "http://www.paypal.de/";
-  const heur = softenHttp(heuristics(url).findings, "paypal.de");
+  const heur = softenHttp(heuristics(url).findings, "paypal.de", "www.paypal.de");
   assert.ok(heur.every((f) => f.stufe !== "gelb" && f.stufe !== "rot"), JSON.stringify(heur));
   const f = listFindings({ url, domain: "paypal.de", pt: PT(url) });
   assert.deepEqual(f.map((x) => [x.key, x.stufe]), [["list-known", "info"]]);
@@ -60,9 +60,11 @@ test("entries that name other pages under the host never make a link red", () =>
   // urlscan: a malicious scan of another page of the domain
   const us = { ok: true, hits: [{ url: "https://www.example-shop.de/x", malicious: true }] };
   assert.deepEqual(listFindings({ url, domain: "example-shop.de", us }).map((x) => [x.key, x.stufe]), [["list-host", "gelb"]]);
-  // on a well-known site that is only a hint
-  const big = listFindings({ url: "https://docs.google.com/document/d/abc", domain: "google.com", us: { ok: true, hits: [{ url: "https://docs.google.com/forms/d/evil", malicious: true }] } });
+  // on the well-known site itself that is only a hint; on a subdomain (platforms!) it stays amber
+  const big = listFindings({ url: "https://www.google.com/search?q=x", domain: "google.com", us: { ok: true, hits: [{ url: "https://www.google.com/url?q=evil", malicious: true }] } });
   assert.deepEqual(big.map((x) => [x.key, x.stufe]), [["list-host", "info"]]);
+  const sub = listFindings({ url: "https://abc123.pages.dev/", domain: "pages.dev", us: { ok: true, hits: [{ url: "https://abc123.pages.dev/login", malicious: true }] } });
+  assert.deepEqual(sub.map((x) => [x.key, x.stufe]), [["list-host", "gelb"]]);
 });
 
 test("a real phishing domain stays red, a lookalike keeps its warning", () => {
@@ -70,6 +72,9 @@ test("a real phishing domain stays red, a lookalike keeps its warning", () => {
   assert.equal(stufe(url, "paypa1-sicherheit.com", { pt: PT(url) }), "rot");
   const local = verdict(heuristics("http://paypa1-sicherheit.com/konto/login").findings, { url: "http://paypa1-sicherheit.com/konto/login" });
   assert.notEqual(local.stufe, "gruen");
+  // http on a subdomain of a hosting platform stays amber (the suffix list here has no private platforms)
+  assert.ok(softenHttp(heuristics("http://xqvmt82n.pages.dev/").findings, "pages.dev", "xqvmt82n.pages.dev").some((f) => f.key === "http" && f.stufe === "gelb"));
+  assert.ok(softenHttp(heuristics("http://www.paypal.de/").findings, "paypal.de", "www.paypal.de").every((f) => f.stufe !== "gelb"));
   // softenHttp leaves unknown domains alone
   assert.ok(softenHttp(heuristics("http://paypa1-sicherheit.com/").findings, "paypa1-sicherheit.com").some((f) => f.key === "http" && f.stufe === "gelb"));
 });

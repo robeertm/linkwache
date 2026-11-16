@@ -26,6 +26,17 @@ export function listKey(url) {
 
 export const sameListedUrl = (a, b) => { const x = listKey(a); return !!x && x === listKey(b); };
 
+/** The well-known site itself (example.org or www.example.org). Subdomains are not: on hosting platforms
+ * (pages.dev, github.io, …) they belong to anyone, and the server's suffix list does not know those platforms. */
+export function isKnownSiteHost(host, domain) {
+  if (!isWellKnown(domain)) return false;
+  const h = String(host || "").toLowerCase().replace(/\.$/, "");
+  const d = String(domain).toLowerCase();
+  return h === d || h === "www." + d;
+}
+
+const hostOf = (url) => { try { return new URL(url).hostname; } catch { return ""; } };
+
 /** The start page of a well-known site itself (example.org/ or www.example.org/, no query) — not a subdomain. */
 export function isKnownStartPage(url, domain) {
   if (!isWellKnown(domain)) return false;
@@ -43,7 +54,7 @@ function hit(list, redKey, p, { exact, url, domain }) {
     if (isKnownStartPage(url, domain)) return { key: "list-known", stufe: "info", p: { list } };
     return { key: redKey, stufe: "rot", p };
   }
-  return { key: "list-host", stufe: isWellKnown(domain) ? "info" : "gelb", p: { list } };
+  return { key: "list-host", stufe: isKnownSiteHost(hostOf(url), domain) ? "info" : "gelb", p: { list } };
 }
 
 /**
@@ -76,8 +87,8 @@ export function listFindings({ url, domain, sb, uh, uhu, pt, us }) {
   return out;
 }
 
-/** http:// to a well-known site: these redirect to https; a hint, not a warning sign. */
-export function softenHttp(findings, domain) {
-  if (!isWellKnown(domain)) return findings;
+/** http:// to a well-known site itself: these redirect to https; a hint, not a warning sign. */
+export function softenHttp(findings, domain, host = domain) {
+  if (!isKnownSiteHost(host, domain)) return findings;
   return findings.map((x) => (x.key === "http" && x.stufe === "gelb" ? { ...x, stufe: "info", p: { ...(x.p || {}), known: true } } : x));
 }
