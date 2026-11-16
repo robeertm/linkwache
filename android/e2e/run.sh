@@ -242,6 +242,28 @@ for lang in en de; do
 done
 adb shell cmd uimode night no >/dev/null
 
+
+# ── Release build (minified) smoke test ─────────────────────────────────────
+if [ "${SHOTS_ONLY:-0}" != 1 ] && [ -n "${APK_RELEASE:-}" ] && [ -f "$APK_RELEASE" ]; then
+  adb uninstall $APP >/dev/null
+  if adb install -r "$APK_RELEASE" >/dev/null; then
+    adb shell cmd role add-role-holder android.app.role.BROWSER $APP 0
+    adb logcat -c
+    view "https://example.com/"
+    if wait_text "Choose browser" 15; then
+      ok "release build: sheet and texts render (asks for the real browser first)"
+      tap "Test browser"
+      end=$(( $(date +%s) + 15 )); res=""
+      while [ "$(date +%s)" -lt "$end" ]; do
+        if opened "https://example.com/"; then res="opened after a check against the preset server"; break; fi
+        if dump > "$OUT/ui.xml" 2>/dev/null && grep -qE "Could not be checked|Suspicious link|Dangerous link" "$OUT/ui.xml"; then res="sheet: $(grep -oE 'Could not be checked|Suspicious link|Dangerous link' "$OUT/ui.xml" | head -1)"; break; fi
+        sleep 0.5
+      done
+      [ -n "$res" ] && ok "release build: $res ($(checkms))" || fail "release build: no result"
+    else fail "release build: no sheet"; fi
+  else fail "release build: install"; fi
+fi
+
 stop_mock
 adb logcat -d -s Linkwache:I FAKEBROWSER:I > "$OUT/logcat.txt" 2>/dev/null
 log "screenshots: $(find "$OUT/shots" -name '*.png' | wc -l)"

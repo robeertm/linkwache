@@ -62,6 +62,10 @@ jobs:
           V=${{ steps.v.outputs.version }}
           cp android/app/build/outputs/apk/release/app-release-unsigned.apk "dist/Linkwache-android-$V-unsigned.apk"
           ( cd dist && sha256sum "Linkwache-android-$V-unsigned.apk" > "Linkwache-android-$V-unsigned.apk.sha256" )
+          # Copy signed with the public debug key, only for the emulator smoke test of the minified build.
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          "$BT/apksigner" sign --ks "$HOME/.android/debug.keystore" --ks-pass pass:android --ks-key-alias androiddebugkey \
+            --out dist/app-release-debugsigned.apk "dist/Linkwache-android-$V-unsigned.apk"
           echo "default server set: ${{ vars.LINKWACHE_DEFAULT_SERVER != '' }}" > dist/build-info.txt
           echo "commit: ${{ github.sha }}" >> dist/build-info.txt
       - uses: actions/upload-artifact@v4
@@ -110,6 +114,7 @@ jobs:
           APK_APP: ${{ github.workspace }}/dist/app-debug.apk
           APK_APP_NEXT: ${{ github.workspace }}/dist/app-debug-99.0.0.apk
           APK_FB: ${{ github.workspace }}/dist/fakebrowser-debug.apk
+          APK_RELEASE: ${{ github.workspace }}/dist/app-release-debugsigned.apk
           OUT: ${{ github.workspace }}/e2e-out
           DEVICE: ${{ matrix.device }}
           SHOTS_ONLY: ${{ matrix.shots_only }}
