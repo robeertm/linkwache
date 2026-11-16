@@ -1,0 +1,309 @@
+{
+ "about": "Expected results of the offline heuristics (src/checks.js heuristics + src/verdict.js). Generated from the server code; the desktop (Rust) and extension ports must produce the same keys, levels and verdict.",
+ "vectors": [
+  {
+   "url": "https://example.com/",
+   "findings": [],
+   "stufe": "gruen"
+  },
+  {
+   "url": "https://www.wikipedia.org/wiki/Link",
+   "findings": [],
+   "stufe": "gruen"
+  },
+  {
+   "url": "http://example.com/",
+   "findings": [
+    {
+     "key": "http",
+     "stufe": "gelb"
+    }
+   ],
+   "stufe": "gelb"
+  },
+  {
+   "url": "https://192.0.2.10/login",
+   "findings": [
+    {
+     "key": "ip-host",
+     "stufe": "rot"
+    },
+    {
+     "key": "lure",
+     "stufe": "info"
+    }
+   ],
+   "stufe": "rot"
+  },
+  {
+   "url": "https://user@example.com/",
+   "findings": [
+    {
+     "key": "at-sign",
+     "stufe": "rot"
+    }
+   ],
+   "stufe": "rot"
+  },
+  {
+   "url": "https://example.com@evil.example/",
+   "findings": [
+    {
+     "key": "at-sign",
+     "stufe": "rot"
+    }
+   ],
+   "stufe": "rot"
+  },
+  {
+   "url": "https://xn--pypal-4ve.com/",
+   "findings": [
+    {
+     "key": "idn",
+     "stufe": "gelb"
+    }
+   ],
+   "stufe": "gelb"
+  },
+  {
+   "url": "https://example.com:8443/",
+   "findings": [
+    {
+     "key": "port",
+     "stufe": "gelb"
+    }
+   ],
+   "stufe": "gelb"
+  },
+  {
+   "url": "https://cheap-deals.top/",
+   "findings": [
+    {
+     "key": "tld",
+     "stufe": "gelb"
+    }
+   ],
+   "stufe": "gelb"
+  },
+  {
+   "url": "https://paypal.com.secure-login.example/",
+   "findings": [
+    {
+     "key": "brand-sub",
+     "stufe": "rot"
+    },
+    {
+     "key": "lure",
+     "stufe": "gelb"
+    }
+   ],
+   "stufe": "rot"
+  },
+  {
+   "url": "https://paypal-konto.example/",
+   "findings": [
+    {
+     "key": "brand-typo",
+     "stufe": "rot"
+    },
+    {
+     "key": "lure",
+     "stufe": "info"
+    }
+   ],
+   "stufe": "rot"
+  },
+  {
+   "url": "https://login.paypal.com/",
+   "findings": [],
+   "stufe": "gruen"
+  },
+  {
+   "url": "https://a.b.c.d.example.com/",
+   "findings": [
+    {
+     "key": "subdomains",
+     "stufe": "gelb"
+    }
+   ],
+   "stufe": "gelb"
+  },
+  {
+   "url": "https://example.com/login/verify",
+   "findings": [
+    {
+     "key": "lure",
+     "stufe": "gelb"
+    }
+   ],
+   "stufe": "gelb"
+  },
+  {
+   "url": "https://example.com/account",
+   "findings": [
+    {
+     "key": "lure",
+     "stufe": "info"
+    }
+   ],
+   "stufe": "gruen"
+  },
+  {
+   "url": "https://bit.ly/3abcdef",
+   "findings": [
+    {
+     "key": "shortener",
+     "stufe": "info"
+    }
+   ],
+   "stufe": "gruen"
+  },
+  {
+   "url": "https://dhl-paket-zustellung.xyz/track",
+   "findings": [
+    {
+     "key": "tld",
+     "stufe": "gelb"
+    },
+    {
+     "key": "brand-typo",
+     "stufe": "rot"
+    },
+    {
+     "key": "lure",
+     "stufe": "gelb"
+    }
+   ],
+   "stufe": "rot"
+  },
+  {
+   "url": "https://sparkasse.de/",
+   "findings": [],
+   "stufe": "gruen"
+  },
+  {
+   "url": "https://amazon.de/gp/your-account",
+   "findings": [
+    {
+     "key": "lure",
+     "stufe": "info"
+    }
+   ],
+   "stufe": "gruen"
+  },
+  {
+   "url": "https://example.org/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "findings": [
+    {
+     "key": "long",
+     "stufe": "info"
+    }
+   ],
+   "stufe": "gruen"
+  },
+  {
+   "url": "https://mail.google.com/mail/u/0/",
+   "findings": [],
+   "stufe": "gruen"
+  },
+  {
+   "url": "https://outlook.office.com/mail/",
+   "findings": [],
+   "stufe": "gruen"
+  },
+  {
+   "url": "https://sub.example.co.uk/",
+   "findings": [],
+   "stufe": "gruen"
+  },
+  {
+   "url": "https://xn--80ak6aa92e.com/",
+   "findings": [
+    {
+     "key": "idn",
+     "stufe": "gelb"
+    }
+   ],
+   "stufe": "gelb"
+  },
+  {
+   "url": "https://www.microsoft.com/",
+   "findings": [],
+   "stufe": "gruen"
+  },
+  {
+   "url": "https://login.microsoftonline.com/common/oauth2",
+   "findings": [],
+   "stufe": "gruen"
+  },
+  {
+   "url": "https://outlook.live.com/mail/",
+   "findings": [],
+   "stufe": "gruen"
+  },
+  {
+   "url": "https://paypal.com.office.com.example/",
+   "findings": [
+    {
+     "key": "brand-sub",
+     "stufe": "rot"
+    },
+    {
+     "key": "subdomains",
+     "stufe": "gelb"
+    }
+   ],
+   "stufe": "rot"
+  },
+  {
+   "url": "https://micros0ft-support.example/",
+   "findings": [
+    {
+     "key": "lure",
+     "stufe": "info"
+    }
+   ],
+   "stufe": "gruen"
+  },
+  {
+   "url": "https://example.zip/",
+   "findings": [
+    {
+     "key": "tld",
+     "stufe": "gelb"
+    }
+   ],
+   "stufe": "gelb"
+  },
+  {
+   "url": "https://shop.example.de/rechnung/mahnung",
+   "findings": [
+    {
+     "key": "lure",
+     "stufe": "gelb"
+    }
+   ],
+   "stufe": "gelb"
+  },
+  {
+   "url": "https://t1p.de/abc",
+   "findings": [
+    {
+     "key": "shortener",
+     "stufe": "info"
+    }
+   ],
+   "stufe": "gruen"
+  },
+  {
+   "url": "https://[2001:db8::1]/",
+   "findings": [
+    {
+     "key": "ip-host",
+     "stufe": "rot"
+    }
+   ],
+   "stufe": "rot"
+  }
+ ]
+}

@@ -1,0 +1,19 @@
+{
+ "about": "Known link wrappers that hide the real target. Clients unwrap them locally before checking (docs/DESKTOP.md section 3). 'out' null = not a wrapper, check the input itself. Unwrapping repeats (max 3 levels).",
+ "vectors": [
+  { "in": "https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpaypal.com.secure-login.example%2Fx&data=05%7C01&reserved=0", "out": "https://paypal.com.secure-login.example/x" },
+  { "in": "https://nam12.safelinks.protection.outlook.com/ap/w-59584e83/?url=https%3A%2F%2Fexample.com%2F&data=1", "out": "https://example.com/" },
+  { "in": "https://www.google.com/url?q=https://example.org/page&sa=D&source=editors", "out": "https://example.org/page" },
+  { "in": "https://www.google.de/url?sa=t&url=https%3A%2F%2Fexample.org%2F&usg=x", "out": "https://example.org/" },
+  { "in": "https://l.facebook.com/l.php?u=https%3A%2F%2Fexample.net%2Fa%3Fb%3D1&h=AT0", "out": "https://example.net/a?b=1" },
+  { "in": "https://l.instagram.com/?u=https%3A%2F%2Fexample.net%2F&e=AT1", "out": "https://example.net/" },
+  { "in": "https://www.youtube.com/redirect?event=video_description&q=https%3A%2F%2Fexample.com%2Fdeal&v=x", "out": "https://example.com/deal" },
+  { "in": "https://slack-redir.net/link?url=https%3A%2F%2Fexample.com%2F", "out": "https://example.com/" },
+  { "in": "https://www.linkedin.com/safety/go?url=https%3A%2F%2Fexample.com%2Fjob&trk=x", "out": "https://example.com/job" },
+  { "in": "https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwww.google.com%2Furl%3Fq%3Dhttps%3A%2F%2Fcheap-deals.top%2F&data=1", "out": "https://cheap-deals.top/" },
+  { "in": "https://www.google.com/url?q=javascript:alert(1)", "out": null },
+  { "in": "https://www.google.com/search?q=https://example.com", "out": null },
+  { "in": "https://safelinks.protection.outlook.com.example/?url=https%3A%2F%2Fexample.com%2F", "out": null },
+  { "in": "https://example.com/?url=https%3A%2F%2Fother.example%2F", "out": null }
+ ]
+}

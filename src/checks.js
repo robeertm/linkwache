@@ -29,6 +29,16 @@ const BRANDS = [
   "binance", "bitpanda", "trade-republic", "scalable", "check24", "booking", "airbnb",
 ];
 
+// Registrable domains that belong to the brand owners themselves: a brand name inside them
+// (outlook.office.com, login.microsoftonline.com) is the real service, not an imitation.
+export const BRAND_HOMES = new Set([
+  "office.com", "office365.com", "live.com", "outlook.com", "microsoft.com", "microsoftonline.com",
+  "sharepoint.com", "onedrive.com", "xbox.com", "apple.com", "icloud.com", "google.com", "google.de",
+  "gmail.com", "youtube.com", "googleusercontent.com", "amazon.com", "amazon.de", "paypal.com", "paypal.de",
+  "facebook.com", "instagram.com", "whatsapp.com", "dhl.de", "dhl.com", "deutschepost.de", "telekom.de",
+  "t-online.de", "ebay.com", "ebay.de", "netflix.com", "spotify.com", "steampowered.com", "steamcommunity.com",
+]);
+
 const LURE_WORDS = [
   "login", "signin", "anmelden", "verify", "verifizier", "bestaetig", "bestätig", "secure",
   "sicherheit", "konto", "account", "update", "aktualisier", "wallet", "sperr", "unlock",
@@ -60,7 +70,7 @@ export function heuristics(url) {
 
   const lowerHost = h.host.replace(/-/g, "");
   const domLower = h.domain.toLowerCase();
-  for (const b of BRANDS) {
+  for (const b of BRAND_HOMES.has(domLower) ? [] : BRANDS) {
     const bb = b.replace(/[-.]/g, "");
     const inSub = h.sub && h.sub.replace(/[-.]/g, "").includes(bb);
     const inDomain = domLower.replace(/[-.]/g, "").includes(bb);
