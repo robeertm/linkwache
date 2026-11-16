@@ -87,7 +87,7 @@ jobs:
       matrix:
         include:
           - device: phone
-            profile: ${{ matrix.profile }}
+            profile: pixel_6
             shots_only: "0"
           - device: tablet
             profile: pixel_tablet
