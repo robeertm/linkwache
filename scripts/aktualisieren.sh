@@ -53,7 +53,7 @@ if [ -z "$WANT" ]; then
 fi
 if ! newer "${WANT#v}" "$RUN_V"; then echo "already up to date ($RUN_V, wanted $WANT)"; exit 0; fi
 
-WORK=$(mktemp -d -t lw-update.XXXXXX)
+WORK=$(mktemp -d "${TMPDIR:-/tmp}/lw-update.XXXXXX")
 trap 'rm -rf "$WORK"' EXIT
 git clone --quiet --depth 1 --branch "$WANT" "$GIT_URL" "$WORK/src" 2>&1 || { echo "tag $WANT not found"; exit 1; }
 cd "$WORK/src"

@@ -28,7 +28,7 @@ echo "== Linkwache $VERSION -> $NAS:$DIR"
 if [ "${SKIP_TESTS:-0}" != "1" ]; then npm test --silent >/dev/null && echo "tests ok"; fi
 [ "${DRY_RUN:-0}" = "1" ] && { echo "dry run: stopping before any change"; exit 0; }
 
-TAR=$(mktemp -t lw-rollout).tar
+TAR=$(mktemp "${TMPDIR:-/tmp}/lw-rollout.XXXXXX")  # GNU and BSD mktemp both need the X template
 trap 'rm -f "$TAR"' EXIT
 COPYFILE_DISABLE=1 git archive --format=tar HEAD > "$TAR"
 REMOTE_TAR="/tmp/lw-new-$STAMP.tar"

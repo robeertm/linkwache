@@ -19,8 +19,9 @@ trap 'rm -rf "$work"' EXIT
 
 gh release view "$TAG" -R "$REPO" --json tagName >/dev/null || { echo "release $TAG does not exist (create it first)" >&2; exit 2; }
 sha=$(gh api "repos/$REPO/commits/$TAG" -q .sha)
-run=$(gh run list -R "$REPO" --workflow Android --commit "$sha" --json databaseId,conclusion,event \
-      -q '[.[] | select(.conclusion=="success")][0].databaseId')
+# REST instead of `gh run list --commit` (that flag is missing in older gh releases, e.g. Debian's 2.23).
+run=$(gh api "repos/$REPO/actions/runs?head_sha=$sha&per_page=100" \
+      -q '[.workflow_runs[] | select(.name=="Android" and .conclusion=="success")][0].id')
 [ -n "$run" ] && [ "$run" != null ] || { echo "no successful Android workflow run for $TAG ($sha) — gate not green" >&2; exit 3; }
 echo "gate: Android run $run succeeded for $sha"
 
