@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name={{name}}
+GenericName=Link checker
+Comment=Checks every link before it opens
+Exec={{exec}} %u
+Icon={{icon}}
+Terminal=false
+Categories=Network;WebBrowser;Security;
+MimeType=x-scheme-handler/http;x-scheme-handler/https;text/html;
+StartupNotify=false

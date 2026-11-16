@@ -1,0 +1,31 @@
+/* Setup assistant (first run). */
+body.setup{display:flex;flex-direction:column;height:100vh}
+.s-top{display:flex;align-items:center;gap:10px;padding:16px 28px 0}
+.spacer{flex:1}
+.s-dots{display:flex;gap:6px;padding:12px 28px 0}
+.s-dots span{height:4px;flex:1;border-radius:4px;background:var(--karte3)}
+.s-dots span.on{background:var(--akzent)}
+.s-main{flex:1;overflow-y:auto;padding:22px 28px 10px}
+.s-main section{display:flex;flex-direction:column;gap:14px}
+.s-main h1{font-size:1.5rem}
+.lead{font-size:1rem;line-height:1.5}
+.s-h{font-size:.78rem;color:var(--leise);text-transform:uppercase;letter-spacing:.07em;margin-top:6px}
+.s-label{font-weight:650;font-size:.9rem;margin-bottom:-6px}
+.row{display:flex;gap:10px}
+.row input{flex:1}
+.langs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.langs button{font:inherit;padding:11px 8px;border-radius:11px;border:1px solid var(--rand);background:var(--karte);color:var(--text);cursor:pointer;font-weight:600}
+.langs button:hover{background:var(--karte2)}
+.langs button.on{border-color:var(--akzent);background:color-mix(in srgb,var(--akzent) 16%,transparent);box-shadow:0 0 0 1px var(--akzent) inset}
+.choices{display:grid;gap:8px}
+.choice{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:1px solid var(--rand);background:var(--karte);cursor:pointer}
+.choice:hover{background:var(--karte2)}
+.choice input{width:18px;height:18px;accent-color:var(--akzent);margin:0}
+.choice .name{font-weight:650;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.choice.on{border-color:var(--akzent);box-shadow:0 0 0 1px var(--akzent) inset}
+.opts{padding:8px 16px}
+.done{align-items:center;text-align:center;padding-top:28px}
+.bigok{width:76px;height:76px}
+.bigok circle{fill:var(--ok)}.bigok path{fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.s-nav{display:flex;align-items:center;gap:10px;padding:14px 28px 20px;border-top:1px solid var(--rand)}
+.s-nav .btn.big{min-width:140px}

@@ -1,0 +1,63 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Linkwache",
+  "mainBinaryName": "linkwache",
+  "identifier": "app.linkwache.desktop",
+  "build": {
+    "frontendDist": "../ui"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [],
+    "security": {
+      "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'; connect-src ipc: http://ipc.localhost"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "createUpdaterArtifacts": true,
+    "publisher": "Linkwache",
+    "homepage": "https://github.com/robeertm/linkwache",
+    "category": "Utility",
+    "shortDescription": "Checks every link before it opens",
+    "longDescription": "Linkwache is the link checker between your programs and your browser: links from mail, documents and messengers are checked for warning signs first; links without warning signs open right away, suspicious ones show a warning.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "12.0"
+    },
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "installerHooks": "windows/hooks.nsh",
+        "languages": ["English", "German", "Turkish", "Polish", "Russian", "Spanish", "French", "Italian"],
+        "displayLanguageSelector": false
+      }
+    },
+    "linux": {
+      "deb": {
+        "desktopTemplate": "linux/linkwache.desktop"
+      },
+      "rpm": {
+        "desktopTemplate": "linux/linkwache.desktop"
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDUxN0IzOEM1MzQ3NTgzQTQKUldTa2czVTB4VGg3VVVsZk0ycWlIcGQ3RHFIWFJKekNOY1NrcnBUUU91WHlESEV1bWF0VHprWXoK",
+      "endpoints": [
+        "https://github.com/robeertm/linkwache/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
+}

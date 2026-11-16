@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Linkwache windows: app commands and events only.",
+  "windows": ["*"],
+  "permissions": ["core:default"]
+}
