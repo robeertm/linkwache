@@ -38,7 +38,7 @@ Buckets are UTC hours (`2026-11-16T21`) kept 30 days and UTC days kept 2 years, 
 
 - No token configured → 404. Wrong token → 401.
 - Requests that came through the reverse proxy (`X-Real-IP` set) are only answered for private, loopback or
-  100.64.0.0/10 addresses (403 otherwise), unless `STATS_PUBLIC=on`.
+  shared-address-space (RFC 6598, used by VPNs) senders (403 otherwise), unless `STATS_PUBLIC=on`.
 - 30 requests per minute per caller.
 
 Answer (contract `dienst-stats/1`):

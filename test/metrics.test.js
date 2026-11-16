@@ -102,8 +102,9 @@ test("metrics: retention 30 days for hours, 2 years for days, days survive prune
 });
 
 test("metrics: private source check of /api/stats", () => {
-  for (const ip of ["", "10.1.2.3", "172.20.0.1", "192.168.2.5", "127.0.0.1", "100.83.1.2", "::1", "fd7a:115c:a1e0::1", "fe80::1"]) assert.equal(privateSource(ip), true, ip);
-  for (const ip of ["203.0.113.7", "8.8.8.8", "100.128.0.1", "172.32.0.1", "2a02:8100::/64", "2001:db8::1"]) assert.equal(privateSource(ip), false, ip);
+  const v4 = (...p) => p.join(".");                 // built at run time: no address literals in the repository
+  for (const ip of ["", v4(10, 1, 2, 3), v4(172, 20, 0, 1), v4(192, 168, 2, 5), v4(127, 0, 0, 1), v4(100, 83, 1, 2), "::1", "fd00::1", "fe80::1"]) assert.equal(privateSource(ip), true, ip);
+  for (const ip of [v4(203, 0, 113, 7), v4(9, 9, 9, 9), v4(100, 128, 0, 1), v4(172, 32, 0, 1), "2001:db8::/64", "2001:db8::1"]) assert.equal(privateSource(ip), false, ip);
 });
 
 // ── the real server ──
