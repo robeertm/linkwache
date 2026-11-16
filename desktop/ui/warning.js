@@ -98,4 +98,5 @@
 
   LW.listen("result", (p) => { if (p && p.id === id) render(p); });
   try { render(await LW.invoke("get_result", { id })); } catch (e) { console.error(e); }
+  requestAnimationFrame(() => LW.invoke("window_ready").catch(() => {}));
 })();

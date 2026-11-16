@@ -101,8 +101,29 @@ pub fn open_warning(app: &AppHandle, id: u64, stufe: &str) {
             .center()
             .always_on_top(true)
             .focused(true)
+            .visible(false)
             .build();
-        if let Ok(w) = built {
+        if built.is_ok() {
+            // Shown by the page once its content is rendered (command window_ready); this is
+            // only the fallback if that never comes.
+            let app3 = app2.clone();
+            std::thread::spawn(move || {
+                std::thread::sleep(std::time::Duration::from_millis(2500));
+                reveal(&app3, &label);
+            });
+        }
+    });
+}
+
+/// Show and focus a window that was created hidden.
+pub fn reveal(app: &AppHandle, label: &str) {
+    let app2 = app.clone();
+    let label = label.to_string();
+    let _ = app.run_on_main_thread(move || {
+        if let Some(w) = app2.get_webview_window(&label) {
+            if !w.is_visible().unwrap_or(true) {
+                let _ = w.show();
+            }
             let _ = w.set_focus();
         }
     });

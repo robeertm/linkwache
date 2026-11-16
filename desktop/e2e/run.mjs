@@ -292,7 +292,7 @@ async function caseAmber() {
   const w = await waitState("warning", (d) => d.stufe === "gelb", 12000, before);
   record("amber link shows the warning window", !!w, w ? `findings ${w.data.findings}` : "");
   if (!w) return;
-  await sleep(1000);
+  await sleep(2500);
   screenshot("warning-amber");
   cmd(`decide ${w.data.id} open`);
   const early = await waitState("decide", (d) => d.action === "open", 4000, before);

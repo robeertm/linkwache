@@ -72,6 +72,7 @@ pub fn main_entry() {
             commands::toast_state,
             commands::get_result,
             commands::decide,
+            commands::window_ready,
             commands::get_settings,
             commands::set_lang,
             commands::set_server,

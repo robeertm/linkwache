@@ -40,6 +40,13 @@ pub async fn get_result(app: AppHandle, id: u64) -> R<Value> {
     Ok(flow::payload(id, pd))
 }
 
+/// The page has rendered its content: show the (hidden) window now.
+#[tauri::command]
+pub async fn window_ready(app: AppHandle, window: tauri::WebviewWindow) -> R<()> {
+    ui::reveal(&app, window.label());
+    Ok(())
+}
+
 #[tauri::command]
 pub async fn decide(app: AppHandle, id: u64, action: String) -> R<()> {
     flow::decide(&app, id, &action)
