@@ -105,7 +105,12 @@ adb shell cmd locale set-app-locales $APP --locales en-US >/dev/null 2>&1 || tru
 start_mock
 adb shell appops set $APP REQUEST_INSTALL_PACKAGES allow
 
-adb shell cmd role add-role-holder android.app.role.BROWSER $APP 0
+# The role service of a freshly booted emulator sometimes times out (TimeoutException): try a few times.
+for i in 1 2 3 4 5 6; do
+  adb shell cmd role add-role-holder android.app.role.BROWSER $APP 0 >/dev/null 2>&1 || true
+  adb shell cmd role get-role-holders android.app.role.BROWSER 2>/dev/null | grep -q $APP && break
+  sleep 5
+done
 if adb shell cmd role get-role-holders android.app.role.BROWSER | grep -q $APP; then ok "Linkwache holds the browser role"; else fail "browser role"; fi
 config --es server $SERVER --es forward $FB --ez setupDone true --ez clear true --ez updateAuto false
 home
