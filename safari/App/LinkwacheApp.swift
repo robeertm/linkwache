@@ -31,9 +31,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         default: break
         }
         model.start()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { Self.fitWindow() }
         if let path = UserDefaults.standard.string(forKey: "LWSnapshot") {
             DispatchQueue.main.asyncAfter(deadline: .now() + 4) { Snapshot.window(to: path) }
         }
+    }
+
+    /// The window takes exactly the size of its content and is not resizable (works on macOS 12 too).
+    static func fitWindow() {
+        guard let win = NSApp.windows.first(where: { $0.isVisible }), let view = win.contentView else { return }
+        win.styleMask.remove(.resizable)
+        win.setContentSize(view.fittingSize)
+        win.center()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
@@ -48,6 +57,7 @@ final class Model: ObservableObject {
     let extensionID = Bundle.main.object(forInfoDictionaryKey: "LWExtensionBundleIdentifier") as? String ?? ""
     let guideURL = URL(string: Bundle.main.object(forInfoDictionaryKey: "LWGuideURL") as? String ?? "")
     private let releasesAPI = URL(string: Bundle.main.object(forInfoDictionaryKey: "LWReleasesAPI") as? String ?? "")
+    private let releasesPage = URL(string: Bundle.main.object(forInfoDictionaryKey: "LWReleasesPage") as? String ?? "")
     private var timer: Timer?
 
     @Published var state: ExtensionState = .unknown
@@ -93,18 +103,34 @@ final class Model: ObservableObject {
             if let cached = UserDefaults.standard.string(forKey: "LWLatest") { show(latest: cached) }
             return
         }
-        var req = URLRequest(url: api, timeoutInterval: 15)
-        req.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
-        req.setValue("linkwache-safari/\(version)", forHTTPHeaderField: "User-Agent")
-        URLSession.shared.dataTask(with: req) { data, resp, _ in
-            let ok = (resp as? HTTPURLResponse)?.statusCode == 200
-            let latest = ok ? data.flatMap(VersionCheck.latestVersion(fromReleaseJSON:)) : nil
+        fetchLatest(api: api) { latest in
             DispatchQueue.main.async {
                 guard let latest = latest else { self.update = .failed; return }
                 UserDefaults.standard.set(Date(), forKey: "LWLastCheck")
                 UserDefaults.standard.set(latest, forKey: "LWLatest")
                 self.show(latest: latest)
             }
+        }
+    }
+
+    /// Release API first; when it refuses (rate limit), the public release page, whose redirect names the latest tag.
+    private func fetchLatest(api: URL, done: @escaping (String?) -> Void) {
+        var req = URLRequest(url: api, timeoutInterval: 15)
+        req.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+        req.setValue("linkwache-safari/\(version)", forHTTPHeaderField: "User-Agent")
+        URLSession.shared.dataTask(with: req) { data, resp, _ in
+            let code = (resp as? HTTPURLResponse)?.statusCode ?? 0
+            if code == 200, let v = data.flatMap(VersionCheck.latestVersion(fromReleaseJSON:)) { return done(v) }
+            print("update check: release API answered \(code)")
+            guard let page = self.releasesPage else { return done(nil) }
+            var head = URLRequest(url: page, timeoutInterval: 15)
+            head.httpMethod = "HEAD"
+            head.setValue("linkwache-safari/\(self.version)", forHTTPHeaderField: "User-Agent")
+            URLSession.shared.dataTask(with: head) { _, resp2, _ in
+                let v = resp2?.url.flatMap(VersionCheck.version(fromReleaseURL:))
+                if v == nil { print("update check: release page gave no version") }
+                done(v)
+            }.resume()
         }.resume()
     }
 
@@ -151,6 +177,7 @@ struct ContentView: View {
             Toggle(s.t("autocheck"), isOn: $model.autoCheck).font(.callout)
         }
         .padding(28)
+        .background(Color(nsColor: .windowBackgroundColor))
     }
 
     private var stateRow: some View {
@@ -201,6 +228,8 @@ struct ContentView: View {
 enum Snapshot {
     /// Renders the app window (content incl. title bar area) to a PNG at the screen's scale, then quits.
     static func window(to path: String) {
+        AppDelegate.fitWindow()
+        NSApp.windows.first(where: { $0.isVisible })?.contentView?.layoutSubtreeIfNeeded()
         guard let win = NSApp.windows.first(where: { $0.isVisible }), let view = win.contentView else {
             FileHandle.standardError.write("snapshot: no window\n".data(using: .utf8)!); exit(3)
         }

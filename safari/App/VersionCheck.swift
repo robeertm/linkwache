@@ -29,6 +29,15 @@ enum VersionCheck {
         return tag.hasPrefix("v") ? String(tag.dropFirst()) : tag
     }
 
+    /// Version from the address the public "latest release" page redirects to (…/releases/tag/v0.6.0).
+    static func version(fromReleaseURL url: URL) -> String? {
+        let parts = url.path.split(separator: "/")
+        guard parts.count >= 2, parts[parts.count - 2] == "tag" else { return nil }
+        let tag = String(parts[parts.count - 1])
+        guard parse(tag) != nil else { return nil }
+        return tag.hasPrefix("v") ? String(tag.dropFirst()) : tag
+    }
+
     /// Ask at most once a day.
     static func isDue(lastCheck: Date?, now: Date, interval: TimeInterval = 86_400) -> Bool {
         guard let last = lastCheck else { return true }

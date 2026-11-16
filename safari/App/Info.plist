@@ -45,6 +45,8 @@
 	<string>$(LW_BUNDLE_PREFIX).extension</string>
 	<key>LWReleasesAPI</key>
 	<string>https://api.github.com/repos/robeertm/linkwache/releases/latest</string>
+	<key>LWReleasesPage</key>
+	<string>https://github.com/robeertm/linkwache/releases/latest</string>
 	<key>LWGuideURL</key>
 	<string>https://github.com/robeertm/linkwache/blob/main/docs/DESKTOP.md#safari</string>
 </dict>

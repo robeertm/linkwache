@@ -28,6 +28,10 @@ struct VersionCheckTests {
         check(VersionCheck.latestVersion(fromReleaseJSON: Data("nope".utf8)) == nil, "broken json")
         check(VersionCheck.latestVersion(fromReleaseJSON: Data(#"{"tag_name":"latest"}"#.utf8)) == nil, "tag without version")
 
+        check(VersionCheck.version(fromReleaseURL: URL(string: "https://github.com/o/r/releases/tag/v0.6.0")!) == "0.6.0", "release page redirect")
+        check(VersionCheck.version(fromReleaseURL: URL(string: "https://github.com/o/r/releases")!) == nil, "no redirect -> no version")
+        check(VersionCheck.version(fromReleaseURL: URL(string: "https://github.com/o/r/releases/tag/nightly")!) == nil, "tag without version")
+
         let now = Date()
         check(VersionCheck.isDue(lastCheck: nil, now: now), "never checked -> due")
         check(!VersionCheck.isDue(lastCheck: now.addingTimeInterval(-3600), now: now), "an hour ago -> not due")
