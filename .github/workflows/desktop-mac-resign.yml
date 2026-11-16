@@ -1,0 +1,52 @@
+# Second half of the macOS notarisation split (desktop/scripts/macos-sign-notarize.sh): after
+# the maintainer's Mac uploaded the notarised DMG and app tarball, sign the tarball with the
+# updater key (CI secret, never on the Mac), rewrite latest.json and SHA256SUMS.txt.
+name: Desktop macOS re-sign
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag, e.g. v0.5.0'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  resign:
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ inputs.tag }}
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Tauri CLI
+        working-directory: desktop
+        run: npm ci
+      - name: Sign the notarised updater tarball and rewrite latest.json
+        run: |
+          set -euo pipefail
+          case "$TAG" in v[0-9]*) ;; *) echo "bad tag" >&2; exit 1;; esac
+          V="${TAG#v}"
+          T="Linkwache_${V}_universal.app.tar.gz"
+          mkdir -p work && cd work
+          gh release download "$TAG" -p "$T" -p latest.json --clobber
+          ../desktop/node_modules/.bin/tauri signer sign "$T"
+          node -e '
+            const fs = require("fs");
+            const [t, tag, repo] = process.argv.slice(1);
+            const m = JSON.parse(fs.readFileSync("latest.json", "utf8"));
+            const sig = fs.readFileSync(t + ".sig", "utf8").trim();
+            const url = `https://github.com/${repo}/releases/download/${tag}/${t}`;
+            for (const k of ["darwin-aarch64", "darwin-x86_64", "darwin-aarch64-app", "darwin-x86_64-app"]) m.platforms[k] = { signature: sig, url };
+            fs.writeFileSync("latest.json", JSON.stringify(m, null, 2) + "\n");
+          ' "$T" "$TAG" "$GITHUB_REPOSITORY"
+          gh release upload "$TAG" "$T.sig" latest.json --clobber
+      - name: SHA256SUMS.txt over every asset
+        run: bash desktop/scripts/sha256sums.sh "$TAG"

@@ -144,6 +144,7 @@ pub fn main_entry() {
             for l in links {
                 flow::handle(&handle, l);
             }
+            e2e::start_commands(&handle);
             e2e::state("started", serde_json::json!({ "version": VERSION, "setupDone": settings.setup_done }));
             Ok(())
         })

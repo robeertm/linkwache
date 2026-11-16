@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Linkwache as default for web links on managed Windows PCs (docs/DESKTOP.md section 3).
+  Import:   Dism /Online /Import-DefaultAppAssociations:windows-default-associations.xml
+  or Group Policy: Computer Configuration > Administrative Templates > Windows Components >
+  File Explorer > "Set a default associations configuration file".
+  The ProgIDs are registered per user when Linkwache starts for the first time (or by the
+  per-user NSIS installer); Windows applies this file at the next sign-in of each user.
+-->
+<DefaultAssociations>
+  <Association Identifier="http" ProgId="LinkwacheURL" ApplicationName="Linkwache" />
+  <Association Identifier="https" ProgId="LinkwacheURL" ApplicationName="Linkwache" />
+  <Association Identifier=".htm" ProgId="LinkwacheHTML" ApplicationName="Linkwache" />
+  <Association Identifier=".html" ProgId="LinkwacheHTML" ApplicationName="Linkwache" />
+</DefaultAssociations>
