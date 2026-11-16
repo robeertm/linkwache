@@ -64,11 +64,12 @@ async function linuxEnv() {
   delete env.GNOME_DESKTOP_SESSION_ID;
   delete env.KDE_FULL_SESSION;
   if (!env.DISPLAY) {
-    const x = spawn("Xvfb", [":99", "-screen", "0", "1280x800x24", "-nolisten", "tcp"], { stdio: "ignore" });
+    const disp = arg("--display", ":99");
+    const x = spawn("Xvfb", [disp, "-screen", "0", "1280x800x24", "-nolisten", "tcp"], { stdio: "ignore" });
     children.push(x);
-    env.DISPLAY = ":99";
+    env.DISPLAY = disp;
     await sleep(1500);
-    notes.push("Xvfb :99 started by the test");
+    notes.push(`Xvfb ${disp} started by the test`);
   }
 }
 
@@ -210,6 +211,12 @@ async function makeDefault() {
   }
   if (PLATFORM === "macos") {
     await sleep(2000);
+    screenshot("macos-default-browser-dialog");
+    // The system asks "change your default web browser to Linkwache?". A user clicks
+    // "Use Linkwache"; the test tries the same through System Events (needs accessibility rights).
+    const click = run("osascript", ["-e", 'tell application "System Events" to tell process "CoreServicesUIAgent" to click (first button of window 1 whose name contains "Linkwache")']);
+    notes.push(`macOS: clicking "Use Linkwache" in the system dialog via System Events: exit ${click.code} ${click.out.trim().slice(0, 160)}`);
+    await sleep(2000);
     st = cli(["--status"]).json || {};
     if (st.isDefault) { openMethod = "open"; record("Linkwache is the default (LSSetDefaultHandlerForURLScheme)", true); return; }
     openMethod = "open-a";
@@ -255,7 +262,9 @@ async function caseGreen() {
   openViaOS(url);
   const got = await waitFor(() => received().find((u) => u === url), 10000, 50);
   const ms = Date.now() - t0;
-  record("green link reaches the real browser", !!got, `${ms} ms`);
+  const via = states().some((s) => s.event === "incoming" && s.data.url === url);
+  record("green link went through Linkwache", via);
+  record("green link reaches the real browser", !!got && via, `${ms} ms`);
   record("green link opens within 2 s", !!got && ms <= 2000, `${ms} ms`, PLATFORM === "linux");
   const toast = states().find((s) => s.event === "toast" && s.data.state === "green" && s.data.domain === "example.com");
   record("green toast shown", !!toast);
@@ -374,6 +383,10 @@ async function caseShipped() {
     for (const s of ["http", "https"]) run("reg", ["add", `HKCU\\Software\\Classes\\${s}\\shell\\open\\command`, "/ve", "/d", `"${SHIPPED}" "%1"`, "/f"]);
   }
   record("release build: --register", reg.code === 0, reg.out.trim().slice(0, 200));
+  const sst = run(SHIPPED, ["--status"]);
+  let shippedDefault = false;
+  try { shippedDefault = JSON.parse(sst.stdout).isDefault === true; } catch { /* windows: no console */ }
+  if (PLATFORM === "linux") record("release build: Linkwache is the default handler", shippedDefault);
   const p = spawn(SHIPPED, ["--autostart"], { env, stdio: "ignore" });
   children.push(p);
   await sleep(3000);

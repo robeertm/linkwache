@@ -54,6 +54,8 @@ jobs:
         working-directory: desktop
         run: cargo test -p linkwache-core
 
+  # Linux packages are built on Ubuntu 22.04 (glibc 2.35) so they also run on Debian 12 and
+  # Ubuntu 22.04; a 24.04 build would require glibc 2.39.
   build:
     name: Build + E2E (${{ matrix.name }})
     strategy:
@@ -62,8 +64,8 @@ jobs:
         include:
           - { os: windows-latest, name: windows, target: '' }
           - { os: macos-latest, name: macos, target: universal-apple-darwin }
-          - { os: ubuntu-24.04, name: linux-x64, target: '' }
-          - { os: ubuntu-24.04-arm, name: linux-arm64, target: '' }
+          - { os: ubuntu-22.04, name: linux-x64, target: '' }
+          - { os: ubuntu-22.04-arm, name: linux-arm64, target: '' }
     runs-on: ${{ matrix.os }}
     env:
       LINKWACHE_DEFAULT_SERVER: ${{ vars.LINKWACHE_DEFAULT_SERVER }}
