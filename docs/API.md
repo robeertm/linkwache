@@ -48,9 +48,12 @@ IP (hashed, /64 for IPv6) `V1_IP_PER_MINUTE`=120, `V1_IP_PER_DAY`=10000 so a who
 behind one address is fine but rotating ids does not open the door. The website keeps its own
 10/min and 150/day.
 
-Third-party budget: the v1 path never submits a urlscan sandbox scan; the urlscan *search* runs
-only when the first pass is not green. crt.sh gets a short timeout. Results are cached in memory
-per normalised URL for 10 minutes to absorb repeated clicks.
+Third-party budget and time: the v1 path never submits a urlscan sandbox scan; the urlscan *search*
+runs only when the first pass is not green; crt.sh is skipped (it only adds an info finding without
+weight). Every lookup has a hard deadline (shortener unwrapping 2 s, first pass 2.5 s, urlscan search
+1.2 s) — a provider that is late counts as unavailable — so the answer always arrives well before
+the clients' 6 s timeout. Results are cached in memory per normalised URL for 10 minutes to absorb
+repeated clicks.
 
 `GET /api/health` additionally reports `"api": [1]` so clients can detect support.
 

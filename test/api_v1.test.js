@@ -2,6 +2,7 @@
 import { test, beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import worker from "../src/index.js";
+import { LITE_BUDGET } from "../src/check.js";
 import { clearV1Cache, reduceUrl } from "../src/api_v1.js";
 import { createLimiter } from "../server/ratelimit.js";
 import { STRINGS, LANGS } from "../src/i18n.js";
@@ -170,16 +171,22 @@ test("in-memory cache: a repeated URL does not repeat the lookups; different URL
   assert.ok(calls.length > n);
 });
 
-test("crt.sh gets a short timeout on v1", async () => {
-  let aborted = null;
-  router = (url, init) => {
-    if (url.includes("crt.sh")) return new Promise((_, rej) => init.signal.addEventListener("abort", () => { aborted = Date.now(); rej(new DOMException("aborted", "AbortError")); }));
-    return calm(url);
-  };
-  const t0 = Date.now();
-  const res = await post(makeEnv(), { url: "https://slow-ct.example.org/" });
+test("v1 never asks crt.sh (info only, often slow)", async () => {
+  const res = await post(makeEnv(), { url: "https://no-ct.example.org/" });
   assert.equal(res.status, 200);
-  assert.ok(aborted && aborted - t0 < 3000, "aborted at ~1.5 s, not 8 s");
+  assert.ok(!calls.some((c) => c.url.includes("crt.sh")), "crt.sh must not be called on v1");
+});
+
+test("a hanging provider cannot hold the v1 answer beyond the time budget", async () => {
+  // RDAP never answers (and ignores abort): the answer must still come within the first-pass budget.
+  router = (url, init) => (url.includes("rdap") ? new Promise(() => {}) : calm(url, init));
+  const t0 = Date.now();
+  const res = await post(makeEnv(), { url: "https://hanging-rdap.example.org/" });
+  const ms = Date.now() - t0;
+  assert.equal(res.status, 200);
+  const j = await res.json();
+  assert.ok(["gruen", "gelb", "rot"].includes(j.stufe));
+  assert.ok(ms < LITE_BUDGET.first + LITE_BUDGET.second + 800, `answered after ${ms} ms`);
 });
 
 test("health reports the supported API versions; the website check still stores and scans", async () => {

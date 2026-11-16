@@ -271,7 +271,9 @@ async function caseGreen() {
   const via = states().some((s) => s.event === "incoming" && s.data.url === url);
   record("green link went through Linkwache", via);
   record("green link reaches the real browser", !!got && via, `${ms} ms`);
-  record("green link opens within 2 s", !!got && ms <= 2000, `${ms} ms`, PLATFORM === "linux");
+  // Against the real server the time depends on the CI runner's distance to the lookup providers:
+  // recorded, but only required with the stand-in (speed of the live server is measured separately).
+  record("green link opens within 2 s", !!got && ms <= 2000, `${ms} ms`, PLATFORM === "linux" && !UPSTREAM);
   const toast = states().find((s) => s.event === "toast" && s.data.state === "green" && s.data.domain === "example.com");
   record("green toast shown", !!toast);
 }

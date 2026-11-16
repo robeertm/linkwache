@@ -40,8 +40,8 @@ All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 ### Added — Server
 - `POST /api/v1/check` for the apps and the extension (`docs/API.md`): limits per random installation id and per
   address (a household behind one address is not locked out), translated findings, no urlscan sandbox submissions
-  (search only when the first pass is not green), short certificate-log timeout, 10-minute in-memory cache, results
-  never stored. `/api/health` reports `api: [1]`.
+  (search only when the first pass is not green), no certificate-log lookup, a hard time budget per lookup so a slow
+  provider can never push the answer past the apps' timeout, 10-minute in-memory cache, results never stored. `/api/health` reports `api: [1]`.
 - Download page `/download` (8 languages): suggests the package for the visitor's system and lists every package with
   version, date, size and SHA-256 from the daily release query (files stay on the release storage of the code host);
   guidance for unsigned Windows/macOS builds and for loading the extension yourself. Quiet hint on the home page.

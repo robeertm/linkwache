@@ -8,15 +8,24 @@ import {
 import { verdict } from "./verdict.js";
 
 const settle = (p) => p.then((v) => ({ ok: true, v }), (e) => ({ ok: false, e: String(e).slice(0, 120) }));
+// A lookup that is not back in time counts as failed (its request may still finish in the background).
+const within = (p, ms) => ms ? Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error("deadline")), ms).unref?.())]) : p;
+
+// Time budget of the client API: the apps wait at most 6 s, so the server must answer well before that,
+// even when one provider hangs (each provider alone may take up to 6 s on the website path).
+export const LITE_BUDGET = { unwrap: 2000, first: 2500, second: 1200 };
 
 // lite (client API v1): never submits a sandbox scan, searches urlscan only when the first pass is not green,
-// and gives crt.sh a short timeout. The website path (lite = false) behaves exactly as before.
+// skips crt.sh (it only ever adds an info finding without weight and is often slow), and keeps every lookup
+// inside LITE_BUDGET. The website path (lite = false) behaves exactly as before.
 export async function runCheck(rawInput, env, { withScan = true, lite = false } = {}) {
   if (lite) withScan = false;
   const input = normalizeInput(rawInput);
   if (!input) return { error: "err.nolink" };
 
-  const { finalUrl, chain } = await unwrapShortener(input);
+  const { finalUrl, chain } = lite
+    ? await within(unwrapShortener(input), LITE_BUDGET.unwrap).catch(() => ({ finalUrl: input, chain: [input] }))
+    : await unwrapShortener(input);
   const url = finalUrl;
   const h = hostInfo(url);
   const { findings: heur } = heuristics(url);
@@ -26,13 +35,14 @@ export async function runCheck(rawInput, env, { withScan = true, lite = false } 
   }
 
   const skipped = { ok: false, e: "lite" };
+  const lim = lite ? LITE_BUDGET.first : 0;
   let [dns, rdap, ct, sb, uh, pt, us] = await Promise.all([
-    settle(dnsFacts(h.host, h.domain)),
-    settle(rdapFacts(h.domain)),
-    settle(ctFacts(h.domain, lite ? 1500 : undefined)),
-    settle(safeBrowsing(url, env.SAFE_BROWSING_KEY)),
-    settle(urlhaus(h.host, env.URLHAUS_KEY)),
-    settle(phishtank(url)),
+    settle(within(dnsFacts(h.host, h.domain), lim)),
+    settle(within(rdapFacts(h.domain), lim)),
+    lite ? skipped : settle(ctFacts(h.domain)),
+    settle(within(safeBrowsing(url, env.SAFE_BROWSING_KEY), lim)),
+    settle(within(urlhaus(h.host, env.URLHAUS_KEY), lim)),
+    settle(within(phishtank(url), lim)),
     lite ? skipped : settle(urlscanSearch(h.domain)),
   ]);
 
@@ -48,7 +58,7 @@ export async function runCheck(rawInput, env, { withScan = true, lite = false } 
   };
   let v = verdict(assemble(), { url });
   if (lite && v.stufe !== "gruen") {
-    us = await settle(urlscanSearch(h.domain));
+    us = await settle(within(urlscanSearch(h.domain), LITE_BUDGET.second));
     v = verdict(assemble(), { url });
   }
 
