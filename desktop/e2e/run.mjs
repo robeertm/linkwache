@@ -292,13 +292,14 @@ async function caseAmber() {
   const w = await waitState("warning", (d) => d.stufe === "gelb", 12000, before);
   record("amber link shows the warning window", !!w, w ? `findings ${w.data.findings}` : "");
   if (!w) return;
-  await sleep(2500);
-  screenshot("warning-amber");
+  const shownAt = Date.now();
   cmd(`decide ${w.data.id} open`);
   const early = await waitState("decide", (d) => d.action === "open", 4000, before);
   record("amber: 'open anyway' refused before the delay", !!early && early.data.ok === false, early ? JSON.stringify(early.data) : "no answer");
+  await sleep(1800);
+  screenshot("warning-amber");
   record("amber: nothing opened before the decision", !received().includes(url));
-  await sleep(3200);
+  await sleep(Math.max(0, 3400 - (Date.now() - shownAt)));
   const n = states().length;
   cmd(`decide ${w.data.id} open`);
   const late = await waitState("decide", (d) => d.action === "open", 4000, n);
