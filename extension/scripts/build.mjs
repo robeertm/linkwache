@@ -1,5 +1,7 @@
-// Builds the extension from one source into extension/dist/chromium/, extension/dist/firefox/ (unpacked, loadable)
-// and extension/dist/linkwache-extension-<target>-<version>.zip. No runtime bundler: every script is one self-contained file.
+// Builds the extension from one source into extension/dist/chromium/, extension/dist/firefox/, extension/dist/safari/
+// (unpacked, loadable) and extension/dist/linkwache-extension-<target>-<version>.zip. The Safari folder is what the Xcode
+// project in safari/ copies into its app extension; dist/safari-app-strings.json carries the container app's texts.
+//   node extension/scripts/build.mjs [chromium] [firefox] [safari]    (no argument: all three) No runtime bundler: every script is one self-contained file.
 //   LINKWACHE_DEFAULT_SERVER=https://... npm run build:extension    (default server address; empty otherwise)
 //   LINKWACHE_PRESET_MIGRATE_FROM="https://... https://..."           (earlier default addresses installations move away from)
 import fs from "node:fs";
@@ -10,12 +12,13 @@ import { build } from "esbuild";
 import { STRINGS, LANGS } from "../../src/i18n.js";
 
 const EXT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const DIST = path.join(EXT, "dist");
+const DIST = process.env.LINKWACHE_EXT_DIST ? path.resolve(process.env.LINKWACHE_EXT_DIST) : path.join(EXT, "dist");
 const pkg = JSON.parse(fs.readFileSync(path.join(EXT, "..", "package.json"), "utf8"));
 const VERSION = pkg.version;
 const DEFAULT_SERVER = process.env.LINKWACHE_DEFAULT_SERVER || "";
 const PRESET_MIGRATE_FROM = process.env.LINKWACHE_PRESET_MIGRATE_FROM || "";
 const KEY_PREFIXES = ["ext.", "f.", "pat.", "v.", "stufe.", "age."];
+export const TARGETS = ["chromium", "firefox", "safari"];
 
 /** Strings the extension needs, per language, from the website's single source of truth. */
 export function extensionStrings() {
@@ -23,6 +26,16 @@ export function extensionStrings() {
   for (const l of LANGS) {
     out[l] = {};
     for (const [k, v] of Object.entries(STRINGS[l])) if (KEY_PREFIXES.some((p) => k.startsWith(p))) out[l][k] = v;
+  }
+  return out;
+}
+
+/** Texts of the Safari container app (safari.app.*), per language. */
+export function safariAppStrings() {
+  const out = {};
+  for (const l of LANGS) {
+    out[l] = {};
+    for (const [k, v] of Object.entries(STRINGS[l])) if (k.startsWith("safari.app.")) out[l][k.slice("safari.app.".length)] = v;
   }
   return out;
 }
@@ -73,7 +86,7 @@ async function buildTarget(target) {
   await build({
     entryPoints: ENTRIES.map((e) => path.join(EXT, "src", e + ".js")), outdir: out, bundle: true, format: "iife", target: "es2022",
     platform: "browser", plugins: [stringsPlugin], legalComments: "none", logLevel: "warning",
-    define: { LW_DEFAULT_SERVER: JSON.stringify(DEFAULT_SERVER), LW_PRESET_MIGRATE_FROM: JSON.stringify(PRESET_MIGRATE_FROM) },
+    define: { LW_TARGET: JSON.stringify(target), LW_DEFAULT_SERVER: JSON.stringify(DEFAULT_SERVER), LW_PRESET_MIGRATE_FROM: JSON.stringify(PRESET_MIGRATE_FROM) },
   });
   for (const f of STATIC) fs.copyFileSync(path.join(EXT, f), path.join(out, f));
   fs.cpSync(path.join(EXT, "icons"), path.join(out, "icons"), { recursive: true });
@@ -98,8 +111,15 @@ async function buildTarget(target) {
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   fs.mkdirSync(DIST, { recursive: true });
-  for (const target of ["chromium", "firefox"]) {
+  const wanted = process.argv.slice(2).filter((a) => !a.startsWith("-"));
+  for (const a of wanted) if (!TARGETS.includes(a)) { console.error(`unknown target ${a} (${TARGETS.join(", ")})`); process.exit(2); }
+  for (const target of wanted.length ? wanted : TARGETS) {
     const { out, zip } = await buildTarget(target);
     console.log(`${target}: ${path.relative(process.cwd(), out)}  ${path.relative(process.cwd(), zip)} (${fs.statSync(zip).size} bytes)`);
+    if (target === "safari") {
+      const f = path.join(DIST, "safari-app-strings.json");
+      fs.writeFileSync(f, JSON.stringify({ version: VERSION, langs: LANGS, strings: safariAppStrings() }, null, 2) + "\n");
+      console.log(`safari app strings: ${path.relative(process.cwd(), f)}`);
+    }
   }
 }

@@ -68,6 +68,6 @@ async function main() {
   $("clear").addEventListener("click", async () => { await api.runtime.sendMessage({ t: "clearCache" }); flash(t(lang, "ext.o.done")); });
   $("reset").addEventListener("click", async () => { await set({ install: randomHex(16) }); flash(t(lang, "ext.o.done")); });
   const app = await api.runtime.sendMessage({ t: "appStatus" }).catch(() => null);
-  $("appState").textContent = app && app.app ? t(lang, "ext.o.app.on", { v: app.app }) : t(lang, "ext.o.app.off");
+  $("appState").textContent = app && app.unsupported ? t(lang, "ext.o.app.safari") : app && app.app ? t(lang, "ext.o.app.on", { v: app.app }) : t(lang, "ext.o.app.off");
 }
 main();

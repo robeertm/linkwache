@@ -32,7 +32,7 @@ test("firefox: gecko id, background scripts, no key", () => {
 });
 
 test("every file the manifests and pages reference exists; one self-contained script each; all eight locales", () => {
-  for (const t of ["chromium", "firefox"]) {
+  for (const t of ["chromium", "firefox", "safari"]) {
     const m = JSON.parse(rd(t, "manifest.json"));
     for (const f of [...Object.values(m.icons), ...m.content_scripts[0].js, m.options_ui.page]) assert.ok(fs.existsSync(path.join(DIST, t, f)), t + " " + f);
     for (const l of ["de", "en", "tr", "pl", "ru", "es", "fr", "it"]) {
@@ -55,7 +55,7 @@ test("no hostname baked into the build when LINKWACHE_DEFAULT_SERVER is empty; s
 });
 
 test("zips exist, are valid and carry the manifest at the root", () => {
-  for (const t of ["chromium", "firefox"]) {
+  for (const t of ["chromium", "firefox", "safari"]) {
     const z = path.join(DIST, `linkwache-extension-${t}-${pkg.version}.zip`);
     assert.ok(fs.existsSync(z), z);
     const list = execFileSync("unzip", ["-Z1", z]).toString().split("\n");

@@ -3,7 +3,7 @@ import { esc, defang } from "./util.js";
 import { STUFE_EMOJI } from "./verdict.js";
 import { t, findingText, verdictText, LANGS, LANG_NAMES } from "./i18n.js";
 import { PAGES } from "./i18n_pages.js";
-import { classify, detectOS, recommend, formatSize, REPO_RELEASES } from "./downloads.js";
+import { classify, detectOS, recommend, formatSize, REPO_RELEASES, SAFARI_GUIDE } from "./downloads.js";
 
 /** Spendenlink: PayPal.me-Name oder eine PayPal-Mailadresse (klassischer Zahlungslink, geht mit jedem Konto). */
 export function paypalLink(env) {
@@ -290,7 +290,8 @@ export function downloadPage(lang, env, { ua = "", os = "" } = {}) {
   if (pkgs.some((p) => p.group === "extension")) {
     body += `<details class="karte helpbox" id="ext"><summary>${P("dl.ext.h")}</summary><div class="help"><p>${P("dl.ext.lead")}</p>
     <h4>${P("dl.ext.chrome.h")}</h4>${steps(lang, env, ["dl.ext.c1", "dl.ext.c2", "dl.ext.c3", "dl.ext.c4"])}
-    <h4>${P("dl.ext.firefox.h")}</h4>${steps(lang, env, ["dl.ext.f1", "dl.ext.f2", "dl.ext.f3"])}<p class="small">${P("dl.ext.f.note")}</p></div></details>`;
+    <h4>${P("dl.ext.firefox.h")}</h4>${steps(lang, env, ["dl.ext.f1", "dl.ext.f2", "dl.ext.f3"])}<p class="small">${P("dl.ext.f.note")}</p>
+    <h4>${P("dl.ext.safari.h")}</h4><p>${P("dl.ext.s.lead")}</p>${steps(lang, env, ["dl.ext.s1", "dl.ext.s2", "dl.ext.s3"])}<p class="small">${P("dl.ext.s.note")}</p><p><a href="${SAFARI_GUIDE}" rel="noopener">${P("dl.ext.s.src")}</a></p></div></details>`;
   }
   body += `</section><p class="small">${P("dl.ios.p")} <a href="/kurzbefehl.html?lang=${lang}">${P("dl.ios.link")}</a></p></div>`;
   return page({ lang, title: `${P("dl.title")} · ${env.SITE_NAME || "Linkwache"}`, body, env, path: "/download" });

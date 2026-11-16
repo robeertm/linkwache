@@ -3,6 +3,7 @@
 // per version. Signatures, updater archives, manifests and checksum files are ignored.
 
 export const REPO_RELEASES = "https://github.com/robeertm/linkwache/releases";
+export const SAFARI_GUIDE = "https://github.com/robeertm/linkwache/blob/main/docs/DESKTOP.md#safari";
 
 const ARCH = (n) => (/(aarch64|arm64)/i.test(n) ? "arm64" : /universal/i.test(n) ? "universal" : "x64");
 

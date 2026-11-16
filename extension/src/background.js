@@ -1,17 +1,19 @@
-// Linkwache extension: service worker (Chromium) / background script (Firefox).
+// Linkwache extension: service worker (Chromium) / background script (Firefox, Safari).
 // Decides for every intercepted link: allowlist -> cache -> local heuristics -> desktop app or server. Never opens silently
 // when the check fails. Docs: docs/DESKTOP.md sections 4-6, docs/API.md.
 import { api } from "./api.js";
 import { getAll, set, installId, validServer, DEFAULTS } from "./store.js";
 import { t, pickLang } from "./i18n.js";
 import * as native from "./native.js";
+import { features, timeoutSignal, createTab, TARGET } from "./platform.js";
 import { hostInfo } from "../../src/util.js";
 import { prepare, isAllowed, localAssess, reduceForSend, cacheKey, cacheFresh, ttlFor, decide, b64urlEncode, slimFindings, normalizeHttp, RULES, purgeOlderRules } from "./logic.js";
 
 const TIMEOUT_MS = 6000;
 const CACHE_MAX = 400;
 const VERSION = api.runtime.getManifest().version;
-const DNR = api.declarativeNetRequest;
+const F = features(TARGET, api);
+const DNR = F.dnr ? api.declarativeNetRequest : null;
 const warningBase = () => api.runtime.getURL("warning.html");
 
 const langOf = (settings) => pickLang(settings.lang, api.i18n?.getUILanguage?.() || "en");
@@ -24,7 +26,7 @@ async function serverCheck(target, st, lang) {
     const r = await fetch(st.settings.server.replace(/\/$/, "") + "/api/v1/check", {
       method: "POST",
       headers: { "content-type": "application/json", "x-linkwache-install": await installId(), "x-linkwache-client": "extension/" + VERSION },
-      body, signal: AbortSignal.timeout(TIMEOUT_MS),
+      body, signal: timeoutSignal(TIMEOUT_MS),
     });
     if (!r.ok) return null;
     const j = await r.json();
@@ -56,7 +58,7 @@ export async function evaluate(raw) {
   }
 
   let res = null;
-  if (native.appInfo() || (await native.hello(VERSION))) res = await native.check(reduceForSend(target, st.settings.scope), lang);
+  if (F.native && (native.appInfo() || (await native.hello(VERSION)))) res = await native.check(reduceForSend(target, st.settings.scope), lang);
   const fromApp = !!res;
   if (res && res.offline) return { ...base, stufe: "off", findings: slimFindings(res.local && res.local.findings), source: "app" };
   if (!res) res = await serverCheck(target, st, lang);
@@ -101,7 +103,7 @@ async function dropOlderRules(minRules) {
   const gone = purgeOlderRules(cache, minRules);
   if (!gone.length) return;
   await set({ cache });
-  try { const rules = await DNR.getSessionRules(); await DNR.updateSessionRules({ removeRuleIds: rules.map((x) => x.id) }); } catch { /* none */ }
+  if (DNR) try { const rules = await DNR.getSessionRules(); await DNR.updateSessionRules({ removeRuleIds: rules.map((x) => x.id) }); } catch { /* none */ }
   await rebuildRules();
 }
 async function newerRules(r) {
@@ -128,7 +130,7 @@ async function redCached(url) {
   return Object.values(cache).some((x) => x.d === domain && x.st === "rot" && cacheFresh(x));
 }
 
-if (api.webNavigation && api.webNavigation.onBeforeNavigate) {
+if (F.webNavigation) {
   api.webNavigation.onBeforeNavigate.addListener(async (d) => {
     if (d.frameId !== 0 || !normalizeHttp(d.url)) return;
     if (await redCached(d.url)) api.tabs.update(d.tabId, { url: warningBase() + "#r=" + d.url }).catch(() => {});
@@ -142,14 +144,14 @@ function warnUrl(r, mode) {
 async function openIn(sender, url, mode) {
   const tab = sender.tab;
   if (mode === "same" && tab) return api.tabs.update(tab.id, { url });
-  return api.tabs.create({ url, active: mode !== "bg", ...(tab ? { index: tab.index + 1, openerTabId: tab.id } : {}) });
+  return createTab(api.tabs, url, mode, tab, F);
 }
 
 async function logEvent(ev, stufe, domain) {
   const { log } = await getAll();
   log.unshift({ t: Date.now(), ev, st: stufe, d: domain });
   await set({ log: log.slice(0, 50) });
-  native.notify({ type: "log", event: ev, stufe, domain });
+  if (F.native) native.notify({ type: "log", event: ev, stufe, domain });
 }
 
 async function proceed({ domain, always, stufe }) {
@@ -159,7 +161,7 @@ async function proceed({ domain, always, stufe }) {
   for (const [k, v] of Object.entries(once)) if (v < Date.now()) delete once[k];
   await set({ once });
   await unblockDomain(domain);
-  if (always && stufe !== "rot" && !st.allow.includes(domain)) { await set({ allow: [...st.allow, domain].sort() }); native.notify({ type: "allow", domain }); }
+  if (always && stufe !== "rot" && !st.allow.includes(domain)) { await set({ allow: [...st.allow, domain].sort() }); if (F.native) native.notify({ type: "allow", domain }); }
   await logEvent("open-anyway", stufe, domain);
   return { ok: true };
 }
@@ -192,10 +194,10 @@ api.runtime.onMessage.addListener((m, sender, reply) => {
         const r = await evaluate(m.url);
         return r ? { ...r, level: decide(r.stufe).level } : null;
       }
-      case "appStatus": return (await native.hello(VERSION)) || null;
+      case "appStatus": return F.native ? (await native.hello(VERSION)) || null : { unsupported: true, target: TARGET };
       case "clearCache": {
         await set({ cache: {} });
-        try { const rules = await DNR.getSessionRules(); await DNR.updateSessionRules({ removeRuleIds: rules.map((x) => x.id) }); } catch { /* none */ }
+        if (DNR) try { const rules = await DNR.getSessionRules(); await DNR.updateSessionRules({ removeRuleIds: rules.map((x) => x.id) }); } catch { /* none */ }
         return { ok: true };
       }
       default: return undefined;
@@ -208,4 +210,4 @@ if (api.action && api.action.onClicked) api.action.onClicked.addListener(() => a
 if (api.runtime.onInstalled) api.runtime.onInstalled.addListener(async () => { await installId(); await set({ settings: (await getAll()).settings }); await dropOlderRules(RULES); });
 if (api.runtime.onStartup) api.runtime.onStartup.addListener(() => { rebuildRules(); });
 rebuildRules();
-native.hello(VERSION);
+if (F.native) native.hello(VERSION);

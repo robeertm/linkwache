@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import worker from "../src/index.js";
 import { parseRelease, parseSums, fetchRelease, startUpdateCheck } from "../server/update.js";
-import { classify, detectOS, recommend } from "../src/downloads.js";
+import { classify, detectOS, recommend, SAFARI_GUIDE } from "../src/downloads.js";
 import { LANGS } from "../src/i18n.js";
 import { PAGES } from "../src/i18n_pages.js";
 
@@ -183,4 +183,16 @@ test("download page shows the release date per language, never as ISO", async ()
     assert.ok(h.includes(f), `${l}: formatted date missing`);
   }
   assert.ok(seen.size >= 6, "dates should differ between languages");
+});
+
+test("Safari build-it-yourself block renders in all 8 languages with the guide link; all dl.ext.s* keys exist", async () => {
+  assert.equal(SAFARI_GUIDE, "https://github.com/robeertm/linkwache/blob/main/docs/DESKTOP.md#safari");
+  const keys = Object.keys(PAGES.de).filter((k) => /^dl\.ext\.(s\d?|s\.\w+|safari\.h)$/.test(k));
+  assert.equal(keys.length, 7);
+  for (const l of LANGS) {
+    for (const k of keys) assert.ok(PAGES[l][k] && PAGES[l][k].length > 1, l + " " + k);
+    const h = await (await get(envWith(FIX), "/download?lang=" + l, UA.win)).text();
+    for (const k of ["dl.ext.safari.h", "dl.ext.s.lead", "dl.ext.s1", "dl.ext.s2", "dl.ext.s3", "dl.ext.s.note"]) assert.ok(h.includes(PAGES[l][k]), l + " " + k);
+    assert.ok(h.includes('href="' + SAFARI_GUIDE + '"') && h.includes(PAGES[l]["dl.ext.s.src"] + "</a>"), l + " guide link");
+  }
 });

@@ -31,7 +31,7 @@ test("every ext.* key used in the extension code exists", () => {
   for (const m of code.matchAll(/["'](ext\.[a-z0-9.]+\.)["']\s*\+\s*(\w+)/g)) for (const s of ["gelb", "rot", "off"]) used.add(m[1] + s);
   assert.ok(used.size > 25);
   for (const k of used) for (const l of LANGS) assert.ok(STRINGS[l][k], l + " " + k);
-  const unused = Object.keys(EXTENSION.en).filter((k) => !used.has(k) && !["ext.name", "ext.desc"].includes(k));
+  const unused = Object.keys(EXTENSION.en).filter((k) => !used.has(k) && !k.startsWith("safari.") && !["ext.name", "ext.desc"].includes(k));
   assert.deepEqual(unused, [], "no orphaned texts");
 });
 
@@ -46,4 +46,14 @@ test("build bundle carries ext.*, finding, pattern, verdict, level and age texts
 test("wording: never 'safe' for a link in extension texts", () => {
   const bad = /\b(safe|sicher|güvenli|bezpieczn\w*|безопасн\w*|seguro|sûr|sicuro)\b/i;
   for (const l of LANGS) for (const [k, v] of Object.entries(EXTENSION[l])) assert.ok(!bad.test(v), l + " " + k + ": " + v);
+});
+
+test("safari.app.* keys exist in all eight languages with their placeholders", () => {
+  const keys = Object.keys(EXTENSION.en).filter((k) => k.startsWith("safari.app."));
+  assert.equal(keys.length, 18);
+  for (const l of LANGS) {
+    for (const k of keys) assert.ok(STRINGS[l][k] && STRINGS[l][k].trim().length > 0, l + " " + k);
+    assert.match(STRINGS[l]["safari.app.update"], /\{v\}.*\{cur\}/, l);
+    for (const k of ["safari.app.uptodate", "safari.app.version"]) assert.match(STRINGS[l][k], /\{v\}/, l + " " + k);
+  }
 });
