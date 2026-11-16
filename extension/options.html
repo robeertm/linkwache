@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Linkwache</title><link rel="stylesheet" href="ui.css"></head>
+<body class="opts"><main class="wrap">
+  <header class="brand"><img src="icons/icon-48.png" alt="" width="32" height="32"><span id="title">Linkwache</span></header>
+  <section class="card">
+    <label class="check"><input id="paused" type="checkbox"><span><b id="pauseLbl"></b><small id="pauseHint" class="small"></small></span></label>
+  </section>
+  <section class="card">
+    <h2 id="appLbl"></h2><p id="appState" class="small"></p>
+  </section>
+  <section class="card">
+    <label class="field" for="server"><b id="serverLbl"></b></label>
+    <input id="server" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://">
+    <p id="serverHint" class="small"></p><p id="serverBad" class="error" hidden></p>
+    <h2 id="scopeLbl"></h2>
+    <label class="radio"><input type="radio" name="scope" value="url"><span id="scopeUrl"></span></label>
+    <label class="radio"><input type="radio" name="scope" value="domain"><span id="scopeDomain"></span></label>
+    <label class="field" for="lang"><b id="langLbl"></b></label><select id="lang"></select>
+  </section>
+  <section class="card">
+    <h2 id="allowLbl"></h2><ul id="allowList" class="chips"></ul><p id="allowEmpty" class="small"></p>
+    <form id="allowForm" class="row"><input id="allowIn" type="text" autocomplete="off" spellcheck="false" placeholder="example.com"><button id="allowAdd" class="btn ghost" type="submit"></button></form>
+  </section>
+  <section class="card">
+    <h2 id="logLbl"></h2><ul id="logList" class="log"></ul><p id="logEmpty" class="small"></p>
+  </section>
+  <section class="card">
+    <p id="privacy" class="small"></p>
+    <div class="actions"><button id="clear" class="btn ghost" type="button"></button><button id="reset" class="btn ghost" type="button"></button></div>
+    <p id="saved" class="ok small" role="status"></p>
+  </section>
+</main><script src="options.js"></script></body></html>

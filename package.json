@@ -2,12 +2,13 @@
   "name": "linkwache",
   "version": "0.4.0",
   "private": true,
-  "description": "Linkwache — prüft verdächtige Links, ohne sie zu öffnen. Cloudflare Worker.",
+  "description": "Linkwache \u2014 pr\u00fcft verd\u00e4chtige Links, ohne sie zu \u00f6ffnen. Cloudflare Worker.",
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js extension/test/*.test.js",
+    "build:extension": "node extension/scripts/build.mjs"
   },
   "dependencies": {
     "mimetext": "^3.0.24",
@@ -15,6 +16,7 @@
     "tldts": "^6.1.86"
   },
   "devDependencies": {
-    "wrangler": "^4.0.0"
+    "wrangler": "^4.0.0",
+    "esbuild": "^0.28.1"
   }
 }

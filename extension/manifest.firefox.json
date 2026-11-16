@@ -1,0 +1,10 @@
+{
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{ef1e5d25-3e24-4517-a534-dad3a936dcb3}",
+      "strict_min_version": "128.0",
+      "data_collection_permissions": { "required": ["browsingActivity"] }
+    }
+  },
+  "background": { "scripts": ["background.js"] }
+}
