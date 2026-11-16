@@ -166,3 +166,21 @@ test("home page carries the quiet hint to /download, the nav links it, the priva
   const de = await (await get(envWith(FIX), "/datenschutz.html?lang=de")).text();
   assert.match(de, /16\. November 2026/);
 });
+
+test("download page shows the release date per language, never as ISO", async () => {
+  const { formatDate } = await import("../src/render.js");
+  assert.equal(formatDate("de", "2026-11-16"), "16. Nov. 2026");
+  assert.equal(formatDate("en", "2026-11-16"), "Nov 16, 2026");
+  assert.equal(formatDate("de", "garbage"), "garbage");
+  assert.equal(formatDate("de", ""), "");
+  const seen = new Set();
+  for (const l of LANGS) {
+    const f = formatDate(l, "2026-11-16");
+    assert.ok(/2026/.test(f) && /16/.test(f) && !f.includes("2026-11-16"), `${l}: ${f}`);
+    seen.add(f);
+    const h = await (await get(envWith(FIX), "/download?lang=" + l, UA.win)).text();
+    assert.ok(!h.includes("2026-11-16"), `${l}: ISO date still on the page`);
+    assert.ok(h.includes(f), `${l}: formatted date missing`);
+  }
+  assert.ok(seen.size >= 6, "dates should differ between languages");
+});

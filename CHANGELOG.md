@@ -2,6 +2,14 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
+## Unreleased
+
+### Fixed
+- Download page: the release date is shown in the reader's language (for example `16. Nov. 2026`, `Nov 16, 2026`)
+  instead of ISO, in the version line and on every package card, in all 8 languages (`Intl`, UTC so the day never
+  shifts). Server and page only; the apps are unchanged. Not released on its own because a tag would rebuild and
+  republish every app package; it ships with the next Linkwache release.
+
 ## 0.5.2 — 2026-11-16
 
 ### Fixed

@@ -201,8 +201,17 @@ function shaBlock(lang, p, env, n) {
   return `<div class="sha"><span class="lbl">${tp(lang, "dl.sha", env)}</span><code class="shaval" id="sha${n}">${esc(p.sha256)}</code><button class="btn ghost small" type="button" data-copy="#sha${n}" data-label="${tp(lang, "dl.copy", env)}" data-done="${tp(lang, "dl.copied", env)}">${tp(lang, "dl.copy", env)}</button></div>`;
 }
 
+// "2026-11-16" -> "16.11.2026" / "16 Nov 2026" per language (UTC, so the day never shifts). Unparsable input is returned unchanged.
+export function formatDate(lang, iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || ""));
+  if (!m) return String(iso || "");
+  const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+  if (Number.isNaN(d.getTime())) return String(iso);
+  try { return new Intl.DateTimeFormat(lang, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(d); } catch { return String(iso); }
+}
+
 function pkgCard(lang, p, env, rel, n, { primary = false, label = "" } = {}) {
-  const meta = [formatSize(p.size), rel.version ? "v" + rel.version : "", rel.date].filter(Boolean).join(" · ");
+  const meta = [formatSize(p.size), rel.version ? "v" + rel.version : "", formatDate(lang, rel.date)].filter(Boolean).join(" · ");
   return `<div class="pkg${primary ? " primary" : ""}">
   <div class="pkg-head"><div><b>${esc(label || pkgLabel(lang, p, env))}</b><span class="small">${esc(p.name)}${meta ? " · " + esc(meta) : ""}</span></div>
   <a class="btn${primary ? " big" : " ghost"}" href="${esc(p.url)}" rel="noopener" download>${tp(lang, "dl.get", env)}</a></div>
@@ -258,7 +267,7 @@ export function downloadPage(lang, env, { ua = "", os = "" } = {}) {
     body += `<div class="karte none"><h2>${P("dl.none.h")}</h2><p>${P("dl.none.p")}</p><p><a class="btn" href="${esc(REPO_RELEASES)}" rel="noopener">${P("dl.none.link")}</a></p></div></div>`;
     return page({ lang, title: `${P("dl.title")} · ${env.SITE_NAME || "Linkwache"}`, body, env, path: "/download" });
   }
-  body += `<p class="small rel">${tp(lang, "dl.rel", env, { v: rel.version, d: rel.date })}</p>`;
+  body += `<p class="small rel">${tp(lang, "dl.rel", env, { v: rel.version, d: formatDate(lang, rel.date) })}</p>`;
   const rec = recommend(sys, pkgs, ua);
   if (rec) body += `<h2>${P("dl.rec")}</h2>` + pkgCard(lang, rec, env, rel, ++n, { primary: true, label: P("dl.for." + rec.group) });
   else if (sys === "android") body += `<div class="karte note"><h3>${P("dl.android.soon")}</h3><p class="small">${P("dl.android.soon.p")}</p></div>`;
