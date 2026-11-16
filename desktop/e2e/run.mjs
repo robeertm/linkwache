@@ -297,11 +297,14 @@ async function caseAmber() {
   const w = await waitState("warning", (d) => d.stufe === "gelb", 12000, before);
   record("amber link shows the warning window", !!w, w ? `findings ${w.data.findings}` : "");
   if (!w) return;
-  const shownAt = Date.now();
+  let shownAt = Date.now();
   cmd(`decide ${w.data.id} open`);
   const early = await waitState("decide", (d) => d.action === "open", 4000, before);
   record("amber: 'open anyway' refused before the delay", !!early && early.data.ok === false, early ? JSON.stringify(early.data) : "no answer");
-  await sleep(1800);
+  // The delay starts when the window is visible (window-ready).
+  const ready = await waitState("window-ready", (d) => d.label === `warn-${w.data.id}`, 5000, before);
+  if (ready) shownAt = Date.now();
+  await sleep(600);
   screenshot("warning-amber");
   record("amber: nothing opened before the decision", !received().includes(url));
   await sleep(Math.max(0, 3400 - (Date.now() - shownAt)));
@@ -348,6 +351,7 @@ async function caseOffline() {
   openViaOS(url);
   const w = await waitState("warning", (d) => d.stufe === "offline", 20000, before);
   record("server down: 'could not be checked' window", !!w, w ? `reason ${w.data.reason}` : "");
+  if (w) await waitState("window-ready", (d) => d.label === `warn-${w.data.id}`, 6000, before);
   await sleep(2500);
   screenshot("warning-offline");
   record("server down: nothing opened", !received().includes(url));
@@ -455,8 +459,10 @@ async function main() {
   await caseSlowToast();
   await caseAmber();
   await caseRed();
+  const bs = states().length;
   cmd("settings history");
-  await sleep(2500);
+  await waitState("window-ready", (d) => d.label === "settings", 8000, bs);
+  await sleep(1200);
   screenshot("settings-history");
   casePrivacy();
   await caseMailto();

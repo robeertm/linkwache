@@ -44,6 +44,20 @@ pub async fn get_result(app: AppHandle, id: u64) -> R<Value> {
 #[tauri::command]
 pub async fn window_ready(app: AppHandle, window: tauri::WebviewWindow) -> R<()> {
     ui::reveal(&app, window.label());
+    // The "open anyway" delay starts when the warning is actually visible.
+    if let Some(id) = window.label().strip_prefix("warn-").and_then(|s| s.parse::<u64>().ok()) {
+        let st = app.state::<AppState>();
+        let payload = {
+            let mut map = st.pending.lock().unwrap();
+            map.get_mut(&id).map(|pd| {
+                pd.shown = std::time::Instant::now();
+                flow::payload(id, pd)
+            })
+        };
+        if let Some(p) = payload {
+            let _ = app.emit("result", p);
+        }
+    }
     crate::e2e::state("window-ready", json!({ "label": window.label() }));
     Ok(())
 }
