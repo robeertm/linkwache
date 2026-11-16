@@ -147,14 +147,22 @@ pub fn bring_to_front(w: &WebviewWindow) {
         crate::platform::bring_window_to_front(ns);
     }
     let _ = w.set_focus();
-    let focused = w.is_focused().unwrap_or(false);
-    if !focused {
-        let _ = w.request_user_attention(Some(tauri::UserAttentionType::Critical));
-    }
-    crate::e2e::state("revealed", serde_json::json!({
-        "label": w.label(), "visible": w.is_visible().unwrap_or(false), "focused": focused,
-        "onTop": w.is_always_on_top().unwrap_or(false),
-    }));
+    // Show/focus requests are applied asynchronously on some systems (GTK): look again shortly after.
+    let w2 = w.clone();
+    std::thread::spawn(move || {
+        std::thread::sleep(std::time::Duration::from_millis(500));
+        let w3 = w2.clone();
+        let _ = w2.run_on_main_thread(move || {
+            let focused = w3.is_focused().unwrap_or(false);
+            if !focused {
+                let _ = w3.request_user_attention(Some(tauri::UserAttentionType::Critical));
+            }
+            crate::e2e::state("revealed", serde_json::json!({
+                "label": w3.label(), "visible": w3.is_visible().unwrap_or(false), "focused": focused,
+                "onTop": w3.is_always_on_top().unwrap_or(false),
+            }));
+        });
+    });
 }
 
 pub fn close_window(app: &AppHandle, label: &str) {
