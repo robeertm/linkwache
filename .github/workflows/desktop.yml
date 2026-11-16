@@ -167,6 +167,27 @@ jobs:
           dbus-run-session -- node e2e/run.mjs --app "$RUNNER_TEMP/e2e-bin/linkwache-e2e" \
             --shipped "$RUNNER_TEMP/deb/usr/bin/linkwache" --out "$RUNNER_TEMP/e2e"
 
+      # Same test, but every check is answered by the real server code (node server/index.js)
+      # behind the logging stand-in: proves the app and the real /api/v1/check fit together.
+      - name: E2E against the real server (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          mkdir -p "$RUNNER_TEMP/real-data"
+          PORT=8788 DATA_DIR="$RUNNER_TEMP/real-data" UPDATE_CHECK=off node server/index.js > "$RUNNER_TEMP/real-server.log" 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8788/api/health >/dev/null 2>&1 && break; sleep 1; done
+          cd desktop
+          dbus-run-session -- node e2e/run.mjs --app "$RUNNER_TEMP/e2e-bin/linkwache-e2e" \
+            --upstream http://127.0.0.1:8788 --out "$RUNNER_TEMP/e2e-real"
+
+      - uses: actions/upload-artifact@v4
+        if: always() && runner.os == 'Linux'
+        with:
+          name: e2e-real-server-${{ matrix.name }}
+          path: ${{ runner.temp }}/e2e-real
+          if-no-files-found: warn
+
       - name: E2E (macOS)
         if: runner.os == 'macOS'
         working-directory: desktop
@@ -257,7 +278,10 @@ jobs:
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" dist/release/* --clobber
           else
+            # Release text = this version's CHANGELOG section (plus a pointer to the checksums).
+            awk -v v="${TAG#v}" '$0 ~ "^## "v" " {on=1; next} on && /^## / {exit} on {print}' CHANGELOG.md > notes.md
+            printf '\nChecksums of every file: `SHA256SUMS.txt`.\n' >> notes.md
             gh release create "$TAG" dist/release/* --prerelease --latest=false --verify-tag \
-              --title "Linkwache $TAG" --notes "Desktop app, browser extension and server $TAG. Checksums: SHA256SUMS.txt."
+              --title "Linkwache $TAG" --notes-file notes.md
           fi
           bash desktop/scripts/sha256sums.sh "$TAG"

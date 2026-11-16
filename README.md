@@ -30,6 +30,8 @@ A live instance run by the author for friends: https://linkwache.example.org
 | Channel | How |
 |---|---|
 | **Web** | paste → check. Works for every messenger and mail client. |
+| **Desktop app** (Windows, macOS, Linux) | checks every clicked link automatically before it opens — see [Desktop protection](#desktop-protection). |
+| **Browser extension** (Chrome, Edge, Brave, Firefox) | checks links clicked in webmail and on web pages. |
 | **Android app** | checks every tapped link automatically before it opens — see [Android](#android) below. |
 | **Android share sheet** | add the page to the home screen once; it then appears under "Share". |
 | **iPhone** | a signed one-tap Shortcut (`/kurzbefehl.html`) puts it in the share sheet. |
@@ -73,6 +75,61 @@ and installs one only after checking its SHA-256 and signing certificate, with y
 Android limits: links opened inside an app's own built-in browser and verified app links never
 reach the default browser — use *Share → Check with Linkwache* there. Details, build and signing:
 [docs/ANDROID.md](docs/ANDROID.md).
+
+## Desktop protection
+
+**Every link clicked anywhere on the computer is checked before it opens** — in the mail program,
+office documents, PDFs, messenger apps. The desktop app (Windows 10/11, macOS 12+, Linux x64/arm64)
+becomes the system's handler for web links, checks each link and hands it to your real browser.
+The browser extension covers what never leaves the browser: links in webmail and on web pages.
+
+- **No warning signs:** a small notice "Linkwache is checking … *domain*" turns into "No warning signs –
+  opening" and the link opens in your browser (known and cached links in well under a second).
+- **Suspicious:** a warning with the findings in plain language; "Don't open" is the main button,
+  "Open anyway" becomes active after three seconds.
+- **Dangerous:** blocked. Opening needs a deliberate second step ("I know what I am doing" → confirm)
+  and is written to the local history.
+- **Server unreachable:** "Could not be checked" with the local assessment — nothing opens by itself.
+
+<p>
+<img src="docs/screenshots/desktop/macos-toast-checking.png" width="400" alt="macOS: Linkwache is checking">
+<img src="docs/screenshots/desktop/windows-warning-red.png" width="400" alt="Windows: dangerous link blocked">
+</p>
+<p>
+<img src="docs/screenshots/desktop/linux-warning-amber.png" width="400" alt="Linux: suspicious link, open anyway after a delay">
+<img src="docs/screenshots/desktop/warning-amber-dark.png" width="250" alt="Suspicious link, dark mode">
+<img src="docs/screenshots/desktop/setup-default.png" width="260" alt="Setup assistant: make Linkwache the default">
+</p>
+<p>
+<img src="docs/screenshots/desktop/extension-toast.png" width="400" alt="Extension: checking a link in webmail">
+<img src="docs/screenshots/desktop/extension-warning-red.png" width="400" alt="Extension: warning page">
+</p>
+
+**Install** (no app stores for now): download the package for your system from the `/download`
+page of a Linkwache site or the [latest release](https://github.com/robeertm/linkwache/releases/latest)
+and compare its SHA-256 (`SHA256SUMS.txt`).
+
+| System | Package | First start |
+|---|---|---|
+| Windows | `Linkwache_X.Y.Z_x64-setup.exe` (per user, no admin) or `.msi` | not code-signed yet: SmartScreen → *More info* → *Run anyway*. The assistant opens *Default apps*; choose Linkwache for HTTP/HTTPS — Windows lets only you make that choice, Linkwache notices it. Managed PCs: [`docs/windows-default-associations.xml`](docs/windows-default-associations.xml) (DISM/GPO). |
+| macOS | `Linkwache_X.Y.Z_universal.dmg` | not notarised yet: right-click → *Open*. Confirm "Use Linkwache" when macOS asks about the default browser. |
+| Linux | `.AppImage` (self-updating), `.deb`, `.rpm` (x64 and arm64) | the assistant sets the default via `xdg-settings` and checks it. |
+| Extension | `linkwache-extension-chromium-X.Y.Z.zip` / `-firefox-` | Chrome/Edge/Brave: unzip, `chrome://extensions` → Developer mode → *Load unpacked*. Firefox: `about:debugging` → *Load Temporary Add-on* (until a signed version exists). |
+
+The setup assistant remembers your previous browser and forwards every checked link to it — never
+back to the system default, so links cannot loop. Only `http`/`https` links are checked; other
+schemes are never taken over. The app and the extension share one cache and allowlist through
+native messaging when both are installed; each also works alone.
+
+**Privacy:** checks run on the device first (allowlist with look-alike protection, cache, offline
+heuristics, unwrapping of mail link wrappers such as Safe Links). Only scheme, host and path go to the
+server — never the part after `?` or `#` (or just the domain, if you prefer). The server does not
+store these checks. History stays on the device; no telemetry.
+
+**Updates:** the app looks for new releases itself (switchable), shows a notice in the tray and
+installs with one click after verifying the update signature, keeping a backup of the previous
+version; settings, allowlist and history stay. Design and API: [docs/DESKTOP.md](docs/DESKTOP.md),
+[docs/API.md](docs/API.md); building and signing: [desktop/README.md](desktop/README.md).
 
 ## Stack
 

@@ -1,6 +1,6 @@
 # Linkwache Desktop — design and build plan
 
-Status: phase 1 in progress (target version 0.5.0). This document is the contract between
+Status: phase 1 built (version 0.5.0). This document is the contract between
 the desktop app, the browser extension and the server. Change it first, then the code.
 
 ## 1. Goal
@@ -206,7 +206,8 @@ instructions) and the Android APK ("coming soon" until a release carries one).
 ## 9. Build, sign, release
 
 - GitHub Actions (`.github/workflows/desktop.yml`) builds on `windows-latest`, `macos-latest`
-  (universal), `ubuntu-24.04` and `ubuntu-24.04-arm`; runs `cargo test`, the end-to-end test and
+  (universal), `ubuntu-22.04` and `ubuntu-22.04-arm` (glibc 2.35, so the Linux packages also run on
+  Debian 12 and other older distributions); runs `cargo test`, the end-to-end test and
   takes native screenshots. Tag builds attach all artefacts + `latest.json` to the release
   draft/pre-release; the release broker promotes.
 - macOS signing and notarisation need the maintainer's Developer ID — a manual step on the

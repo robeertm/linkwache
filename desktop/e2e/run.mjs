@@ -25,6 +25,7 @@ const BUNDLE = arg("--bundle") ? path.resolve(arg("--bundle")) : "";
 const FAKE_IN = arg("--fake") ? path.resolve(arg("--fake")) : "";
 const SHIPPED = arg("--shipped") ? path.resolve(arg("--shipped")) : "";
 const PORT = Number(arg("--port", "8787"));
+const UPSTREAM = arg("--upstream"); // real Linkwache server behind the logging stand-in
 const SERVER = `http://127.0.0.1:${PORT}`;
 
 fs.mkdirSync(OUT, { recursive: true });
@@ -120,7 +121,7 @@ function screenshot(name) {
 
 let mock = null;
 async function startMock() {
-  mock = spawn(process.execPath, [path.join(here, "mock-server.mjs"), "--port", String(PORT), "--log", REQ_LOG], { stdio: "inherit", env: process.env });
+  mock = spawn(process.execPath, [path.join(here, "mock-server.mjs"), "--port", String(PORT), "--log", REQ_LOG, ...(UPSTREAM ? ["--upstream", UPSTREAM] : [])], { stdio: "inherit", env: process.env });
   children.push(mock);
   const ok = await waitFor(() => { const r = spawnSync(process.execPath, ["-e", `fetch("${SERVER}/api/health").then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))`]); return r.status === 0; }, 15000, 300);
   if (!ok) throw new Error("mock server did not start");

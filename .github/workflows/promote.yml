@@ -1,0 +1,80 @@
+# Turns the pre-release of a version into the regular ("latest") release — only after the
+# PUBLISHED files have been downloaded and checked. Started by the release broker after the
+# tag build (desktop.yml) has attached all packages; can also be started by hand.
+#
+# Why: the desktop apps look for updates under releases/latest (latest.json) and the download
+# page lists the files of releases/latest. A release that was not checked as the files users
+# actually receive must never become "latest".
+name: Promote to latest
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "The version, e.g. 0.5.0 (without v)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      V: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the published release
+        run: |
+          set -euo pipefail
+          [[ "$V" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "bad version '$V'"; exit 1; }
+          TAG="v$V"
+          inside=$(node -p "require('./package.json').version")
+          [ "$inside" = "$V" ] || { echo "package.json on main says $inside, not $V"; exit 1; }
+          gh release view "$TAG" --json isPrerelease,assets > rel.json
+          node -e '
+            const r = require("./rel.json"); const v = process.env.V;
+            const names = r.assets.map((a) => a.name);
+            const need = [
+              [/_x64-setup\.exe$/, "Windows installer"], [/\.msi$/, "Windows MSI"], [/\.dmg$/, "macOS disk image"],
+              [/_amd64\.AppImage$/, "Linux AppImage x64"], [/_aarch64\.AppImage$/, "Linux AppImage arm64"],
+              [/_amd64\.deb$/, "deb x64"], [/_arm64\.deb$/, "deb arm64"], [/x86_64\.rpm$/, "rpm x64"], [/aarch64\.rpm$/, "rpm arm64"],
+              [/^linkwache-extension-chromium-.*\.zip$/, "Chromium extension"], [/^linkwache-extension-firefox-.*\.(zip|xpi)$/, "Firefox extension"],
+              [/^latest\.json$/, "updater manifest"], [/^SHA256SUMS\.txt$/, "checksums"],
+            ];
+            let bad = 0;
+            for (const [re, what] of need) { const hit = names.find((n) => re.test(n)); console.log(hit ? "  OK " : "  🔴 ", what, hit || "missing"); if (!hit) bad++; }
+            for (const n of names) if (/\d+\.\d+\.\d+/.test(n) && !n.includes(v)) { console.log("  🔴  foreign version in", n); bad++; }
+            if (!r.isPrerelease) console.log("  (already a regular release)");
+            process.exit(bad ? 1 : 0);
+          '
+      - name: Download every file and verify checksums and updater manifest
+        run: |
+          set -euo pipefail
+          TAG="v$V"
+          mkdir -p check && cd check
+          gh release download "$TAG"
+          # Every file except the checksum list itself must be listed and match.
+          sha256sum -c SHA256SUMS.txt
+          for f in *; do
+            [ "$f" = SHA256SUMS.txt ] && continue
+            grep -q "  $f\$" SHA256SUMS.txt || grep -q " \*$f\$" SHA256SUMS.txt || { echo "🔴 $f is not in SHA256SUMS.txt"; exit 1; }
+          done
+          node -e '
+            const j = require("./latest.json"); const v = process.env.V; const tag = "v" + v;
+            if (j.version !== v && j.version !== tag) { console.log("🔴 latest.json version", j.version); process.exit(1); }
+            const fs = require("fs"); let bad = 0;
+            for (const [p, e] of Object.entries(j.platforms || {})) {
+              const file = decodeURIComponent(String(e.url).split("/").pop());
+              const ok = String(e.url).includes("/releases/download/" + tag + "/") && fs.existsSync(file) && String(e.signature || "").length > 40;
+              if (!ok) { console.log("🔴", p, e.url); bad++; }
+            }
+            console.log(Object.keys(j.platforms || {}).length, "updater platforms checked");
+            process.exit(bad || !Object.keys(j.platforms || {}).length ? 1 : 0);
+          '
+      - name: Make it the regular release
+        run: |
+          gh release edit "v$V" --prerelease=false --latest
+          gh release view "v$V" --json isPrerelease,isDraft,tagName

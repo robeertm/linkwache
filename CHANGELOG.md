@@ -2,7 +2,50 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
-## 0.5.0 — unreleased
+## 0.5.0 — 2026-11-16
+
+### Added — Desktop app (Windows, macOS, Linux)
+- Background app (`desktop/`, Tauri 2) that becomes the system's handler for web links in the "browser picker" pattern:
+  every link clicked in a mail program, office document, PDF or messenger is checked first and then handed to the
+  browser chosen during setup (never back to the system default, so links cannot loop). Only `http`/`https` links are
+  checked; local HTML files pass through, other schemes are never taken over.
+- Check notice in a screen corner ("Linkwache is checking … *domain*" → "No warning signs – opening"); warning window
+  with the findings in plain language: suspicious links can be opened after a warning ("Open anyway" active after
+  3 s), dangerous links are blocked and open only through a deliberate second step (logged locally), "Could not be
+  checked" when the server is unreachable — nothing ever opens silently.
+- Fast path: allowlist with look-alike protection, on-device cache, offline heuristics (Rust port pinned by shared test
+  vectors), local unwrapping of mail link wrappers (Safe Links, Google, Facebook, Instagram, YouTube, Slack, LinkedIn).
+- Setup assistant (language, server, forward browser, default handler per system with verification, native-messaging
+  hosts, autostart), settings (server, privacy scope, browser, allowlist, history, pause, updates, language), tray icon
+  with status and menu. Windows: per-user browser registration, the assistant opens *Default apps* and verifies the
+  user's choice; XML for DISM/GPO default associations. macOS: confirmation dialog via Launch Services. Linux:
+  `xdg-settings`/`xdg-mime`.
+- Updater from the first version: signed update manifests (verified before anything is replaced, independent of
+  code signing), one-click install from tray or settings, backup of the previous version, settings kept, check
+  switchable.
+- CI (`.github/workflows/desktop.yml`): builds for Windows (NSIS, MSI), macOS (universal DMG), Linux x64/arm64
+  (AppImage, deb, rpm); `cargo test`; end-to-end tests on real Windows, macOS and Linux runners (links opened through
+  the system, a fake browser records what arrives: green opens, red stays blocked, amber after the delay, offline opens
+  nothing), once against a stand-in and once against the real server; native screenshots. Release job attaches all
+  packages, `latest.json` and `SHA256SUMS.txt` to a pre-release. Hooks for Windows code signing and macOS
+  notarisation (see `docs/DESKTOP.md`, `desktop/README.md`).
+
+### Added — Browser extension (Chromium, Firefox)
+- Manifest V3 extension (`extension/`, `npm run build:extension`): intercepts clicks on links to other sites (webmail!),
+  shows an in-page notice, opens green links as intended (same tab, new tab, background tab) and shows its own warning
+  page for suspicious, dangerous and unreachable cases with the same rules as the desktop app. Known dangerous domains
+  are also blocked by session rules. Talks to the desktop app over native messaging, works alone over the server API.
+- Options page (server, privacy scope, allowlist, pause, language, desktop app status). Fixed extension ids.
+
+### Added — Server
+- `POST /api/v1/check` for the apps and the extension (`docs/API.md`): limits per random installation id and per
+  address (a household behind one address is not locked out), translated findings, no urlscan sandbox submissions
+  (search only when the first pass is not green), short certificate-log timeout, 10-minute in-memory cache, results
+  never stored. `/api/health` reports `api: [1]`.
+- Download page `/download` (8 languages): suggests the package for the visitor's system and lists every package with
+  version, date, size and SHA-256 from the daily release query (files stay on the release storage of the code host);
+  guidance for unsigned Windows/macOS builds and for loading the extension yourself. Quiet hint on the home page.
+- Privacy policy (8 languages): desktop app, Android app, extension, update checks and download page.
 
 ### Added — Android app
 - Android app (`android/`, Android 8.0+): chosen as the default browser app, it checks every tapped web link (mail,
@@ -25,6 +68,10 @@ All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 - CI (`.github/workflows/android.yml`): unit and Robolectric tests, lint, unsigned release build, end-to-end test on an
   Android 14 emulator with a stand-in server and browser, screenshots of every state (light/dark, phone/tablet).
   The release APK is signed outside CI (`android/scripts/sign-release.sh`); see `docs/ANDROID.md`.
+
+### Fixed
+- Brand owners' own domains are no longer reported as imitations (web mail on `outlook.office.com`, the sign-in page
+  on `login.microsoftonline.com` were rated dangerous).
 
 ## 0.4.0 — 2026-11-14
 
