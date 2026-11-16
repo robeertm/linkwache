@@ -71,7 +71,7 @@ export async function fetchLatest(repo, fetchFn = fetch) {
 }
 
 // info.latest is set only while a newer release exists; info.release always holds the latest published release (download page).
-export function startUpdateCheck(info, { current, repo, enabled = true, fetchFn = fetch, log = console.log, every = 86400000 } = {}) {
+export function startUpdateCheck(info, { current, repo, enabled = true, fetchFn = fetch, log = console.log, every = 3 * 3600000 } = {}) { // every 3 h: assets attached after a release (APK, notarised macOS files) show up soon
   if (!enabled || !repo) return null;
   const run = async () => {
     try {

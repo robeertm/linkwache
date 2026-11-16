@@ -2,6 +2,18 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
+## 0.5.1 — 2026-11-16
+
+### Changed
+- Download page: heading and introduction name the Android app as well (an Android visitor is offered the APK and
+  read "for your computer" before), in all eight languages.
+- The server looks for new release files every 3 hours instead of once a day, so files attached after a release (the
+  Android APK, notarised macOS builds) appear on the download page soon.
+
+### Fixed
+- Rollout and update scripts run on GNU systems too (`mktemp` templates); the APK publishing script works with older
+  GitHub CLI versions.
+
 ## 0.5.0 — 2026-11-16
 
 ### Added — Desktop app (Windows, macOS, Linux)

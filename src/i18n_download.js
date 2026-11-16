@@ -6,8 +6,8 @@ export const DOWNLOAD = {};
 
 DOWNLOAD.de = {
   "dl.copy": "Kopieren", "dl.copied": "Kopiert",
-  "dl.nav": "Download", "dl.title": "Download", "dl.h1": "Linkwache für deinen Computer",
-  "dl.lead": "Die App prüft Links aus jedem Programm, bevor sie sich öffnen — Mail, Office, PDF, Messenger. Die Browser-Erweiterung deckt Links im Webmail ab. Keine Warnzeichen: der Link öffnet sich sofort. Sonst siehst du erst eine verständliche Warnung.",
+  "dl.nav": "Download", "dl.title": "Download", "dl.h1": "Linkwache für Computer und Handy",
+  "dl.lead": "Die Apps prüfen jeden Link, bevor er sich öffnet — am Computer aus Mail, Office, PDF und Messengern, auf dem Android-Handy aus jeder App. Die Browser-Erweiterung deckt Links im Webmail ab. Keine Warnzeichen: der Link öffnet sich sofort. Sonst siehst du erst eine verständliche Warnung.",
   "dl.rel": "Version {v} · veröffentlicht am {d}",
   "dl.for.windows": "Für Windows laden", "dl.for.macos": "Für macOS laden", "dl.for.linux": "Für Linux laden", "dl.for.android": "Android-App laden",
   "dl.rec": "Passend zu deinem System", "dl.get": "Herunterladen", "dl.all.h": "Alle Downloads",
@@ -59,8 +59,8 @@ DOWNLOAD.de = {
 
 DOWNLOAD.en = {
   "dl.copy": "Copy", "dl.copied": "Copied",
-  "dl.nav": "Download", "dl.title": "Download", "dl.h1": "Linkwache for your computer",
-  "dl.lead": "The app checks links from any program before they open — mail, Office, PDF, messengers. The browser extension covers links in webmail. No warning signs: the link opens right away. Otherwise you first see a plain-language warning.",
+  "dl.nav": "Download", "dl.title": "Download", "dl.h1": "Linkwache for your computer and phone",
+  "dl.lead": "The apps check every link before it opens — on the computer from mail, Office, PDF and messengers, on Android phones from any app. The browser extension covers links in webmail. No warning signs: the link opens right away. Otherwise you first see a plain-language warning.",
   "dl.rel": "Version {v} · released {d}",
   "dl.for.windows": "Download for Windows", "dl.for.macos": "Download for macOS", "dl.for.linux": "Download for Linux", "dl.for.android": "Get the Android app",
   "dl.rec": "Matches your system", "dl.get": "Download", "dl.all.h": "All downloads",
@@ -112,8 +112,8 @@ DOWNLOAD.en = {
 
 DOWNLOAD.tr = {
   "dl.copy": "Kopyala", "dl.copied": "Kopyalandı",
-  "dl.nav": "İndir", "dl.title": "İndir", "dl.h1": "Bilgisayarın için Linkwache",
-  "dl.lead": "Uygulama, e-posta, Office, PDF ve mesajlaşma gibi her programdaki bağlantıları açılmadan önce kontrol eder. Tarayıcı eklentisi web postasındaki bağlantıları kapsar. Uyarı işareti yoksa bağlantı hemen açılır; aksi halde önce anlaşılır bir uyarı görürsün.",
+  "dl.nav": "İndir", "dl.title": "İndir", "dl.h1": "Bilgisayar ve telefon için Linkwache",
+  "dl.lead": "Uygulamalar her bağlantıyı açılmadan önce kontrol eder — bilgisayarda e-posta, Office, PDF ve mesajlaşma programlarından, Android telefonda her uygulamadan. Tarayıcı eklentisi web postasındaki bağlantıları kapsar. Uyarı işareti yoksa bağlantı hemen açılır; aksi halde önce anlaşılır bir uyarı görürsün.",
   "dl.rel": "Sürüm {v} · yayın tarihi {d}",
   "dl.for.windows": "Windows için indir", "dl.for.macos": "macOS için indir", "dl.for.linux": "Linux için indir", "dl.for.android": "Android uygulamasını indir",
   "dl.rec": "Sistemine uygun", "dl.get": "İndir", "dl.all.h": "Tüm indirmeler",
@@ -165,8 +165,8 @@ DOWNLOAD.tr = {
 
 DOWNLOAD.pl = {
   "dl.copy": "Kopiuj", "dl.copied": "Skopiowano",
-  "dl.nav": "Pobierz", "dl.title": "Pobieranie", "dl.h1": "Linkwache na Twój komputer",
-  "dl.lead": "Aplikacja sprawdza linki z każdego programu, zanim się otworzą — poczta, Office, PDF, komunikatory. Rozszerzenie przeglądarki obejmuje linki w poczcie webowej. Brak znaków ostrzegawczych: link otwiera się od razu. W przeciwnym razie najpierw zobaczysz zrozumiałe ostrzeżenie.",
+  "dl.nav": "Pobierz", "dl.title": "Pobieranie", "dl.h1": "Linkwache na komputer i telefon",
+  "dl.lead": "Aplikacje sprawdzają każdy link, zanim się otworzy — na komputerze z poczty, Office, PDF i komunikatorów, na telefonie z Androidem z każdej aplikacji. Rozszerzenie przeglądarki obejmuje linki w poczcie webowej. Brak znaków ostrzegawczych: link otwiera się od razu. W przeciwnym razie najpierw widzisz zrozumiałe ostrzeżenie.",
   "dl.rel": "Wersja {v} · opublikowana {d}",
   "dl.for.windows": "Pobierz dla Windows", "dl.for.macos": "Pobierz dla macOS", "dl.for.linux": "Pobierz dla Linuksa", "dl.for.android": "Pobierz aplikację na Androida",
   "dl.rec": "Pasuje do Twojego systemu", "dl.get": "Pobierz", "dl.all.h": "Wszystkie pliki",
@@ -218,8 +218,8 @@ DOWNLOAD.pl = {
 
 DOWNLOAD.ru = {
   "dl.copy": "Копировать", "dl.copied": "Скопировано",
-  "dl.nav": "Скачать", "dl.title": "Скачать", "dl.h1": "Linkwache для вашего компьютера",
-  "dl.lead": "Приложение проверяет ссылки из любой программы до их открытия — почта, Office, PDF, мессенджеры. Расширение для браузера охватывает ссылки в веб-почте. Тревожных признаков нет: ссылка открывается сразу. Иначе сначала вы увидите понятное предупреждение.",
+  "dl.nav": "Скачать", "dl.title": "Скачать", "dl.h1": "Linkwache для компьютера и телефона",
+  "dl.lead": "Приложения проверяют каждую ссылку до её открытия — на компьютере из почты, Office, PDF и мессенджеров, на телефоне с Android из любого приложения. Расширение для браузера охватывает ссылки в веб-почте. Нет признаков опасности — ссылка открывается сразу. Иначе сначала вы увидите понятное предупреждение.",
   "dl.rel": "Версия {v} · опубликована {d}",
   "dl.for.windows": "Скачать для Windows", "dl.for.macos": "Скачать для macOS", "dl.for.linux": "Скачать для Linux", "dl.for.android": "Скачать приложение для Android",
   "dl.rec": "Подходит вашей системе", "dl.get": "Скачать", "dl.all.h": "Все загрузки",
@@ -271,8 +271,8 @@ DOWNLOAD.ru = {
 
 DOWNLOAD.es = {
   "dl.copy": "Copiar", "dl.copied": "Copiado",
-  "dl.nav": "Descargar", "dl.title": "Descargar", "dl.h1": "Linkwache para tu ordenador",
-  "dl.lead": "La app comprueba los enlaces de cualquier programa antes de que se abran: correo, Office, PDF, mensajería. La extensión del navegador cubre los enlaces del correo web. Sin señales de alerta: el enlace se abre al instante. Si no, primero ves un aviso comprensible.",
+  "dl.nav": "Descargar", "dl.title": "Descargar", "dl.h1": "Linkwache para tu ordenador y tu móvil",
+  "dl.lead": "Las apps comprueban cada enlace antes de que se abra: en el ordenador desde el correo, Office, PDF y la mensajería; en el móvil Android desde cualquier app. La extensión del navegador cubre los enlaces del correo web. Sin señales de alerta: el enlace se abre al instante. Si no, primero ves una advertencia clara.",
   "dl.rel": "Versión {v} · publicada el {d}",
   "dl.for.windows": "Descargar para Windows", "dl.for.macos": "Descargar para macOS", "dl.for.linux": "Descargar para Linux", "dl.for.android": "Descargar la app para Android",
   "dl.rec": "Adecuado para tu sistema", "dl.get": "Descargar", "dl.all.h": "Todas las descargas",
@@ -324,8 +324,8 @@ DOWNLOAD.es = {
 
 DOWNLOAD.fr = {
   "dl.copy": "Copier", "dl.copied": "Copié",
-  "dl.nav": "Télécharger", "dl.title": "Téléchargement", "dl.h1": "Linkwache pour votre ordinateur",
-  "dl.lead": "L’application vérifie les liens de n’importe quel programme avant leur ouverture : messagerie, Office, PDF, messageries instantanées. L’extension de navigateur couvre les liens du webmail. Aucun signe d’alerte : le lien s’ouvre aussitôt. Sinon, vous voyez d’abord un avertissement clair.",
+  "dl.nav": "Télécharger", "dl.title": "Téléchargement", "dl.h1": "Linkwache pour ordinateur et téléphone",
+  "dl.lead": "Les applications vérifient chaque lien avant son ouverture — sur l’ordinateur depuis la messagerie, Office, PDF et les messageries instantanées, sur un téléphone Android depuis n’importe quelle application. L’extension de navigateur couvre les liens du webmail. Aucun signe d’alerte : le lien s’ouvre aussitôt. Sinon, vous voyez d’abord un avertissement compréhensible.",
   "dl.rel": "Version {v} · publiée le {d}",
   "dl.for.windows": "Télécharger pour Windows", "dl.for.macos": "Télécharger pour macOS", "dl.for.linux": "Télécharger pour Linux", "dl.for.android": "Obtenir l’application Android",
   "dl.rec": "Adapté à votre système", "dl.get": "Télécharger", "dl.all.h": "Tous les téléchargements",
@@ -377,8 +377,8 @@ DOWNLOAD.fr = {
 
 DOWNLOAD.it = {
   "dl.copy": "Copia", "dl.copied": "Copiato",
-  "dl.nav": "Scarica", "dl.title": "Download", "dl.h1": "Linkwache per il tuo computer",
-  "dl.lead": "L’app controlla i link di qualsiasi programma prima che si aprano: posta, Office, PDF, messaggistica. L’estensione del browser copre i link nella posta web. Nessun segnale d’allarme: il link si apre subito. Altrimenti vedi prima un avviso comprensibile.",
+  "dl.nav": "Scarica", "dl.title": "Download", "dl.h1": "Linkwache per computer e telefono",
+  "dl.lead": "Le app controllano ogni link prima che si apra: sul computer da posta, Office, PDF e messaggistica, sul telefono Android da qualsiasi app. L’estensione del browser copre i link nella posta web. Nessun segnale d’allarme: il link si apre subito. Altrimenti vedi prima un avviso comprensibile.",
   "dl.rel": "Versione {v} · pubblicata il {d}",
   "dl.for.windows": "Scarica per Windows", "dl.for.macos": "Scarica per macOS", "dl.for.linux": "Scarica per Linux", "dl.for.android": "Scarica l’app per Android",
   "dl.rec": "Adatto al tuo sistema", "dl.get": "Scarica", "dl.all.h": "Tutti i download",
