@@ -9,7 +9,7 @@ changes get a new path (`/api/v2/…`).
 Request headers:
 - `content-type: application/json` (else 415)
 - `x-linkwache-install: <32 lowercase hex>` (else 400 `err.install`)
-- `x-linkwache-client: desktop/<version>` or `extension/<version>` (informational)
+- `x-linkwache-client: desktop/<version>`, `extension/<version>` or `android/<version>` (informational)
 - Browser pages from other web origins are refused (403); requests without `Origin` (desktop)
   and from `chrome-extension://`, `moz-extension://`, `safari-web-extension://` are allowed.
 
