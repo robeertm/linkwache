@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Linkwache tray menu (visual mock)</title>
+<link rel="stylesheet" href="../../ui/app.css">
+<style>
+  /* Visual stand-in for the native tray menu (rendered by the OS in the real app). */
+  body{display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-end;height:100vh;padding:0;overflow:hidden}
+  .menu{margin:0 18px 8px 0;min-width:300px;background:var(--grund2);border:1px solid var(--rand);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.35);padding:6px;font-size:.92rem}
+  .menu div{padding:7px 14px;border-radius:6px;white-space:nowrap}
+  .menu div.item:hover,.menu div.hl{background:color-mix(in srgb,var(--akzent) 22%,transparent)}
+  .menu div.head{color:var(--leise);display:flex;gap:8px;align-items:center}
+  .menu div.head::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--ok)}
+  .menu hr{border:none;border-top:1px solid var(--rand);margin:5px 6px}
+  .bar{height:44px;width:100%;background:color-mix(in srgb,var(--grund2) 80%,#000);border-top:1px solid var(--rand);display:flex;justify-content:flex-end;align-items:center;gap:14px;padding:0 16px}
+  .bar img{width:22px;height:22px;border-radius:5px}
+  .bar span{color:var(--leise);font-size:.85rem}
+</style>
+</head>
+<body>
+  <div class="menu" id="menu"></div>
+  <div class="bar"><img src="../../src-tauri/icons/tray/tray-active.png" alt=""><span>12:41</span></div>
+  <script src="../../ui/i18n.generated.js"></script>
+  <script src="../../ui/common.js"></script>
+  <script>
+    (async () => {
+      await LW.boot();
+      const m = document.getElementById("menu");
+      const items = [["head", "dt.tray.status.active"], "-", ["item hl", "dt.tray.pause"], ["item", "dt.tray.history"], ["item", "dt.tray.settings"], "-", ["item", "dt.tray.update.install", { v: "0.5.1" }], "-", ["item", "dt.tray.quit"]];
+      for (const it of items) {
+        if (it === "-") { m.append(document.createElement("hr")); continue; }
+        const d = document.createElement("div");
+        d.className = it[0];
+        d.textContent = LW.t(it[1], it[2] || {});
+        m.append(d);
+      }
+    })();
+  </script>
+</body>
+</html>

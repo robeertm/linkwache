@@ -25,7 +25,8 @@ pub fn start_commands(app: &tauri::AppHandle) {
     let Some(path) = std::env::var_os("LINKWACHE_E2E_CMD_FILE") else { return };
     let app = app.clone();
     std::thread::spawn(move || {
-        let mut done = 0usize;
+        // Only commands written after this start count (an earlier instance's "quit" stays in the file).
+        let mut done = std::fs::read_to_string(&path).map(|t| t.lines().count()).unwrap_or(0);
         loop {
             std::thread::sleep(std::time::Duration::from_millis(150));
             let text = std::fs::read_to_string(&path).unwrap_or_default();

@@ -143,6 +143,7 @@ async function quitApp(p = appProc) {
   cmd("quit");
   if (!(await waitFor(() => p.exitCode !== null || p.signalCode !== null, 8000))) p.kill();
   await sleep(500);
+  fs.writeFileSync(CMD, "");
 }
 
 // ── Fake browser and handler registration per OS ─────────────────────────────
@@ -184,6 +185,11 @@ function lsregister(p) {
 // How links are opened "through the OS" on this machine (decided after registration).
 let openMethod = "";
 function openViaOS(url) {
+  // Non-web links always go through the plain OS route (Linkwache is not registered for them).
+  if (!/^https?:/i.test(url)) {
+    if (PLATFORM === "macos") return spawn("open", [url], { env, stdio: "ignore" });
+    if (PLATFORM === "windows") return spawn("rundll32", ["url.dll,FileProtocolHandler", url], { env, stdio: "ignore" });
+  }
   if (PLATFORM === "linux") return spawn("xdg-open", [url], { env, stdio: "ignore" });
   if (PLATFORM === "macos") return spawn("open", openMethod === "open" ? [url] : ["-a", BUNDLE, url], { env, stdio: "ignore" });
   if (openMethod === "shell") return spawn("rundll32", ["url.dll,FileProtocolHandler", url], { env, stdio: "ignore" });
@@ -224,6 +230,14 @@ async function makeDefault() {
   openMethod = "shell";
   openViaOS(probe);
   const seen = await waitState("incoming", (d) => d.url && d.url.startsWith(probe), 8000, before);
+  if (!seen) {
+    // Without a user choice Windows shows its app picker: Linkwache must be offered there.
+    await sleep(2500);
+    screenshot("windows-https-picker");
+    const picker = run("tasklist", ["/FI", "IMAGENAME eq OpenWith.exe"]).out.includes("OpenWith.exe");
+    notes.push(`Windows: app picker (OpenWith.exe) shown after removing UserChoice: ${picker} — see screenshot windows-https-picker`);
+    run("taskkill", ["/IM", "OpenWith.exe", "/F"]);
+  }
   if (seen) {
     record("OS shell (url.dll FileProtocolHandler) delivers links to Linkwache", true);
   } else {
@@ -330,6 +344,7 @@ async function caseMailto() {
   const p = openViaOS("mailto:e2e@example.com");
   p.on("error", () => {});
   await sleep(3000);
+  if (PLATFORM === "windows") run("taskkill", ["/IM", "OpenWith.exe", "/F"]);
   const handled = states().slice(before).some((s) => s.event === "incoming" && String(s.data.url).startsWith("mailto:"));
   record("mailto: is not handled by Linkwache (not registered)", !handled);
   // If a mailto link ever reaches the app, it is refused and never launched.

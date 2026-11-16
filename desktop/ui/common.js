@@ -80,7 +80,7 @@ const LW = (() => {
 
   function fmtTime(sec, withDate = false) {
     const d = new Date(sec * 1000);
-    const o = withDate ? { dateStyle: "short", timeStyle: "short" } : { timeStyle: "short" };
+    const o = withDate ? { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" } : { timeStyle: "short" };
     try { return new Intl.DateTimeFormat(lang, o).format(d); } catch { return d.toLocaleString(); }
   }
 

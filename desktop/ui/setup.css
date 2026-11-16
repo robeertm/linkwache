@@ -24,7 +24,7 @@ body.setup{display:flex;flex-direction:column;height:100vh}
 .choice .name{font-weight:650;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .choice.on{border-color:var(--akzent);box-shadow:0 0 0 1px var(--akzent) inset}
 .opts{padding:8px 16px}
-.done{align-items:center;text-align:center;padding-top:28px}
+.done{align-items:center;text-align:center;padding-top:72px}
 .bigok{width:76px;height:76px}
 .bigok circle{fill:var(--ok)}.bigok path{fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .s-nav{display:flex;align-items:center;gap:10px;padding:14px 28px 20px;border-top:1px solid var(--rand)}

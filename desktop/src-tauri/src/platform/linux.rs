@@ -207,11 +207,60 @@ pub fn make_default() -> MakeDefault {
     if !is_default() {
         let _ = run("xdg-mime", &["default", SELF_DESKTOP, "x-scheme-handler/http", "x-scheme-handler/https"]);
     }
+    if !is_default() {
+        // Without a known desktop environment, xdg-utils (generic mode) reads only the legacy
+        // defaults.list files; mimeapps.list is what GNOME/KDE/GIO read. Write both.
+        for path in [config_home().join("mimeapps.list"), data_home().join("applications/defaults.list")] {
+            let _ = set_default_apps(&path, &["x-scheme-handler/http", "x-scheme-handler/https"], SELF_DESKTOP);
+        }
+    }
     if is_default() {
         MakeDefault::Done
     } else {
         MakeDefault::Failed("xdg-settings/xdg-mime did not take effect".into())
     }
+}
+
+/// Set `mime=desktop_id` in the `[Default Applications]` group of a mimeapps.list-style file,
+/// keeping everything else.
+fn set_default_apps(path: &Path, mimes: &[&str], id: &str) -> Result<(), String> {
+    let text = fs::read_to_string(path).unwrap_or_default();
+    let mut out: Vec<String> = Vec::new();
+    let mut in_group = false;
+    let mut found_group = false;
+    for line in text.lines() {
+        let t = line.trim();
+        if t.starts_with('[') {
+            if in_group {
+                for m in mimes {
+                    out.push(format!("{m}={id}"));
+                }
+            }
+            in_group = t == "[Default Applications]";
+            found_group |= in_group;
+            out.push(line.to_string());
+            continue;
+        }
+        if in_group && mimes.iter().any(|m| t.starts_with(&format!("{m}="))) {
+            continue;
+        }
+        out.push(line.to_string());
+    }
+    if in_group {
+        for m in mimes {
+            out.push(format!("{m}={id}"));
+        }
+    }
+    if !found_group {
+        out.push("[Default Applications]".into());
+        for m in mimes {
+            out.push(format!("{m}={id}"));
+        }
+    }
+    if let Some(d) = path.parent() {
+        fs::create_dir_all(d).map_err(|e| e.to_string())?;
+    }
+    fs::write(path, out.join("\n") + "\n").map_err(|e| e.to_string())
 }
 
 /// Open `arg` (URL or local file) in the saved browser by its desktop entry.

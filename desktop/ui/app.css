@@ -69,7 +69,7 @@ label.check input{margin:3px 0 0;width:18px;height:18px;accent-color:var(--akzen
 .pill.gelb{color:var(--warnung);border-color:color-mix(in srgb,var(--warnung) 40%,transparent);background:color-mix(in srgb,var(--warnung) 12%,transparent)}
 .pill.rot{color:var(--kritisch);border-color:color-mix(in srgb,var(--kritisch) 40%,transparent);background:color-mix(in srgb,var(--kritisch) 12%,transparent)}
 .pill.offline{color:var(--grau)}
-.status{display:flex;gap:8px;align-items:flex-start;font-size:.9rem;padding:9px 12px;border-radius:10px;background:var(--karte2);border:1px solid var(--rand)}
+.status{overflow-wrap:anywhere;display:flex;gap:8px;align-items:flex-start;font-size:.9rem;padding:9px 12px;border-radius:10px;background:var(--karte2);border:1px solid var(--rand)}
 .status::before{content:"";flex:0 0 9px;height:9px;border-radius:50%;margin-top:6px;background:var(--grau)}
 .status.ok::before{background:var(--ok)}.status.warn::before{background:var(--warnung)}.status.bad::before{background:var(--kritisch)}
 .status.busy::before{background:var(--akzent);animation:blink 1s ease-in-out infinite}

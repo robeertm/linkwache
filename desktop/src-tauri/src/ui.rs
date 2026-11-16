@@ -5,7 +5,7 @@ use crate::state::{AppState, ToastState};
 use linkwache_core::i18n::t;
 use tauri::{AppHandle, Emitter, Manager, PhysicalPosition, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
-pub const TOAST_W: f64 = 420.0;
+pub const TOAST_W: f64 = 440.0;
 pub const TOAST_H: f64 = 108.0;
 
 pub fn ensure_toast(app: &AppHandle) -> tauri::Result<WebviewWindow> {
