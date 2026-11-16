@@ -78,7 +78,7 @@
     tb.textContent = "";
     for (const it of items) {
       const lvl = it.stufe ? LW.el("span", { class: "pill " + it.stufe }, LW.t(LEVEL[it.stufe] || LEVEL.offline)) : "–";
-      tb.append(LW.el("tr", {}, LW.el("td", { class: "t" }, LW.fmtTime(it.time, true)), LW.el("td", { class: "d" }, it.domain || "–"), LW.el("td", {}, lvl), LW.el("td", {}, LW.t(ACTION[it.action] || ACTION.opened))));
+      tb.append(LW.el("tr", {}, LW.el("td", { class: "t" }, LW.fmtTime(it.time, true)), LW.el("td", { class: "d", title: it.domain || "" }, it.domain || "–"), LW.el("td", {}, lvl), LW.el("td", {}, LW.t(ACTION[it.action] || ACTION.opened))));
     }
     $("histempty").hidden = items.length > 0;
     $("hist").closest("table").hidden = items.length === 0;

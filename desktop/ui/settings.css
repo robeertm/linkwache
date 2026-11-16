@@ -33,8 +33,13 @@ table.hist{width:100%;border-collapse:collapse;font-size:.88rem}
 .hist td{padding:8px 12px;border-bottom:1px solid var(--rand);vertical-align:middle}
 .hist tr:last-child td{border-bottom:none}
 .hist td.d{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:230px}
-.hist td:last-child{white-space:nowrap}
+
 .hist td.t{white-space:nowrap;color:var(--leise)}
 .empty{padding:14px}
 .idbox{flex:1;padding:9px 12px;border-radius:10px;background:var(--feld);border:1px solid var(--rand);font-size:.8rem;overflow:hidden;text-overflow:ellipsis;user-select:text;-webkit-user-select:text}
 .toastmsg{position:fixed;right:22px;bottom:20px;padding:8px 14px;border-radius:10px;background:var(--ok);color:#06281b;font-weight:700;font-size:.88rem;box-shadow:var(--schatten)}
+.hist .pill{text-transform:none;letter-spacing:0;font-size:.78rem;white-space:normal;line-height:1.25;padding:3px 9px}
+.hist td.d{max-width:200px}
+.tablewrap{overflow-x:auto}
+.hist th,.hist td{padding:8px 9px}
+.hist td.d{max-width:196px}

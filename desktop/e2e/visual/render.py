@@ -61,6 +61,7 @@ CLIP_JS = """
   }
   const doc = document.documentElement;
   if (doc.scrollWidth > innerWidth + 1) out.push({ page: 'horizontal overflow', sw: doc.scrollWidth, w: innerWidth });
+  for (const w of document.querySelectorAll('.tablewrap')) if (vis(w) && w.scrollWidth > w.clientWidth + 1) out.push({ page: 'table wider than its card', sw: w.scrollWidth, cw: w.clientWidth });
   const t = document.querySelector('.t-card');
   if (t && t.scrollHeight > t.clientHeight + 1) out.push({ page: 'toast content taller than window', sh: t.scrollHeight, h: t.clientHeight });
   return out;
