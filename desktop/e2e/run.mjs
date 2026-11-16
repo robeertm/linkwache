@@ -153,7 +153,7 @@ function setupFake() {
   if (PLATFORM === "linux") {
     const script = path.join(FAKE_DIR, "fakebrowser.sh");
     fs.writeFileSync(script, `#!/bin/sh\nfor a in "$@"; do printf '%s\\n' "$a" >> "${FAKE_LOG}"; done\n`, { mode: 0o755 });
-    const desktop = `[Desktop Entry]\nType=Application\nName=Fake Browser\nExec="${script}" %u\nTerminal=false\nCategories=Network;WebBrowser;\nMimeType=x-scheme-handler/http;x-scheme-handler/https;text/html;\n`;
+    const desktop = `[Desktop Entry]\nType=Application\nName=Fake Browser\nExec=${script} %u\nTerminal=false\nCategories=Network;WebBrowser;\nMimeType=x-scheme-handler/http;x-scheme-handler/https;text/html;\n`;
     fs.writeFileSync(path.join(env.XDG_DATA_HOME, "applications", "fakebrowser.desktop"), desktop);
     // The fake was the default browser before Linkwache (the assistant records it as target).
     run("xdg-mime", ["default", "fakebrowser.desktop", "x-scheme-handler/http", "x-scheme-handler/https"]);

@@ -158,7 +158,12 @@ fn own_desktop() -> PathBuf {
     data_home().join("applications").join(SELF_DESKTOP)
 }
 
+/// Quote the program for an `Exec=` line only when needed: xdg-utils 1.1.3 (still the common
+/// version) cannot start a quoted program path from xdg-open.
 fn quote_exec(p: &str) -> String {
+    if !p.is_empty() && p.chars().all(|c| c.is_ascii_alphanumeric() || "/._-+,@".contains(c)) {
+        return p.to_string();
+    }
     let escaped = p.replace('\\', "\\\\").replace('"', "\\\"").replace('`', "\\`").replace('$', "\\$");
     format!("\"{escaped}\"")
 }
