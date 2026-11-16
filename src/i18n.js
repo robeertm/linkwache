@@ -4,6 +4,8 @@
 // Neue Texte: erst hier in ALLEN Sprachen anlegen, dann benutzen.
 
 import { MORE } from "./i18n_more.js";
+import { DESKTOP } from "./i18n_desktop.js";
+import { EXTENSION } from "./i18n_extension.js";
 
 export const LANGS = ["de", "en", "tr", "pl", "ru", "es", "fr", "it"];
 export const LANG_NAMES = { de: "Deutsch", en: "English", tr: "Türkçe", pl: "Polski", ru: "Русский", es: "Español", fr: "Français", it: "Italiano" };
@@ -231,6 +233,8 @@ S.en = {
 };
 
 Object.assign(S, MORE);
+// Desktop app and browser extension: merged per language (key by key), never replacing a language.
+for (const extra of [DESKTOP, EXTENSION]) for (const [l, d] of Object.entries(extra)) S[l] = { ...(S[l] || {}), ...d };
 export const STRINGS = S;
 
 /** Befund (key, stufe, p) → Titel + Text in der Sprache. */
