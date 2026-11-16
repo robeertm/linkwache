@@ -1,0 +1,109 @@
+# Linkwache for Safari (docs/DESKTOP.md "Safari"): extension tests, the container app's own tests, an ad-hoc signed build
+# of the Xcode project (no Apple developer account involved), structure and signature checks, window screenshots of the
+# container app, and the app as a zip artifact. Nothing is published: the Safari build is made by the user on their Mac
+# (safari/scripts/build-local.sh). Runs on demand and when main changes under safari/ or extension/.
+name: Safari
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'safari/**'
+      - 'extension/**'
+      - 'src/i18n_extension.js'
+      - '.github/workflows/safari.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: safari-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build + checks (macOS)
+    runs-on: macos-15
+    timeout-minutes: 40
+    env:
+      LINKWACHE_DEFAULT_SERVER: ${{ vars.LINKWACHE_DEFAULT_SERVER }}
+      LINKWACHE_PRESET_MIGRATE_FROM: ${{ vars.LINKWACHE_PRESET_MIGRATE_FROM }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - name: Extension tests (all browsers, incl. Safari fallbacks)
+        run: node --test extension/test/*.test.js test/extension_i18n.test.js
+      - name: Build the Safari extension
+        run: node extension/scripts/build.mjs safari
+      - name: Container app logic tests (version check, language)
+        run: |
+          xcodebuild -version
+          mkdir -p "$RUNNER_TEMP/vc"
+          swiftc -swift-version 5 -parse-as-library safari/App/VersionCheck.swift safari/App/Strings.swift safari/tests/VersionCheckTests.swift -o "$RUNNER_TEMP/vc/run"
+          "$RUNNER_TEMP/vc/run"
+      - name: Build unsigned (CODE_SIGNING_ALLOWED=NO)
+        run: |
+          V=$(node -p 'require("./package.json").version')
+          xcodebuild -project safari/Linkwache.xcodeproj -target "Linkwache for Safari" -configuration Release \
+            SYMROOT="$RUNNER_TEMP/unsigned" OBJROOT="$RUNNER_TEMP/unsigned/obj" MARKETING_VERSION="$V" CODE_SIGNING_ALLOWED=NO build | tail -n 25
+          test -d "$RUNNER_TEMP/unsigned/Release/Linkwache for Safari.app/Contents/PlugIns/Linkwache Extension.appex"
+      - name: Build ad-hoc signed (what build-local.sh --adhoc does)
+        run: safari/scripts/build-local.sh --adhoc --no-install
+      - name: Check bundle structure, version, signature
+        run: |
+          set -e
+          V=$(node -p 'require("./package.json").version')
+          APP="safari/build/Release/Linkwache for Safari.app"
+          EXT="$APP/Contents/PlugIns/Linkwache Extension.appex"
+          R="$EXT/Contents/Resources"
+          for f in manifest.json background.js content.js warning.html warning.js options.html options.js ui.css icons/icon-128.png _locales/de/messages.json _locales/it/messages.json; do
+            test -f "$R/$f" || { echo "missing in extension: $f"; exit 1; }
+          done
+          test -f "$APP/Contents/Resources/app-strings.json"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Contents/Info.plist")" = "$V"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$EXT/Contents/Info.plist")" = "$V"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Contents/Info.plist")" = "app.linkwache.safari"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$EXT/Contents/Info.plist")" = "app.linkwache.safari.extension"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :NSExtension:NSExtensionPointIdentifier' "$EXT/Contents/Info.plist")" = "com.apple.Safari.web-extension"
+          node -e 'const m=require(process.argv[1]); if(m.manifest_version!==3||m.version!==process.argv[2]||m.permissions.includes("nativeMessaging")) process.exit(1)' "$PWD/$R/manifest.json" "$V"
+          codesign --verify --deep --strict --verbose=2 "$APP"
+          codesign -d --entitlements :- "$EXT" | grep -q com.apple.security.app-sandbox
+          lipo -archs "$APP/Contents/MacOS/Linkwache for Safari"
+      - name: Safari sees the extension (pluginkit)
+        run: |
+          APP="$PWD/safari/build/Release/Linkwache for Safari.app"
+          /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$APP"
+          open -g "$APP" --args -LWLanguage en; sleep 5; osascript -e 'tell application id "app.linkwache.safari" to quit' || true
+          pluginkit -mAvvv -p com.apple.Safari.web-extension | tee "$RUNNER_TEMP/pluginkit.txt"
+          grep -q app.linkwache.safari.extension "$RUNNER_TEMP/pluginkit.txt"
+      - name: Screenshots of the container app (light/dark, de/en)
+        run: |
+          APP="$PWD/safari/build/Release/Linkwache for Safari.app/Contents/MacOS/Linkwache for Safari"
+          mkdir -p shots
+          for lang in en de; do for look in light dark; do
+            "$APP" -LWLanguage $lang -LWAppearance $look -LWSnapshot "$PWD/shots/safari-app-$lang-$look.png" &
+            P=$!; for i in $(seq 1 30); do kill -0 $P 2>/dev/null || break; sleep 1; done; kill $P 2>/dev/null || true
+            test -s "shots/safari-app-$lang-$look.png" || { echo "no screenshot $lang $look"; exit 1; }
+          done; done
+          ls -la shots
+      - name: Zip the app (ad-hoc signed)
+        run: |
+          V=$(node -p 'require("./package.json").version')
+          mkdir -p out
+          ditto -c -k --keepParent "safari/build/Release/Linkwache for Safari.app" "out/Linkwache-for-Safari-$V-adhoc.zip"
+          shasum -a 256 out/*.zip | tee out/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linkwache-safari-app
+          path: out/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: linkwache-safari-screenshots
+          path: shots/
+          if-no-files-found: ignore

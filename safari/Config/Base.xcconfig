@@ -1,0 +1,15 @@
+// Shared build settings of "Linkwache for Safari". Signing comes from the person building, never from the repository:
+//   - safari/scripts/build-local.sh passes DEVELOPMENT_TEAM (free "Personal Team" of an Apple ID) or signs ad hoc;
+//   - or put your own values into Config/Local.xcconfig (gitignored), see Local.xcconfig.example.
+LW_BUNDLE_PREFIX = app.linkwache.safari
+MARKETING_VERSION = 0.0.0
+CURRENT_PROJECT_VERSION = 1
+MACOSX_DEPLOYMENT_TARGET = 12.0
+SWIFT_VERSION = 5.0
+CODE_SIGN_STYLE = Automatic
+DEVELOPMENT_TEAM =
+ENABLE_HARDENED_RUNTIME = YES
+ENABLE_USER_SCRIPT_SANDBOXING = NO
+DEAD_CODE_STRIPPING = YES
+
+#include? "Local.xcconfig"

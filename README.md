@@ -31,7 +31,7 @@ A live instance run by the author for friends: https://linkwache.example.org
 |---|---|
 | **Web** | paste → check. Works for every messenger and mail client. |
 | **Desktop app** (Windows, macOS, Linux) | checks every clicked link automatically before it opens — see [Desktop protection](#desktop-protection). |
-| **Browser extension** (Chrome, Edge, Brave, Firefox) | checks links clicked in webmail and on web pages. |
+| **Browser extension** (Chrome, Edge, Brave, Firefox, Safari) | checks links clicked in webmail and on web pages. |
 | **Android app** | checks every tapped link automatically before it opens — see [Android](#android) below. |
 | **Android share sheet** | add the page to the home screen once; it then appears under "Share". |
 | **iPhone** | a signed one-tap Shortcut (`/kurzbefehl.html`) puts it in the share sheet. |
@@ -115,6 +115,7 @@ and compare its SHA-256 (`SHA256SUMS.txt`).
 | macOS | `Linkwache_X.Y.Z_universal.dmg` | not notarised yet: right-click → *Open*. Confirm "Use Linkwache" when macOS asks about the default browser. |
 | Linux | `.AppImage` (self-updating), `.deb`, `.rpm` (x64 and arm64) | the assistant sets the default via `xdg-settings` and checks it. |
 | Extension | `linkwache-extension-chromium-X.Y.Z.zip` / `-firefox-` | Chrome/Edge/Brave: unzip, `chrome://extensions` → Developer mode → *Load unpacked*. Firefox: `about:debugging` → *Load Temporary Add-on* (until a signed version exists). |
+| Safari (Mac) | build it yourself: `safari/scripts/build-local.sh` | Safari loads extensions only from a Mac app, and a downloadable one needs a paid developer account. With Xcode and your free Apple ID the script builds "Linkwache for Safari" in a few minutes; then Safari → *Settings → Extensions* → tick Linkwache. Details, the variant without an Apple ID and the limits: [docs/DESKTOP.md#safari](docs/DESKTOP.md#safari). |
 
 The setup assistant remembers your previous browser and forwards every checked link to it — never
 back to the system default, so links cannot loop. Only `http`/`https` links are checked; other

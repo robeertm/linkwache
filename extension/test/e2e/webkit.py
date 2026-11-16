@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+"""Safari build in WebKit (the engine of Safari) — what can be checked without a Mac.
+Loads the pages of extension/dist/safari (warning page, options page) in Playwright's WebKit with a stubbed `browser.*`
+API (storage in memory, the background script answering like Safari: no desktop app) and checks that the scripts run in
+WebKit, the texts are there in several languages and nothing opens by itself. Real Safari with the extension enabled is
+only available on a Mac (safari/scripts/build-local.sh); safaridriver cannot load extensions.
+Run:  ~/.venvs/slk-pw1.49.1/bin/python extension/test/e2e/webkit.py [--shots DIR]   (after: node extension/scripts/build.mjs safari)"""
+import base64, json, os, sys
+from playwright.sync_api import sync_playwright
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+DIST = os.path.abspath(os.path.join(HERE, "..", "..", "dist", "safari"))
+SHOTS = sys.argv[sys.argv.index("--shots") + 1] if "--shots" in sys.argv else None
+FAIL = []
+
+def ok(cond, what):
+    print(("PASS " if cond else "FAIL ") + what)
+    if not cond: FAIL.append(what)
+
+STUB = """
+(() => {
+  const mem = { settings: { lang: %(lang)s, server: "https://lw.example", scope: "url", paused: false } };
+  window.__sent = [];
+  globalThis.browser = {
+    runtime: {
+      getManifest: () => ({ version: "test" }),
+      getURL: (p) => location.href.replace(/[^/]*$/, "") + p,
+      sendMessage: async (m) => { window.__sent.push(m); if (m.t === "appStatus") return { unsupported: true, target: "safari" }; return { ok: true }; },
+    },
+    storage: { local: { get: async (k) => { const o = {}; for (const x of [].concat(k || Object.keys(mem))) if (x in mem) o[x] = mem[x]; return o; }, set: async (o) => Object.assign(mem, o) },
+               onChanged: { addListener: () => {} } },
+    i18n: { getUILanguage: () => %(lang)s },
+  };
+})();
+"""
+
+def b64url(obj):
+    return base64.urlsafe_b64encode(json.dumps(obj, ensure_ascii=False).encode()).decode().rstrip("=")
+
+RED = {"u": "https://paypal.secure-login.example/konto", "s": "rot", "w": False, "m": "new",
+       "f": [{"key": "brand-sub", "stufe": "rot", "p": {"brand": "paypal", "domain": "secure-login.example"}}, {"key": "http", "stufe": "gelb", "p": {}}]}
+AMBER = {"u": "http://offer-parcel.example/track", "s": "gelb", "w": True, "m": "new", "f": [{"key": "http", "stufe": "gelb", "p": {}}]}
+
+def page(b, lang, look, w, h):
+    ctx = b.new_context(viewport={"width": w, "height": h}, color_scheme=look, locale=lang)
+    ctx.add_init_script(STUB % {"lang": json.dumps(lang)})
+    pg = ctx.new_page(); errs = []
+    pg.on("pageerror", lambda e: errs.append(str(e)))
+    return ctx, pg, errs
+
+def main():
+    ok(os.path.isfile(os.path.join(DIST, "manifest.json")), "safari build exists")
+    with sync_playwright() as p:
+        b = p.webkit.launch()
+        for lang, look in (("de", "light"), ("en", "dark"), ("fr", "light")):
+            for name, data in (("red", RED), ("amber", AMBER)):
+                ctx, pg, errs = page(b, lang, look, 1100, 860)
+                pg.goto("file://" + os.path.join(DIST, "warning.html") + "#d=" + b64url(data))
+                pg.wait_for_selector("#title:not(:empty)")
+                title = pg.text_content("#title")
+                ok(not errs, f"{lang} {name}: no script error in WebKit {errs[:1]}")
+                ok(pg.evaluate("document.body.classList.contains(%s)" % json.dumps("rot" if name == "red" else "gelb")), f"{lang} {name}: level class set")
+                ok(len(title) > 5 and "ext.w." not in title, f"{lang} {name}: translated title '{title}'")
+                ok(pg.evaluate("document.documentElement.lang") == lang, f"{lang} {name}: page language")
+                ok("secure-login" in pg.content() or "offer-parcel" in pg.content(), f"{lang} {name}: target shown")
+                if SHOTS:
+                    os.makedirs(SHOTS, exist_ok=True)
+                    pg.screenshot(path=os.path.join(SHOTS, f"safari-webkit-warning-{name}-{lang}-{look}.png"), full_page=True)
+                if name == "red" and lang == "de":
+                    pg.wait_for_timeout(1500)
+                    ok(not any(m.get("t") in ("go", "proceed") for m in pg.evaluate("window.__sent")), "red: nothing opened by itself")
+                ctx.close()
+        for lang in ("de", "en"):
+            ctx, pg, errs = page(b, lang, "light", 1000, 900)
+            pg.goto("file://" + os.path.join(DIST, "options.html"))
+            pg.wait_for_function("document.getElementById('appState').textContent.length > 10")
+            st = pg.text_content("#appState")
+            ok(not errs, f"options {lang}: no script error {errs[:1]}")
+            ok("Safari" in st, f"options {lang}: desktop-app line explains the Safari limit: '{st}'")
+            if SHOTS: pg.screenshot(path=os.path.join(SHOTS, f"safari-webkit-options-{lang}.png"), full_page=True)
+            ctx.close()
+        b.close()
+    if FAIL:
+        print(f"{len(FAIL)} FAILED"); sys.exit(1)
+    print("ALL PASSED")
+
+main()

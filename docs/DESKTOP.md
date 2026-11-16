@@ -41,8 +41,10 @@ It says "No warning signs found". It finds warning signs; it cannot prove innoce
 
 - `desktop/` — the desktop app (Rust + system webview via Tauri 2), one code base for
   Windows 10/11, macOS 12+, Linux (x86_64 and arm64).
-- `extension/` — one Manifest V3 code base for Chromium browsers (Chrome, Edge, Brave) and
-  Firefox. Safari is a later phase.
+- `extension/` — one Manifest V3 code base for Chromium browsers (Chrome, Edge, Brave), Firefox
+  and Safari (see [Safari](#safari)).
+- `safari/` — the Xcode project of the Safari container app "Linkwache for Safari", built by the
+  user on their own Mac (no developer account needed).
 - `server/` + `src/` — the existing service, extended by `POST /api/v1/check`.
 
 ### Why Tauri 2
@@ -216,7 +218,8 @@ instructions) and the Android APK ("coming soon" until a release carries one).
   explains it). Updates are still safe: the updater verifies the minisign signature of every
   update before it replaces anything — independent of Authenticode.
 - Extension: `extension/dist/chromium.zip` and `extension/dist/firefox.zip`, loadable unpacked;
-  store submission is a later phase.
+  store submission is a later phase. Safari: built locally from `safari/` (see [Safari](#safari)); the
+  `Safari` workflow builds and checks it on a macOS runner and keeps the ad-hoc signed app as an artifact.
 
 ### Windows code signing later
 
@@ -257,7 +260,89 @@ Later phases (planned, not built):
 |---|-------|-------|----------|
 | 2 | Signed builds: macOS notarisation in CI, Windows code signing (hook ready) | Developer ID secret, certificate | 0.5 day |
 | 3 | Store submission: Chrome Web Store, Edge Add-ons, Firefox AMO (for now: download page) | developer accounts | 1 day + review time |
-| 4 | Safari extension (Safari Web Extension in an Xcode wrapper) | Mac + Xcode | 2–3 days |
+| 4 | Safari extension (Safari Web Extension in an Xcode wrapper) — **built in 0.6.0 as the free, build-it-yourself variant** ([Safari](#safari)); a signed, notarised download needs a paid developer account | Mac + Xcode | done (free variant) |
 | 5 | Managed rollout: MSI with GPO/Intune defaults, macOS MDM profile, extension force-install policies | test machines | 2 days |
 | 6 | Family console: opt-in status (active, version, last check — never URLs) of installations of family and friends | consent flow, server storage | 3–4 days |
 | 7 | Mail attachments (PDF/Office links checked before opening) | file-type handlers | 3–5 days |
+
+## Safari
+
+Safari loads web extensions only from inside a Mac app ("Safari Web Extension" in a container app).
+Linkwache ships the same extension for Safari, built from the same source as the Chromium and Firefox
+packages (`node extension/scripts/build.mjs safari` → `extension/dist/safari/`), wrapped in the small
+container app **Linkwache for Safari** (`safari/Linkwache.xcodeproj`, bundle ids `app.linkwache.safari`
+and `app.linkwache.safari.extension`, macOS 12+, Safari 16.4+).
+
+### Why build it yourself, and why not in a store
+
+A downloadable Safari extension must be signed with a Developer ID and notarised by Apple, and the Mac
+App Store needs a paid developer account as well. Without one, the only way to run it is to build it on
+your own Mac. That is what the free variant does:
+
+- **With your Apple ID (recommended):** Xcode's free "Personal Team" signs the app for your Mac. Safari
+  shows the extension like any other.
+- **Without an Apple ID (ad hoc):** the app is signed only locally. Safari lists it only after
+  *Settings → Advanced → Show features for web developers* and *Settings → Developer → Allow unsigned
+  extensions* — and Safari turns that setting off again on every restart, so this is for trying it out.
+
+When the project gets a developer account, the same Xcode project can be signed, notarised and attached
+to the release (phase 2/3); nothing in the extension changes.
+
+### Building
+
+Needs Xcode (not only the Command Line Tools) and Node.js 20+.
+
+```sh
+git clone https://github.com/robeertm/linkwache.git && cd linkwache
+# once: Xcode → Settings → Accounts → add your Apple ID (free)
+safari/scripts/build-local.sh            # Personal Team, found automatically (or DEVELOPMENT_TEAM=...)
+safari/scripts/build-local.sh --adhoc    # without an Apple ID
+```
+
+The script builds the extension, builds the app with `xcodebuild` (team from `DEVELOPMENT_TEAM` or the
+"Apple Development" certificate Xcode created for the Personal Team), verifies the signature, replaces
+`/Applications/Linkwache for Safari.app` (the previous version stays as a backup until the copy has
+succeeded), registers it with Launch Services and opens it. Then in Safari: *Settings → Extensions* →
+tick **Linkwache** and allow it on all websites. `LINKWACHE_DEFAULT_SERVER=https://…` presets the
+server address; otherwise it is set once in the extension's settings. The team id never goes into the
+repository: it comes from the environment or from `safari/Config/Local.xcconfig` (gitignored, see
+`Local.xcconfig.example`) when building from Xcode itself.
+
+### What is different in Safari
+
+| Topic | Chromium / Firefox | Safari |
+|---|---|---|
+| Talking to the desktop app | native messaging to `app.linkwache.desktop` (shared cache, allowlist, server) | not possible: Safari routes native messaging only to the extension's own container app. The extension asks the server directly (`POST /api/v1/check`); its settings page says so. |
+| Known-red domains before they load | `declarativeNetRequest` session rules + `webNavigation` | `webNavigation` only (Safari's regex redirects into an extension page are not reliable); clicks are checked by the content script as everywhere |
+| Background | service worker (Chromium) / event page (Firefox) | non-persistent background page; it keeps no state in memory, everything lives in `storage.local` |
+| New tabs | next to the opener (`openerTabId`) | plain new tab (retried without opener fields where they are rejected) |
+| Timeouts | `AbortSignal.timeout` | same, with an `AbortController` fallback |
+| Permissions | storage, webNavigation, declarativeNetRequest, nativeMessaging | storage, webNavigation; Safari additionally asks the user to allow the extension per website or on all websites |
+
+Forwarding from the container app to the desktop app would need an App Group or a local socket, both
+tied to a signing team — that would rule out the ad-hoc build, so it is deliberately left out. The
+container app's `SafariWebExtensionHandler` only answers "unsupported".
+
+### Updates
+
+The free build cannot update itself: replacing an app in place safely needs a signed, notarised update
+channel, which the free variant does not have. Instead the container app asks the public release list once
+a day (switchable in the app; no other data is sent) and shows "Version x.y.z is available" with a link
+to this guide. Updating means running `safari/scripts/build-local.sh` again after `git pull`; settings,
+allowlist and history of the extension stay in Safari's extension storage.
+
+### Tests
+
+- `npm test` → `extension/test/safari.test.js`: capability fallbacks (no native messaging/DNR in Safari,
+  timeout fallback, new-tab retry), the Safari manifest and the container app's texts in all eight
+  languages.
+- `extension/test/e2e/webkit.py`: the Safari build's warning and settings pages in WebKit (Safari's
+  engine, Playwright) with a stubbed extension API — scripts run, texts in several languages, nothing
+  opens by itself.
+- `.github/workflows/safari.yml` (macOS runner, on demand and on changes under `safari/` or
+  `extension/` on main): extension tests, Swift tests of the update check and language choice
+  (`safari/tests/VersionCheckTests.swift`), unsigned and ad-hoc builds, bundle structure, versions,
+  sandbox entitlements and signature, registration of the extension with the system (`pluginkit`),
+  window screenshots of the container app (light/dark, two languages) and the app as a zip artifact.
+- Only on a Mac: clicking links in real Safari with the extension switched on. `safaridriver` cannot
+  load extensions, so this stays a manual check after `build-local.sh`.

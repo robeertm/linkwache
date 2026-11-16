@@ -1,0 +1,4 @@
+// Copy to Local.xcconfig (gitignored) to build from Xcode itself with your own team.
+// DEVELOPMENT_TEAM = ABCDE12345
+// Own bundle prefix if "app.linkwache.safari" is already taken for your Apple ID:
+// LW_BUNDLE_PREFIX = com.example.linkwache.safari

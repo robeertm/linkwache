@@ -1,0 +1,6 @@
+# Signing settings of the person building (team id) never go into the repository.
+Config/Local.xcconfig
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/

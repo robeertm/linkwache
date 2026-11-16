@@ -1,0 +1,425 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D741A228FC1A4047183E8857 /* LinkwacheApp.swift */ = {isa = PBXBuildFile; fileRef = 8401CF9043E4515114B1E065 /* LinkwacheApp.swift */; };
+		D2742927A04A36864F6C5976 /* Strings.swift */ = {isa = PBXBuildFile; fileRef = 18B0215C2B8E6DCCA678B079 /* Strings.swift */; };
+		34B8A4FB9CDFFD1DFA74DB0E /* VersionCheck.swift */ = {isa = PBXBuildFile; fileRef = 0D10C14D7698CD99F5C44AB3 /* VersionCheck.swift */; };
+		6EEEE39B1AB4355FA617C29C /* Assets.xcassets */ = {isa = PBXBuildFile; fileRef = 926215B008EBBA578C8620F6 /* Assets.xcassets */; };
+		7B0E1D7F6FD4C5167F3278A9 /* SafariWebExtensionHandler.swift */ = {isa = PBXBuildFile; fileRef = BB6D2BB7981EF39C70CA44AD /* SafariWebExtensionHandler.swift */; };
+		1727D02CD44CA2AAC275618D /* Linkwache Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3B4F002C0EBF43711C4D9724 /* Linkwache Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		431387EB7262E1CFC79B125E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2E599F9B8792E58EB83FE964;
+			remoteInfo = "Linkwache Extension";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		425893CE4AEDF359C5F0F0D7 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				1727D02CD44CA2AAC275618D /* Linkwache Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		8401CF9043E4515114B1E065 /* LinkwacheApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkwacheApp.swift; sourceTree = "<group>"; };
+		18B0215C2B8E6DCCA678B079 /* Strings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Strings.swift; sourceTree = "<group>"; };
+		0D10C14D7698CD99F5C44AB3 /* VersionCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionCheck.swift; sourceTree = "<group>"; };
+		926215B008EBBA578C8620F6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		860A48FE92893D5D78A7B5D0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B8F01DA1649FA11CF752E183 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
+		BB6D2BB7981EF39C70CA44AD /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		350AC5775A9BB18F5F56EB8F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2E447EA45ECBEF10AA1BE7FF /* Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Extension.entitlements; sourceTree = "<group>"; };
+		A55F4C356B7DCF0A4E04481A /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
+		5A07B39B079D429B404E4D0F /* Linkwache for Safari.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Linkwache for Safari.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B4F002C0EBF43711C4D9724 /* Linkwache Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Linkwache Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7BCCCE497AA012DCD2E0EAF8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A75A52574E553B1077B38116 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		B19911C44BD755AB4F173858 = {
+			isa = PBXGroup;
+			children = (
+				30BAE363BF904CFF4BA52B3A,
+				89F22DFD890ECD9D188FD1E0,
+				C3809410BC68B6AD7407904A,
+				3936A56E033FE156B0D38F79,
+			);
+			sourceTree = "<group>";
+		};
+		30BAE363BF904CFF4BA52B3A = {
+			isa = PBXGroup;
+			children = (
+				8401CF9043E4515114B1E065,
+				18B0215C2B8E6DCCA678B079,
+				0D10C14D7698CD99F5C44AB3,
+				926215B008EBBA578C8620F6,
+				860A48FE92893D5D78A7B5D0,
+				B8F01DA1649FA11CF752E183,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		89F22DFD890ECD9D188FD1E0 = {
+			isa = PBXGroup;
+			children = (
+				BB6D2BB7981EF39C70CA44AD,
+				350AC5775A9BB18F5F56EB8F,
+				2E447EA45ECBEF10AA1BE7FF,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		C3809410BC68B6AD7407904A = {
+			isa = PBXGroup;
+			children = (
+				A55F4C356B7DCF0A4E04481A,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		3936A56E033FE156B0D38F79 = {
+			isa = PBXGroup;
+			children = (
+				5A07B39B079D429B404E4D0F,
+				3B4F002C0EBF43711C4D9724,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C4F1B4ACBD326E86B48FA1A3 /* Linkwache for Safari */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4132F69B986A244D2B8DB735;
+			buildPhases = (
+				6634E4E6CF27A4DB3739CFE3,
+				7BCCCE497AA012DCD2E0EAF8,
+				50054D6B1C75A22C3200B9AF,
+				425893CE4AEDF359C5F0F0D7,
+				26EDCE471D835D8409A0BFA3,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2254342BECCEAFBD04538E0A,
+			);
+			name = "Linkwache for Safari";
+			productName = "Linkwache for Safari";
+			productReference = 5A07B39B079D429B404E4D0F;
+			productType = "com.apple.product-type.application";
+		};
+		2E599F9B8792E58EB83FE964 /* Linkwache Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 54413A0119BA852953388CB0;
+			buildPhases = (
+				EE8198A1FB5C79C1B53CEA72,
+				A75A52574E553B1077B38116,
+				B34DA598ACE525E5D15DF4A7,
+				AD431939E8950C90F6965C06,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Linkwache Extension";
+			productName = "Linkwache Extension";
+			productReference = 3B4F002C0EBF43711C4D9724;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		46F86FAA6BBF9AC94A7E4595 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					C4F1B4ACBD326E86B48FA1A3 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					2E599F9B8792E58EB83FE964 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = 2D6CADEF21B99EA5E890ABE8;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				de,
+				tr,
+				pl,
+				ru,
+				es,
+				fr,
+				it,
+			);
+			mainGroup = B19911C44BD755AB4F173858;
+			productRefGroup = 3936A56E033FE156B0D38F79 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C4F1B4ACBD326E86B48FA1A3 /* Linkwache for Safari */,
+				2E599F9B8792E58EB83FE964 /* Linkwache Extension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		50054D6B1C75A22C3200B9AF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6EEEE39B1AB4355FA617C29C /* Assets.xcassets */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B34DA598ACE525E5D15DF4A7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		26EDCE471D835D8409A0BFA3 /* Copy container app texts */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy container app texts";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/scripts/copy-resources.sh\" app\n";
+			showEnvVarsInLog = 0;
+		};
+		AD431939E8950C90F6965C06 /* Copy extension web resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy extension web resources";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/scripts/copy-resources.sh\" extension\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6634E4E6CF27A4DB3739CFE3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D741A228FC1A4047183E8857 /* LinkwacheApp.swift in Sources */,
+				D2742927A04A36864F6C5976 /* Strings.swift in Sources */,
+				34B8A4FB9CDFFD1DFA74DB0E /* VersionCheck.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EE8198A1FB5C79C1B53CEA72 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7B0E1D7F6FD4C5167F3278A9 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2254342BECCEAFBD04538E0A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2E599F9B8792E58EB83FE964 /* Linkwache Extension */;
+			targetProxy = 431387EB7262E1CFC79B125E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		F7A05CCCA6FC7FCDE22B0386 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A55F4C356B7DCF0A4E04481A /* Base.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		4A700DBA2BEC4B0C8B3156CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(LW_BUNDLE_PREFIX)";
+				PRODUCT_MODULE_NAME = LinkwacheSafari;
+				PRODUCT_NAME = "Linkwache for Safari";
+			};
+			name = Debug;
+		};
+		D9F61455C56C039C9DEDFE3F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Extension/Extension.entitlements;
+				INFOPLIST_FILE = Extension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(LW_BUNDLE_PREFIX).extension";
+				PRODUCT_MODULE_NAME = LinkwacheExtension;
+				PRODUCT_NAME = "Linkwache Extension";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		43ADF472203157914B4DFC0E /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A55F4C356B7DCF0A4E04481A /* Base.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		718206ED4EB1D6E8278C4BAE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(LW_BUNDLE_PREFIX)";
+				PRODUCT_MODULE_NAME = LinkwacheSafari;
+				PRODUCT_NAME = "Linkwache for Safari";
+			};
+			name = Release;
+		};
+		6B2B213F860782AB48332275 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Extension/Extension.entitlements;
+				INFOPLIST_FILE = Extension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(LW_BUNDLE_PREFIX).extension";
+				PRODUCT_MODULE_NAME = LinkwacheExtension;
+				PRODUCT_NAME = "Linkwache Extension";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2D6CADEF21B99EA5E890ABE8 /* Build configuration list for PBXProject "Linkwache" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F7A05CCCA6FC7FCDE22B0386 /* Debug */,
+				43ADF472203157914B4DFC0E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4132F69B986A244D2B8DB735 /* Build configuration list for PBXNativeTarget "Linkwache for Safari" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4A700DBA2BEC4B0C8B3156CF /* Debug */,
+				718206ED4EB1D6E8278C4BAE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		54413A0119BA852953388CB0 /* Build configuration list for PBXNativeTarget "Linkwache Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D9F61455C56C039C9DEDFE3F /* Debug */,
+				6B2B213F860782AB48332275 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+}
