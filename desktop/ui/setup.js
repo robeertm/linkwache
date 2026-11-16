@@ -125,4 +125,5 @@
     show();
   });
   show();
+  requestAnimationFrame(() => LW.invoke("window_ready").catch(() => {}));
 })();

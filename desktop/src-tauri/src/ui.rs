@@ -148,15 +148,22 @@ fn single(app: &AppHandle, label: &'static str, url: String, title: String, size
             let _ = w.set_focus();
             return;
         }
-        if let Ok(w) = WebviewWindowBuilder::new(&app2, label, WebviewUrl::App(url.into()))
+        if WebviewWindowBuilder::new(&app2, label, WebviewUrl::App(url.into()))
             .title(title)
             .inner_size(size.0, size.1)
             .min_inner_size(min.0, min.1)
             .center()
             .focused(true)
+            .visible(false)
             .build()
+            .is_ok()
         {
-            let _ = w.set_focus();
+            // Revealed by the page (window_ready) once rendered; fallback after 2.5 s.
+            let app3 = app2.clone();
+            std::thread::spawn(move || {
+                std::thread::sleep(std::time::Duration::from_millis(2500));
+                reveal(&app3, label);
+            });
         }
     });
 }

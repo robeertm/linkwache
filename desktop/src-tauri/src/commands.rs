@@ -44,6 +44,7 @@ pub async fn get_result(app: AppHandle, id: u64) -> R<Value> {
 #[tauri::command]
 pub async fn window_ready(app: AppHandle, window: tauri::WebviewWindow) -> R<()> {
     ui::reveal(&app, window.label());
+    crate::e2e::state("window-ready", json!({ "label": window.label() }));
     Ok(())
 }
 

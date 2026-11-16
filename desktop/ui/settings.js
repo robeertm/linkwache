@@ -135,4 +135,5 @@
 
   await load();
   showTab(tab);
+  requestAnimationFrame(() => LW.invoke("window_ready").catch(() => {}));
 })();

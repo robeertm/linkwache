@@ -158,6 +158,11 @@ function setupFake() {
     fs.writeFileSync(path.join(env.XDG_DATA_HOME, "applications", "fakebrowser.desktop"), desktop);
     // The fake was the default browser before Linkwache (the assistant records it as target).
     run("xdg-mime", ["default", "fakebrowser.desktop", "x-scheme-handler/http", "x-scheme-handler/https"]);
+    // A stand-in mail program, so the mailto test never starts a real application.
+    const mail = path.join(FAKE_DIR, "fakemail.sh");
+    fs.writeFileSync(mail, `#!/bin/sh\nfor a in "$@"; do printf '%s\\n' "$a" >> "${path.join(FAKE_DIR, "mail.log")}"; done\n`, { mode: 0o755 });
+    fs.writeFileSync(path.join(env.XDG_DATA_HOME, "applications", "fakemail.desktop"), `[Desktop Entry]\nType=Application\nName=Fake Mail\nExec=${mail} %u\nMimeType=x-scheme-handler/mailto;\n`);
+    fs.writeFileSync(path.join(env.XDG_DATA_HOME, "applications", "defaults.list"), "[Default Applications]\nx-scheme-handler/mailto=fakemail.desktop\n");
     fakeId = "fakebrowser.desktop";
     forwardSpec = `linux-desktop:${fakeId}`;
   } else if (PLATFORM === "macos") {
@@ -314,6 +319,7 @@ async function caseRed() {
   const w = await waitState("warning", (d) => d.stufe === "rot", 12000, before);
   record("red link shows the warning window", !!w, w ? `findings ${w.data.findings}` : "");
   if (!w) return;
+  await waitState("window-ready", (d) => d.label === `warn-${w.data.id}`, 5000, before);
   await sleep(3500);
   screenshot("warning-red");
   record("red link: the real browser received nothing", !received().includes(url), received().join(" "));
@@ -418,7 +424,8 @@ async function main() {
   const first = startApp(APP);
   const setup = await waitState("window", (d) => d.window === "setup", 30000);
   record("first start opens the setup assistant", !!setup);
-  await sleep(2500);
+  await waitState("window-ready", (d) => d.label === "setup", 10000);
+  await sleep(1200);
   screenshot("setup-assistant");
   await quitApp(first);
 

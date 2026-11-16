@@ -58,6 +58,12 @@ pub fn main_entry() {
     if cli::is_cli(&args) {
         std::process::exit(cli::run(&args));
     }
+    // WebKitGTK's DMA-BUF renderer shows blank windows on some GPUs, VMs and virtual
+    // displays; the classic renderer works everywhere. Respect an explicit user setting.
+    #[cfg(target_os = "linux")]
+    if std::env::var_os("WEBKIT_DISABLE_DMABUF_RENDERER").is_none() {
+        std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
+    }
     let paths = Paths::default_location();
     let start = linkwache_core::updater::record_start(&paths, VERSION).ok();
     let autostarted = args.iter().any(|a| a == "--autostart");
