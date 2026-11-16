@@ -30,10 +30,49 @@ A live instance run by the author for friends: https://linkwache.example.org
 | Channel | How |
 |---|---|
 | **Web** | paste → check. Works for every messenger and mail client. |
+| **Android app** | checks every tapped link automatically before it opens — see [Android](#android) below. |
 | **Android share sheet** | add the page to the home screen once; it then appears under "Share". |
 | **iPhone** | a signed one-tap Shortcut (`/kurzbefehl.html`) puts it in the share sheet. |
 | **E-mail** | forward the suspicious mail to `pruefen@<your domain>` (Cloudflare Email Routing → this Worker; Cloudflare variant only). |
 | **Telegram** | forward the message to your bot. |
+
+## Android
+
+**Every link you tap is checked before it opens** — in mail, messengers, text messages, PDFs.
+The app becomes your phone's default browser app, checks each link and hands it to your real
+browser. No warning signs: it opens right away. Suspicious: a warning with the reasons, "Open
+anyway" only after three seconds. Dangerous: blocked, opening only through a deliberate second
+step. Server unreachable: "Could not be checked" — nothing opens by itself.
+
+<p>
+<img src="docs/screenshots/android/phone-light-sheet-green.png" width="200" alt="No warning signs – opening">
+<img src="docs/screenshots/android/phone-light-sheet-gelb.png" width="200" alt="Suspicious link">
+<img src="docs/screenshots/android/phone-dark-sheet-rot.png" width="200" alt="Dangerous link – blocked">
+<img src="docs/screenshots/android/phone-dark-sheet-offline.png" width="200" alt="Could not be checked">
+</p>
+<p>
+<img src="docs/screenshots/android/phone-light-setup-4.png" width="200" alt="Setup: make Linkwache the default">
+<img src="docs/screenshots/android/phone-dark-home-update.png" width="200" alt="Protection status and update notice">
+<img src="docs/screenshots/android/tablet-light-sheet-gelb.png" width="412" alt="Tablet">
+</p>
+
+**Install** (no app store for now):
+
+1. Download `Linkwache-android-X.Y.Z.apk` from the [latest release](https://github.com/robeertm/linkwache/releases/latest)
+   (or the `/download` page of a Linkwache site) and compare its SHA-256.
+2. Open it and allow **"Install unknown apps"** for your browser or file manager when Android asks
+   (only for this installation), then tap *Install*.
+3. Open Linkwache and follow the five setup steps. In step 4 choose **Linkwache as default browser
+   app** in Android's dialog (or *Settings → Apps → Default apps → Browser app*). Your previous
+   browser stays installed and receives every checked link.
+
+Only the address and path go to the server — the part after `?` and `#` stays on the phone (or
+just the domain, if you prefer). History stays on the device. The app looks for updates itself
+and installs one only after checking its SHA-256 and signing certificate, with your confirmation.
+
+Android limits: links opened inside an app's own built-in browser and verified app links never
+reach the default browser — use *Share → Check with Linkwache* there. Details, build and signing:
+[docs/ANDROID.md](docs/ANDROID.md).
 
 ## Stack
 

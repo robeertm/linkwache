@@ -2,6 +2,30 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
+## 0.5.0 — unreleased
+
+### Added — Android app
+- Android app (`android/`, Android 8.0+): chosen as the default browser app, it checks every tapped web link (mail,
+  messengers, text messages, PDFs) before it opens and hands it to the real browser picked during setup — always with
+  an explicit package name, so a link can never loop back. Also "Share → Check with Linkwache" and the text selection menu.
+- Check sheet over the calling app: "checking", "No warning signs – opening" (opens after ~0.7 s), suspicious (findings
+  in plain language, "Open anyway" active after 3 s), dangerous (blocked; opening only via a deliberate second step),
+  "Could not be checked" (reason and local assessment; nothing opens on its own; a locally red link stays blocked).
+- Check flow shared with the desktop app: link wrappers unwrapped locally, offline heuristics ported to Kotlin and
+  pinned by the shared test vectors, allowlist (never matching look-alikes), on-device cache, `POST /api/v1/check` with a
+  hard 6 s timeout. Query string and fragment never leave the phone; "Domain only" sends just the host.
+- Custom Tabs: Linkwache answers the default browser's tab service (without preloading anything), so links that apps
+  show in a Custom Tab are checked too and then open as a Custom Tab of the real browser.
+- Setup assistant (five steps) that requests the browser role through Android's own dialog and verifies the result;
+  settings for browser, server, privacy scope, pause, allowlist, local history (last 200) and installation ID.
+- Updater from the first version: notice when the GitHub release marked "latest" carries a newer APK (switchable);
+  one tap downloads it, verifies SHA-256, package name, version and the signing certificate, then hands it to the
+  system installer. Settings are kept.
+- Eight languages; verdict and finding texts are generated from the server translations, a test fails on missing texts.
+- CI (`.github/workflows/android.yml`): unit and Robolectric tests, lint, unsigned release build, end-to-end test on an
+  Android 14 emulator with a stand-in server and browser, screenshots of every state (light/dark, phone/tablet).
+  The release APK is signed outside CI (`android/scripts/sign-release.sh`); see `docs/ANDROID.md`.
+
 ## 0.4.0 — 2026-11-14
 
 ### Added

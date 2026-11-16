@@ -75,6 +75,20 @@ view() { adb shell am start -a android.intent.action.VIEW -d "'$1'" "${@:2}" >/d
 
 shot() { adb exec-out screencap -p > "$1"; }
 
+# launch_shot <file> <am start args…>: (re)start the activity without killing the process,
+# wait until it is drawn; an almost empty capture (cold start still running) is retried.
+launch_shot() {
+  local f=$1; shift
+  local i
+  for i in 1 2 3 4; do
+    adb shell am start -W -f 0x10008000 "$@" >/dev/null
+    sleep $((2 + i))
+    shot "$f"
+    [ "$(stat -c%s "$f")" -gt 60000 ] && return 0
+  done
+  log "WARN: screenshot looks empty: $f"
+}
+
 checkms() { adb logcat -d -s Linkwache:I | grep "check outcome" | tail -1 | sed 's/.*check //'; }
 
 home() { adb shell input keyevent KEYCODE_HOME; sleep 0.5; }
@@ -89,6 +103,7 @@ adb shell am broadcast -a com.android.systemui.demo -e command network -e wifi s
 adb shell am broadcast -a com.android.systemui.demo -e command notifications -e visible false >/dev/null
 adb shell cmd locale set-app-locales $APP --locales en-US >/dev/null 2>&1 || true
 start_mock
+adb shell appops set $APP REQUEST_INSTALL_PACKAGES allow
 
 adb shell cmd role add-role-holder android.app.role.BROWSER $APP 0
 if adb shell cmd role get-role-holders android.app.role.BROWSER | grep -q $APP; then ok "Linkwache holds the browser role"; else fail "browser role"; fi
@@ -202,19 +217,16 @@ config --es server $SERVER --es forward $FB --ez setupDone true --ez demoHistory
 shots() {  # $1 = theme (light|dark), $2 = lang
   local d="$OUT/shots/$2"; mkdir -p "$d"
   for s in checking green gelb rot rot2 offline; do
-    adb shell am start -S -n $APP/.DemoActivity --es state $s >/dev/null; sleep 3
-    shot "$d/$DEV-$1-sheet-$s.png"
+    launch_shot "$d/$DEV-$1-sheet-$s.png" -n $APP/.DemoActivity --es state $s
   done
   for step in 1 2 3 4 5; do
-    adb shell am start -S -n $APP/.MainActivity --ei step $step >/dev/null; sleep 3
-    shot "$d/$DEV-$1-setup-$step.png"
+    launch_shot "$d/$DEV-$1-setup-$step.png" -n $APP/.MainActivity --ei step $step
   done
   config --ez clear true --ez demoHistory true --ez updateAuto true --es updateApi "$SERVER/release/good"
-  adb shell am force-stop $APP
-  adb shell am start -n $APP/.MainActivity >/dev/null; sleep 6
-  shot "$d/$DEV-$1-home-update.png"
+  launch_shot "$d/$DEV-$1-home-update.png" -n $APP/.MainActivity
+  sleep 3; shot "$d/$DEV-$1-home-update.png"
   config --ez updateAuto false
-  adb shell am start -S -n $APP/.MainActivity >/dev/null; sleep 3
+  launch_shot "$d/$DEV-$1-home-top.png" -n $APP/.MainActivity
   scroll; scroll
   shot "$d/$DEV-$1-home-settings.png"
   scroll; scroll; scroll
