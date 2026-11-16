@@ -168,8 +168,8 @@ commit (tests, lint, emulator test) succeeded — and compares the digest GitHub
 local SHA-256. It never creates tags or releases. The download page and the in-app updater
 pick the APK up from the release.
 
-Emulator CI also installs the minified release build (signed with the public debug key, for
-this test only) and checks that the sheet renders and a link gets a verdict.
+Emulator CI also installs the minified release build (signed with a throwaway test key,
+for this test only) and checks that the sheet renders and a link gets a verdict.
 
 ## Languages
 
