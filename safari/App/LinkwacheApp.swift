@@ -12,9 +12,7 @@ struct LinkwacheApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(model: delegate.model)
-                .frame(width: 560)
-                .fixedSize(horizontal: true, vertical: true)
+            ContentView.sized(model: delegate.model)
         }
         .windowStyle(.hiddenTitleBar)
         .commands { CommandGroup(replacing: .newItem) {} }
@@ -31,16 +29,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         default: break
         }
         model.start()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { Self.fitWindow() }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { self.fitWindow() }
         if let path = UserDefaults.standard.string(forKey: "LWSnapshot") {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 4) { Snapshot.window(to: path) }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) { self.fitWindow() }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5) { Snapshot.window(to: path) }
         }
     }
 
     /// The window takes exactly the size of its content and is not resizable (works on macOS 12 too).
-    static func fitWindow() {
-        guard let win = NSApp.windows.first(where: { $0.isVisible }), let view = win.contentView else { return }
-        let size = view.fittingSize
+    func fitWindow() {
+        guard let win = NSApp.windows.first(where: { $0.isVisible }) else { return }
+        // The window's own hosting view reports no fitting size; measure the same content in a fresh one.
+        let size = NSHostingView(rootView: ContentView.sized(model: model)).fittingSize
         guard size.width >= 200, size.height >= 200 else { return }
         win.styleMask.remove(.resizable)
         win.setContentSize(size)
@@ -143,6 +143,10 @@ final class Model: ObservableObject {
 
 struct ContentView: View {
     @ObservedObject var model: Model
+
+    static func sized(model: Model) -> some View {
+        ContentView(model: model).frame(width: 560).fixedSize(horizontal: true, vertical: true)
+    }
     private var s: Strings { model.strings }
 
     var body: some View {
@@ -235,7 +239,6 @@ enum Snapshot {
 
     /// Renders the app window's content to a PNG at the screen's scale, then quits.
     static func window(to path: String) {
-        AppDelegate.fitWindow()
         guard let win = NSApp.windows.first(where: { $0.isVisible }) ?? NSApp.windows.first, let view = win.contentView else {
             fail(3, "no window (\(NSApp.windows.count) windows)")
         }
