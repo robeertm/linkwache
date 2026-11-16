@@ -351,10 +351,10 @@ private fun RedContent(s: SheetState.Done, a: SheetActions, revealRedStep: Boole
     VerdictBox(Texts.verdictShort(ctx, s.r), t("warn.lead.rot"), sig.crit, sig.critBg)
     Spacer(Modifier.height(14.dp))
     LinkLines(s.r)
-    Text(t("warn.findings"), style = MaterialTheme.typography.titleSmall)
-    Spacer(Modifier.height(10.dp))
-    FindingsList(s.r.findings, if (step) 150 else 260)
     if (!step) {
+        Text(t("warn.findings"), style = MaterialTheme.typography.titleSmall)
+        Spacer(Modifier.height(10.dp))
+        FindingsList(s.r.findings)
         Text(Texts.verdictAdvice(ctx, s.r), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(top = 14.dp))
         Spacer(Modifier.height(18.dp))
         PrimaryButton(t("btn.close"), "btn-close", a::close)
@@ -363,7 +363,6 @@ private fun RedContent(s: SheetState.Done, a: SheetActions, revealRedStep: Boole
             Text(t("btn.know"), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     } else {
-        Spacer(Modifier.height(16.dp))
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
         Spacer(Modifier.height(14.dp))
         Text(t("red.title"), style = MaterialTheme.typography.titleMedium, color = sig.crit)

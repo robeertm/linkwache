@@ -64,7 +64,8 @@ object Updater {
                 p.updateLastCheck = System.currentTimeMillis()
                 if (r.code == 404) { p.updateFound = null; return Result.UpToDate }
                 if (!r.isSuccessful) return Result.Error("set.upd.error")
-                val info = Update.parseLatest(r.body?.string().orEmpty(), BuildConfig.VERSION_NAME)
+                val testServer = BuildConfig.DEBUG && p.debugUpdateApi != null
+                val info = Update.parseLatest(r.body?.string().orEmpty(), BuildConfig.VERSION_NAME, allowHttp = testServer)
                 p.updateFound = info?.let { toJson(it) }
                 if (info == null) Result.UpToDate else Result.Available(info)
             }

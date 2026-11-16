@@ -82,6 +82,17 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - device: phone
+            profile: ${{ matrix.profile }}
+            shots_only: "0"
+          - device: tablet
+            profile: pixel_tablet
+            shots_only: "1"
+    name: e2e (${{ matrix.device }})
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -93,24 +104,26 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - name: Emulator test (Android 14)
+      - name: Emulator test (Android 14, ${{ matrix.device }})
         uses: reactivecircus/android-emulator-runner@v2
         env:
           APK_APP: ${{ github.workspace }}/dist/app-debug.apk
           APK_APP_NEXT: ${{ github.workspace }}/dist/app-debug-99.0.0.apk
           APK_FB: ${{ github.workspace }}/dist/fakebrowser-debug.apk
           OUT: ${{ github.workspace }}/e2e-out
+          DEVICE: ${{ matrix.device }}
+          SHOTS_ONLY: ${{ matrix.shots_only }}
         with:
           api-level: 34
           target: google_apis
           arch: x86_64
-          profile: pixel_6
+          profile: ${{ matrix.profile }}
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: bash android/e2e/run.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: android-e2e
+          name: android-e2e-${{ matrix.device }}
           path: e2e-out/
           retention-days: 30

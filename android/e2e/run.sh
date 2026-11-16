@@ -95,6 +95,7 @@ if adb shell cmd role get-role-holders android.app.role.BROWSER | grep -q $APP; 
 config --es server $SERVER --es forward $FB --ez setupDone true --ez clear true --ez updateAuto false
 home
 
+if [ "${SHOTS_ONLY:-0}" != 1 ]; then
 # ── 1. Green: opens in the real browser; query never reaches the server ──────
 adb logcat -c
 U="https://gruen.example/start?token=secret123#frag"
@@ -189,40 +190,45 @@ if wait_text "Update 99.0.0 available" 15; then
 else fail "update notice (good)"; fi
 config --ez updateAuto false --ez clear true
 
+fi
+
 # ── Screenshots of every state ──────────────────────────────────────────────
-config --es server $SERVER --es forward $FB --ez setupDone true --ez demoHistory true --es allow "example.net"
-shots() {  # $1 = tag (phone|tablet), $2 = theme (light|dark), $3 = lang
-  local d="$OUT/shots/$3"; mkdir -p "$d"
+# Real users have animations on: switch them back on so progress indicators are drawn.
+for k in window_animation_scale transition_animation_scale animator_duration_scale; do adb shell settings put global $k 1; done
+DEV=${DEVICE:-phone}
+read -r W H < <(adb shell wm size | sed -n 's/.*: \([0-9]*\)x\([0-9]*\).*/\1 \2/p' | tail -1)
+scroll() { adb shell input swipe $((W / 2)) $((H * 4 / 5)) $((W / 2)) $((H / 5)) 600; sleep 0.8; }
+config --es server $SERVER --es forward $FB --ez setupDone true --ez demoHistory true --es allow "example.net" --ez updateAuto false
+shots() {  # $1 = theme (light|dark), $2 = lang
+  local d="$OUT/shots/$2"; mkdir -p "$d"
   for s in checking green gelb rot rot2 offline; do
-    adb shell am start -S -n $APP/.DemoActivity --es state $s >/dev/null; sleep 2.5
-    shot "$d/$1-$2-sheet-$s.png"
+    adb shell am start -S -n $APP/.DemoActivity --es state $s >/dev/null; sleep 3
+    shot "$d/$DEV-$1-sheet-$s.png"
   done
-  for step in 1 3 4 5; do
-    adb shell am start -S -n $APP/.MainActivity --ei step $step >/dev/null; sleep 2.5
-    shot "$d/$1-$2-setup-$step.png"
+  for step in 1 2 3 4 5; do
+    adb shell am start -S -n $APP/.MainActivity --ei step $step >/dev/null; sleep 3
+    shot "$d/$DEV-$1-setup-$step.png"
   done
-  config --ez updateAuto true --es updateApi "$SERVER/release/good"
+  config --ez clear true --ez demoHistory true --ez updateAuto true --es updateApi "$SERVER/release/good"
   adb shell am force-stop $APP
-  adb shell am start -n $APP/.MainActivity >/dev/null; sleep 4
-  shot "$d/$1-$2-home-update.png"
+  adb shell am start -n $APP/.MainActivity >/dev/null; sleep 6
+  shot "$d/$DEV-$1-home-update.png"
   config --ez updateAuto false
-  adb shell am start -S -n $APP/.MainActivity >/dev/null; sleep 1
-  # settings further down the page
-  adb shell input swipe 500 1800 500 400 400; sleep 1.2
-  shot "$d/$1-$2-home-settings.png"
-  config --ez clear true --ez demoHistory true
+  adb shell am start -S -n $APP/.MainActivity >/dev/null; sleep 3
+  scroll; scroll
+  shot "$d/$DEV-$1-home-settings.png"
+  scroll; scroll; scroll
+  shot "$d/$DEV-$1-home-bottom.png"
+  config --ez clear true --ez demoHistory true --ez updateAuto false
 }
 for lang in en de; do
   adb shell cmd locale set-app-locales $APP --locales $lang >/dev/null 2>&1 || true
   for theme in light dark; do
-    [ $theme = dark ] && adb shell cmd uimode night yes >/dev/null || adb shell cmd uimode night no >/dev/null
-    adb shell wm size reset; adb shell wm density reset
-    shots phone $theme $lang
-    adb shell wm size 1600x2560; adb shell wm density 320
-    shots tablet $theme $lang
+    if [ $theme = dark ]; then adb shell cmd uimode night yes >/dev/null; else adb shell cmd uimode night no >/dev/null; fi
+    shots $theme $lang
   done
 done
-adb shell wm size reset; adb shell wm density reset; adb shell cmd uimode night no >/dev/null
+adb shell cmd uimode night no >/dev/null
 
 stop_mock
 adb logcat -d -s Linkwache:I FAKEBROWSER:I > "$OUT/logcat.txt" 2>/dev/null

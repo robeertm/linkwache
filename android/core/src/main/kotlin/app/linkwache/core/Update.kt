@@ -26,7 +26,7 @@ object Update {
     private val SHA = Regex("^[0-9a-f]{64}$")
 
     /** Parse `GET /repos/<owner>/<repo>/releases/latest`; null if it carries no APK or is not newer. */
-    fun parseLatest(json: String, current: String): UpdateInfo? {
+    fun parseLatest(json: String, current: String, allowHttp: Boolean = false): UpdateInfo? {
         val j = try { JSONObject(json) } catch (e: JSONException) { return null }
         if (j.optBoolean("draft") || j.optBoolean("prerelease")) return null
         val tagVersion = j.optString("tag_name").removePrefix("v")
@@ -37,7 +37,7 @@ object Update {
             val a = assets.optJSONObject(i) ?: continue
             val name = a.optString("name")
             if (APK_NAME.matches(name)) apk = a
-            if (name == "SHA256SUMS.txt") sums = a.optString("browser_download_url").takeIf { it.startsWith("https://") }
+            if (name == "SHA256SUMS.txt") sums = a.optString("browser_download_url").takeIf { secure(it, allowHttp) }
         }
         apk ?: return null
         val name = apk.optString("name")
@@ -45,11 +45,14 @@ object Update {
         if (tagVersion.isNotEmpty() && tagVersion != version) return null
         if (compare(version, current) <= 0) return null
         val url = apk.optString("browser_download_url")
-        if (!url.startsWith("https://")) return null
+        if (!secure(url, allowHttp)) return null
         val digest = apk.optString("digest").removePrefix("sha256:").lowercase().takeIf { SHA.matches(it) }
         if (digest == null && sums == null) return null
         return UpdateInfo(version, name, url, apk.optLong("size", -1), digest, sums, j.optString("html_url"))
     }
+
+    /** Downloads only over https; plain http exists solely for the emulator test server of debug builds. */
+    private fun secure(url: String, allowHttp: Boolean) = url.startsWith("https://") || (allowHttp && url.startsWith("http://"))
 
     /** Line `<sha256>  <name>` from a SHA256SUMS.txt. */
     fun shaFromSums(text: String, name: String): String? = text.lineSequence()

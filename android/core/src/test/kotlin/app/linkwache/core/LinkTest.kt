@@ -47,6 +47,9 @@ class LinkTest {
         assertNull(Update.parseLatest(rel.replace("\"prerelease\":false", "\"prerelease\":true"), "0.5.0"))
         assertNull(Update.parseLatest(rel.replace("Linkwache-android-0.6.0.apk", "other.apk"), "0.5.0"))
         assertNull(Update.parseLatest(rel.replace("v0.6.0\",\"draft", "v0.7.0\",\"draft"), "0.5.0"))
+        val plain = rel.replace("https://github.com/o/r/releases/download", "http://10.0.2.2/x")
+        assertNull(Update.parseLatest(plain, "0.5.0"))
+        assertEquals("0.6.0", Update.parseLatest(plain, "0.5.0", allowHttp = true)!!.version)
         val noDigest = Update.parseLatest(rel.replace("\"digest\":\"sha256:${"a".repeat(64)}\"", "\"digest\":null"), "0.5.0")!!
         assertNull(noDigest.sha256)
         assertTrue(noDigest.sumsUrl!!.endsWith("SHA256SUMS.txt"))
