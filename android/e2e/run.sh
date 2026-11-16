@@ -260,6 +260,14 @@ if [ "${SHOTS_ONLY:-0}" != 1 ] && [ -n "${APK_RELEASE:-}" ] && [ -f "$APK_RELEAS
         sleep 0.5
       done
       [ -n "$res" ] && ok "release build: $res ($(checkms))" || fail "release build: no result"
+      # The release build must use the preset from the repository variable (host never in the repository).
+      if [ -n "${EXPECTED_SERVER:-}" ]; then
+        want=$(printf '%s' "$EXPECTED_SERVER" | sed -E 's#^https?://##; s#[/:].*$##' | tr -d '\n' | sha256sum | cut -c1-12)
+        line=$(adb logcat -d -s Linkwache:I | grep "check outcome" | tail -1)
+        if printf '%s' "$line" | grep -q "server=$want" && printf '%s' "$line" | grep -q "outcome=GRUEN source=SERVER"; then
+          ok "release build: green from the preset server (repository variable, tag $want)"
+        else fail "release build: expected a green server check against the preset server ($want), got: ${line##*check }"; fi
+      fi
     else fail "release build: no sheet"; fi
   else fail "release build: install"; fi
 fi

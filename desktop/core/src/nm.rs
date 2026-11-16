@@ -53,7 +53,7 @@ pub fn handle<A: CheckApi>(msg: &Value, paths: &Paths, app_version: &str, api_fo
     let id = msg.get("id").cloned().unwrap_or(Value::Null);
     let settings = match Settings::load(paths) {
         Some(s) => s,
-        None => Settings::load_or_create(paths, "", "en").unwrap_or_default(),
+        None => Settings::load_or_create(paths, &crate::settings::Preset::default(), "en").unwrap_or_default(),
     };
     let s = |k: &str| msg.get(k).and_then(|x| x.as_str()).unwrap_or("").to_string();
     match msg.get("type").and_then(|t| t.as_str()).unwrap_or("") {

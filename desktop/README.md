@@ -28,6 +28,12 @@ npm ci && npx tauri build             # full build (Linux needs libwebkit2gtk-4.
 `LINKWACHE_DEFAULT_SERVER` (build-time environment, a repository variable in CI) prefills the
 server address in the setup assistant. The address is never written into the source.
 
+The settings remember whether the address is the preset (`server_preset`). When a later release
+ships another preset, installations that follow it move along; an address the user entered
+stays. `LINKWACHE_PRESET_MIGRATE_FROM` (build-time, repository variable, addresses separated by
+commas or spaces) lists earlier presets: installations from 0.5.0/0.5.1, which stored the
+preset without that marker, move from those to the current preset.
+
 Command line (installer hooks, administrators, tests): `linkwache --help`.
 
 ## Releases

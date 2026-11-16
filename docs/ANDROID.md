@@ -138,7 +138,10 @@ LINKWACHE_DEFAULT_SERVER=https://example.org ./gradlew :app:assembleRelease   # 
 - `app/` is the Android app. `fakebrowser/` is a test helper for the emulator tests only.
 - The version follows `package.json`; `versionCode = major·10000 + minor·100 + patch`.
 - `LINKWACHE_DEFAULT_SERVER` sets the preset server address at build time (empty: the
-  setup assistant asks for one).
+  setup assistant asks for one). The app stores an address only when the user enters one
+  that differs from the preset, so installations follow a new preset by themselves.
+  `LINKWACHE_PRESET_MIGRATE_FROM` (build-time, earlier presets separated by commas or spaces)
+  drops a stored copy of an earlier preset at start; an address of the user's own stays.
 
 ### Continuous integration
 

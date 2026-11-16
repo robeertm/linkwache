@@ -51,4 +51,28 @@ class AndroidPartsTest {
         val old = p.installId
         assertTrue(p.resetInstallId() != old)
     }
+
+    @Test
+    fun builtInAddressMovesOwnAddressStays() {
+        val old = "https://old-preset.example"
+        val new = "https://new-preset.example"
+        val p = Prefs(ctx)
+        // 0.5.x stored nothing for the preset: follows the new one without any change
+        p.serverOverride = null
+        assertFalse(p.migrateServer(new, listOf(old)))
+        assertEquals(null, p.serverOverride)
+        // a stored copy of the old preset is dropped
+        p.serverOverride = "$old/"
+        assertTrue(p.migrateServer(new, listOf(old)))
+        assertEquals(null, p.serverOverride)
+        // an own address stays
+        p.serverOverride = "https://my-own.example"
+        assertFalse(p.migrateServer(new, listOf(old)))
+        assertEquals("https://my-own.example", p.serverOverride)
+        // empty preset: nothing is touched
+        p.serverOverride = old
+        assertFalse(p.migrateServer("", listOf(old)))
+        assertEquals(old, p.serverOverride)
+        p.serverOverride = null
+    }
 }

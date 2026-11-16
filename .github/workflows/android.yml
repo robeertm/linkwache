@@ -44,6 +44,7 @@ jobs:
         working-directory: android
         env:
           LINKWACHE_DEFAULT_SERVER: ${{ vars.LINKWACHE_DEFAULT_SERVER }}
+          LINKWACHE_PRESET_MIGRATE_FROM: ${{ vars.LINKWACHE_PRESET_MIGRATE_FROM }}
         run: >
           ./gradlew --no-daemon --stacktrace
           :core:test :app:testDebugUnitTest :app:lintDebug :app:lintRelease
@@ -117,6 +118,7 @@ jobs:
           APK_APP_NEXT: ${{ github.workspace }}/dist/app-debug-99.0.0.apk
           APK_FB: ${{ github.workspace }}/dist/fakebrowser-debug.apk
           APK_RELEASE: ${{ github.workspace }}/dist/app-release-debugsigned.apk
+          EXPECTED_SERVER: ${{ vars.LINKWACHE_DEFAULT_SERVER }}
           OUT: ${{ github.workspace }}/e2e-out
           DEVICE: ${{ matrix.device }}
           SHOTS_ONLY: ${{ matrix.shots_only }}

@@ -35,7 +35,7 @@ fn green() -> Value {
 fn setup() -> (tempfile::TempDir, Paths, Settings) {
     let dir = tempfile::tempdir().unwrap();
     let paths = Paths::new(dir.path());
-    let mut s = Settings::load_or_create(&paths, "https://lw.example", "en").unwrap();
+    let mut s = Settings::load_or_create(&paths, &linkwache_core::settings::Preset::server_only("https://lw.example"), "en").unwrap();
     s.setup_done = true;
     s.save(&paths).unwrap();
     (dir, paths, s)

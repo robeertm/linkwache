@@ -85,7 +85,8 @@ const UPDATE_INFO = {};
 const env = {
   ASSET_VER,
   SITE_NAME: process.env.SITE_NAME || "Linkwache",
-  SITE_URL: (process.env.SITE_URL || `http://localhost:${PORT}`).replace(/\/$/, ""),
+  // Öffentliche Adresse (canonical, hreflang, og:url, Links in Telegram/Mail). PUBLIC_URL hat Vorrang, SITE_URL ist der alte Name.
+  SITE_URL: (process.env.PUBLIC_URL || process.env.SITE_URL || `http://localhost:${PORT}`).replace(/\/+$/, ""),
   PAYPAL_ME: process.env.PAYPAL_ME || "",
   PAYPAL_MAIL: process.env.PAYPAL_MAIL || "",
   CONTACT_MAIL: process.env.CONTACT_MAIL || "",
@@ -137,6 +138,24 @@ for (const sig of ["SIGTERM", "SIGINT"]) process.on(sig, () => { flushStats(); p
 // Textantworten ab 1 KB gzip-komprimiert ausliefern (der DSM-Proxy komprimiert nicht).
 const COMPRESSIBLE = /^(text\/|application\/(json|javascript|manifest\+json)|image\/svg)/;
 
+// Hostnamen der früheren öffentlichen Adresse(n), kommagetrennt (linkwache.env). Leer = keine Umleitung.
+const LEGACY_HOSTS = new Set(String(process.env.LEGACY_HOSTS || "").split(/[\s,;]+/).map((h) => h.trim().toLowerCase().replace(/\.$/, "")).filter(Boolean));
+// Nur diese Seiten werden umgeleitet (GET/HEAD). Nie /api/*, /telegram, /admin oder Dateien.
+const PAGE_PATHS = /^\/(?:|index\.html|download(?:\/|\.html)?|impressum\.html|datenschutz\.html|kurzbefehl\.html|share|r\/[A-Za-z0-9_-]{1,32})$/;
+
+/** Ziel der Umleitung für eine Seite unter einer alten Adresse, sonst "". */
+function legacyRedirect(method, host, url, legacy = LEGACY_HOSTS, site = env.SITE_URL) {
+  if (!legacy.size || !["GET", "HEAD"].includes(method) || !/^https:\/\//.test(site)) return "";
+  const h = String(host || "").toLowerCase().replace(/:\d+$/, "").replace(/\.$/, "");
+  if (!legacy.has(h)) return "";
+  let target;
+  try { target = new URL(site); } catch { return ""; }
+  if (h === target.hostname.toLowerCase()) return "";
+  const pathOnly = String(url || "/").split("?")[0];
+  if (!PAGE_PATHS.test(pathOnly)) return "";
+  return target.origin + target.pathname.replace(/\/+$/, "") + (String(url || "/").startsWith("/") ? url : "/" + url);
+}
+
 http.createServer(async (req, res) => {
   try {
     // Größe beim LESEN begrenzen — vorher wurde alles in den Speicher geholt und erst dann geprüft (300 MB = Absturz).
@@ -158,6 +177,13 @@ http.createServer(async (req, res) => {
     headers.set("cf-connecting-ip", ip);
     const proto = String(req.headers["x-forwarded-proto"] || "http");
     const host = String(req.headers["x-forwarded-host"] || req.headers.host || "localhost");
+    // Alte Adresse (LEGACY_HOSTS): nur HTML-Seiten auf die öffentliche Adresse umleiten. Die API, der Telegram-Webhook
+    // und alle Dateien bleiben unter der alten Adresse erreichbar — installierte Apps sprechen sie dort an.
+    const legacyTarget = legacyRedirect(req.method, host, req.url);
+    if (legacyTarget) {
+      res.writeHead(301, { ...SECURITY, location: legacyTarget, "cache-control": "max-age=3600" });
+      res.end(); return;
+    }
     // Kommt jemand über http (Port 80 am Reverse-Proxy), schicken wir ihn auf die https-Adresse.
     if (req.headers["x-forwarded-proto"] === "http" && env.SITE_URL.startsWith("https://") && !req.url.startsWith("/api/health")) {
       res.writeHead(["GET", "HEAD"].includes(req.method) ? 301 : 308, { ...SECURITY, location: env.SITE_URL + req.url });

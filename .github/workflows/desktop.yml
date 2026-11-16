@@ -69,6 +69,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       LINKWACHE_DEFAULT_SERVER: ${{ vars.LINKWACHE_DEFAULT_SERVER }}
+      LINKWACHE_PRESET_MIGRATE_FROM: ${{ vars.LINKWACHE_PRESET_MIGRATE_FROM }}
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
       TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
       WINDOWS_SIGN_MODE: ${{ secrets.WINDOWS_SIGN_MODE }}
@@ -252,6 +253,10 @@ jobs:
           path: dist/raw
           merge-multiple: true
       - name: Browser extension packages (if the extension is part of this tree)
+        env:
+          # Same preset as the apps (repository variables); 0.5.0/0.5.1 shipped the extension without one.
+          LINKWACHE_DEFAULT_SERVER: ${{ vars.LINKWACHE_DEFAULT_SERVER }}
+          LINKWACHE_PRESET_MIGRATE_FROM: ${{ vars.LINKWACHE_PRESET_MIGRATE_FROM }}
         run: |
           npm ci
           npm run build:extension --if-present

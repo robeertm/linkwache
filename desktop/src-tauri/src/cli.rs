@@ -2,7 +2,7 @@
 //! end-to-end tests. `linkwache --help` lists them.
 
 use crate::platform;
-use crate::state::{default_server, system_locale, VERSION};
+use crate::state::{preset, system_locale, VERSION};
 use linkwache_core::forward::{is_self, ForwardTarget, Kind};
 use linkwache_core::link::{valid_server, Scope};
 use linkwache_core::settings::{Settings, LANGS};
@@ -70,11 +70,11 @@ fn parse_kind(k: &str) -> Option<Kind> {
 
 fn configure(pairs: &[String]) -> Result<Value, String> {
     let paths = Paths::default_location();
-    let mut s = Settings::load_or_create(&paths, default_server(), &system_locale()).map_err(|e| e.to_string())?;
+    let mut s = Settings::load_or_create(&paths, &preset(), &system_locale()).map_err(|e| e.to_string())?;
     for p in pairs {
         let (k, v) = p.split_once('=').ok_or_else(|| format!("expected KEY=VALUE: {p}"))?;
         match k {
-            "server" => s.server = valid_server(v).ok_or("invalid server address")?,
+            "server" => s.set_server(valid_server(v).ok_or("invalid server address")?, &preset()),
             "lang" if LANGS.contains(&v) => s.lang = v.into(),
             "scope" => s.scope = Scope::parse(v),
             "setup-done" => s.setup_done = v == "1" || v == "true",

@@ -14,6 +14,7 @@ import app.linkwache.android.ui.LinkwacheTheme
 import app.linkwache.android.ui.MainScreen
 import app.linkwache.android.update.Updater
 import app.linkwache.core.Link
+import app.linkwache.core.ServerPreset
 import app.linkwache.core.UpdateInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -91,7 +92,8 @@ class MainActivity : ComponentActivity(), HomeModel.Host {
 
     override fun setServer(s: String): Boolean {
         val v = Link.validServer(s) ?: return false
-        lw.prefs.serverOverride = if (v == Link.validServer(BuildConfig.DEFAULT_SERVER)) null else v
+        // The current or an earlier built-in address keeps following the preset; anything else is the user's own.
+        lw.prefs.serverOverride = ServerPreset.keepOverride(v, BuildConfig.DEFAULT_SERVER, Prefs.PRESET_MIGRATE_FROM)
         lw.cache.clear()
         refresh()
         return true

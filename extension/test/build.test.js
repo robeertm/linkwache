@@ -11,7 +11,7 @@ import pkg from "../../package.json" with { type: "json" };
 const EXT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = path.join(EXT, "dist");
 const rd = (...p) => fs.readFileSync(path.join(DIST, ...p), "utf8");
-before(() => { execFileSync(process.execPath, [path.join(EXT, "scripts", "build.mjs")], { env: { ...process.env, LINKWACHE_DEFAULT_SERVER: "" }, stdio: "pipe" }); });
+before(() => { execFileSync(process.execPath, [path.join(EXT, "scripts", "build.mjs")], { env: { ...process.env, LINKWACHE_DEFAULT_SERVER: "", LINKWACHE_PRESET_MIGRATE_FROM: "" }, stdio: "pipe" }); });
 
 test("chromium: fixed id from the manifest key, service worker, MV3", () => {
   const m = JSON.parse(rd("chromium", "manifest.json"));

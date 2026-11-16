@@ -2,6 +2,29 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
+## 0.5.2 — 2026-11-16
+
+### Fixed
+- Desktop app, browser extension and Android app follow the built-in server address instead of freezing it: the
+  desktop settings and the extension storage now record whether the address is the preset. When a release ships a
+  new preset, installations that follow it move along; an address the user entered stays untouched.
+  Installations from 0.5.0/0.5.1 move from the earlier presets listed in the build-time variable
+  `LINKWACHE_PRESET_MIGRATE_FROM` (repository variable, never in the source). On Android a stored copy of an earlier
+  preset is dropped at start.
+- The browser extension packages of 0.5.0/0.5.1 were built without the preset server address; the release job now
+  passes it (and the migration list) to the extension build. An empty address from those packages gets the preset.
+- Pages name the configured public address only: new `rel="canonical"`, `hreflang` (plus `x-default`) and
+  `og:url` come from `PUBLIC_URL` (the older `SITE_URL` still works).
+- Outgoing requests (link shortener lookups, page fetches) name the project page in the user agent instead of a
+  domain that is not part of the project.
+
+### Added
+- `LEGACY_HOSTS` (operator setting): HTML pages requested under an earlier host name answer 301 to the public
+  address. The API, the Telegram webhook, the admin page and all files are never redirected, so installed apps keep
+  working with the address they were built with.
+- The Android release smoke test confirms the green check came from the preset server (compared as a hash, the
+  address never appears in logs).
+
 ## 0.5.1 — 2026-11-16
 
 ### Changed

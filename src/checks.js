@@ -4,7 +4,7 @@
 //
 // Stufen: "rot" = klares Warnzeichen · "gelb" = auffällig · "info" = gut zu
 // wissen · "gruen" = spricht für die Seite.
-import { hostInfo, SHORTENERS, fetchTimeout, daysBetween } from "./util.js";
+import { hostInfo, SHORTENERS, fetchTimeout, daysBetween, UA } from "./util.js";
 
 // Endungen, die in Betrugskampagnen weit überproportional vorkommen (Spamhaus/
 // Cloudflare-Radar-Listen, Stand 2026) und praktisch nie bei deutschen Firmen.
@@ -109,7 +109,7 @@ export async function unwrapShortener(url) {
     const h = hostInfo(cur);
     if (!SHORTENERS.has(h.domain)) break;
     try {
-      const r = await fetchTimeout(cur, { method: "HEAD", redirect: "manual", headers: { "user-agent": "Linkwache/1.0 (+https://linkwache.de)" } }, 5000);
+      const r = await fetchTimeout(cur, { method: "HEAD", redirect: "manual", headers: { "user-agent": UA } }, 5000);
       const loc = r.headers.get("location");
       if (!loc) break;
       cur = new URL(loc, cur).href;

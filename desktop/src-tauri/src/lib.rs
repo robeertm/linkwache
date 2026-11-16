@@ -14,7 +14,7 @@ mod updates;
 use linkwache_core::api::{HttpApi, DEFAULT_TIMEOUT};
 use linkwache_core::settings::Settings;
 use linkwache_core::store::Paths;
-use state::{default_server, system_locale, AppState, VERSION};
+use state::{preset, system_locale, AppState, VERSION};
 use tauri::{AppHandle, Manager, RunEvent};
 
 /// Arguments that are links/files (not our own flags, not the program path).
@@ -24,7 +24,7 @@ fn link_args(args: &[String]) -> Vec<String> {
 
 fn native_messaging_host() -> i32 {
     let paths = Paths::default_location();
-    let _ = Settings::load_or_create(&paths, default_server(), &system_locale());
+    let _ = Settings::load_or_create(&paths, &preset(), &system_locale());
     let stdin = std::io::stdin();
     let stdout = std::io::stdout();
     let r = linkwache_core::nm::serve(&mut stdin.lock(), &mut stdout.lock(), &paths, VERSION, &|s: &Settings| HttpApi::new(&s.server, &s.install_id, VERSION, DEFAULT_TIMEOUT));

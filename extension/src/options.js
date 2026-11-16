@@ -1,6 +1,7 @@
 // Options page: server address, what is sent, language, allowlist, pause, desktop app status, local log.
 import { api } from "./api.js";
-import { getAll, set, validServer, randomHex } from "./store.js";
+import { getAll, set, validServer, randomHex, PRESET } from "./store.js";
+import { presetMarkFor } from "./preset.js";
 import { t, pickLang, LANGS } from "./i18n.js";
 
 const $ = (id) => document.getElementById(id);
@@ -44,7 +45,7 @@ async function saveSettings() {
   const ok = !server || validServer(server);
   $("serverBad").hidden = ok;
   if (!ok) return;
-  st.settings = { ...st.settings, server, scope: document.querySelector("input[name=scope]:checked").value, paused: $("paused").checked, lang: $("lang").value };
+  st.settings = { ...st.settings, server, serverPreset: presetMarkFor(server, PRESET), scope: document.querySelector("input[name=scope]:checked").value, paused: $("paused").checked, lang: $("lang").value };
   await set({ settings: st.settings });
   lang = pickLang(st.settings.lang, (api.i18n && api.i18n.getUILanguage && api.i18n.getUILanguage()) || navigator.language);
   texts(); lists(); flash(t(lang, "ext.o.saved"));

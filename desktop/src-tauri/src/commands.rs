@@ -91,7 +91,7 @@ pub async fn set_lang(app: AppHandle, lang: String) -> R<()> {
 pub async fn set_server(app: AppHandle, url: String) -> R<String> {
     let v = valid_server(&url).ok_or("invalid")?;
     let out = v.clone();
-    app.state::<AppState>().update_settings(|s| s.server = v);
+    app.state::<AppState>().update_settings(|s| s.set_server(v, &crate::state::preset()));
     changed(&app);
     Ok(out)
 }

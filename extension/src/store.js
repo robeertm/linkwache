@@ -1,11 +1,19 @@
 // chrome.storage.local wrapper: settings, allowlist, cache, log, install id.
 import { api } from "./api.js";
+import { normServer, parsePresetList, applyPreset } from "./preset.js";
 
-export const DEFAULTS = { server: typeof LW_DEFAULT_SERVER === "string" ? LW_DEFAULT_SERVER : "", scope: "url", paused: false, lang: "auto" };
+/** Built-in server address and earlier ones to move away from (build-time, see scripts/build.mjs). */
+export const PRESET = normServer(typeof LW_DEFAULT_SERVER === "string" ? LW_DEFAULT_SERVER : "");
+export const PRESET_MIGRATE_FROM = parsePresetList(typeof LW_PRESET_MIGRATE_FROM === "string" ? LW_PRESET_MIGRATE_FROM : "", PRESET);
+
+export const DEFAULTS = { server: PRESET, serverPreset: PRESET, scope: "url", paused: false, lang: "auto" };
 
 export async function getAll() {
   const r = await api.storage.local.get(["settings", "allow", "cache", "log", "install"]);
-  return { settings: { ...DEFAULTS, ...(r.settings || {}) }, allow: r.allow || [], cache: r.cache || {}, log: r.log || [], install: r.install || "" };
+  const stored = r.settings || {};
+  const settings = { scope: "url", paused: false, lang: "auto", ...stored };
+  if (applyPreset(settings, PRESET, PRESET_MIGRATE_FROM)) await api.storage.local.set({ settings });
+  return { settings, allow: r.allow || [], cache: r.cache || {}, log: r.log || [], install: r.install || "" };
 }
 export const set = (o) => api.storage.local.set(o);
 

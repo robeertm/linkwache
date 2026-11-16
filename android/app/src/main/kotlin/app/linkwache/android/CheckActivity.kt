@@ -125,7 +125,7 @@ class CheckActivity : ComponentActivity(), SheetActions {
     private fun show(r: CheckResult, t0: Long) {
         val ms = SystemClock.elapsedRealtime() - t0
         result = r.copy(elapsedMs = ms)
-        Log.i(TAG, "check outcome=${r.outcome} source=${r.source} reason=${r.reason} ms=$ms")
+        Log.i(TAG, "check outcome=${r.outcome} source=${r.source} reason=${r.reason} ms=$ms server=${serverTag(lw.prefs.server)}")
         state = SheetState.Done(result!!, Browsers.label(this, lw.prefs.forwardPackage))
         if (r.outcome == Outcome.GRUEN) {
             lifecycleScope.launch {
@@ -179,5 +179,12 @@ class CheckActivity : ComponentActivity(), SheetActions {
     companion object {
         const val TAG = "Linkwache"
         const val EXTRA_CUSTOM_TABS_SESSION = "android.support.customtabs.extra.SESSION"
+    }
+
+    /** First 12 hex digits of SHA-256(host): lets tests confirm the server without the address in any log. */
+    private fun serverTag(server: String?): String {
+        val host = server?.substringAfter("://")?.substringBefore('/')?.substringBefore(':') ?: return "none"
+        val d = java.security.MessageDigest.getInstance("SHA-256").digest(host.toByteArray())
+        return d.take(6).joinToString("") { "%02x".format(it) }
     }
 }

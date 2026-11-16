@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import app.linkwache.core.EngineSettings
 import app.linkwache.core.Link
 import app.linkwache.core.Scope
+import app.linkwache.core.ServerPreset
 import org.json.JSONArray
 import org.json.JSONObject
 import java.security.SecureRandom
@@ -23,7 +24,21 @@ class Prefs(context: Context) {
         set(v) = sp.edit().putString("server", v).apply()
 
     val server: String?
-        get() = Link.validServer(serverOverride) ?: Link.validServer(BuildConfig.DEFAULT_SERVER)
+        get() = ServerPreset.effective(serverOverride, BuildConfig.DEFAULT_SERVER, PRESET_MIGRATE_FROM)
+
+    /**
+     * Drop a stored address that only repeats the current or an earlier built-in one, so the
+     * installation follows the preset again. An address of the user's own stays. Returns true when
+     * something was removed.
+     */
+    fun migrateServer(preset: String = BuildConfig.DEFAULT_SERVER, migrateFrom: List<String> = PRESET_MIGRATE_FROM): Boolean {
+        val stored = serverOverride ?: return false
+        if (Link.validServer(preset) == null) return false
+        val keep = ServerPreset.keepOverride(stored, preset, migrateFrom)
+        if (keep == stored) return false
+        serverOverride = keep
+        return true
+    }
 
     var forwardPackage: String?
         get() = sp.getString("forward", null)
@@ -101,5 +116,7 @@ class Prefs(context: Context) {
 
     companion object {
         const val MAX_HISTORY = 200
+        /** Earlier built-in addresses (build-time list, see app/build.gradle.kts). */
+        val PRESET_MIGRATE_FROM: List<String> by lazy { ServerPreset.parseList(BuildConfig.PRESET_MIGRATE_FROM, BuildConfig.DEFAULT_SERVER) }
     }
 }

@@ -79,7 +79,7 @@ export async function sha256hex(s) {
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-export const UA = "Linkwache/1.0 (+https://linkwache.de; Link-Pruefung ohne Aufruf der Zielseite)";
+export const UA = "Linkwache/1.0 (+https://github.com/robeertm/linkwache; Link-Pruefung ohne Aufruf der Zielseite)";
 
 /** fetch mit Zeitlimit und Absenderkennung (rdap.org antwortet ohne User-Agent mit 403). */
 export async function fetchTimeout(url, init = {}, ms = 6000) {

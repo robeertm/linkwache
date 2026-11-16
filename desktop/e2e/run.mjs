@@ -387,6 +387,38 @@ function casePrivacy() {
   record("client header desktop/<version>", reqs.every((r) => /^desktop\/\d+\.\d+\.\d+/.test(r.client || "")));
 }
 
+// Built-in server address (repository variables): a fresh install takes the preset, settings of 0.5.0/0.5.1 that
+// still hold an earlier preset move to the current one, an own address stays. Never logs an address.
+function casePresetMove() {
+  const norm = (s) => { try { return new URL(String(s).trim()).href.replace(/\/+$/, ""); } catch { return ""; } };
+  const preset = norm(process.env.LINKWACHE_DEFAULT_SERVER || "");
+  const earlier = String(process.env.LINKWACHE_PRESET_MIGRATE_FROM || "").split(/[\s,;]+/).map(norm).filter((x) => x && x !== preset);
+  if (!preset || !earlier.length) { notes.push("preset move: skipped (no preset or no earlier preset in this build)"); return; }
+  const st = cli(["--status"]).json || {};
+  const file = st.configDir ? path.join(st.configDir, "settings.json") : "";
+  let original;
+  try { original = fs.readFileSync(file, "utf8"); } catch { record("preset move: settings file after the first start", false, "missing"); return; }
+  const read = () => JSON.parse(fs.readFileSync(file, "utf8"));
+  const fresh = read();
+  record("preset move: fresh install takes the built-in address", fresh.server === preset && fresh.server_preset === preset);
+  try {
+    // settings.json as 0.5.1 wrote it: the earlier preset, no server_preset field
+    const legacy = { ...fresh, server: earlier[0] + "/", setup_done: true };
+    delete legacy.server_preset;
+    fs.writeFileSync(file, JSON.stringify(legacy, null, 2));
+    const c1 = cli(["--configure"]);
+    const moved = read();
+    record("preset move: 0.5.1 settings with the earlier preset move to the current one", c1.code === 0 && moved.server === preset && moved.server_preset === preset && moved.install_id === fresh.install_id && moved.setup_done === true);
+    const own = { ...legacy, server: "https://own-server.example" };
+    fs.writeFileSync(file, JSON.stringify(own, null, 2));
+    cli(["--configure"]);
+    const kept = read();
+    record("preset move: an own address stays", kept.server === "https://own-server.example" && !kept.server_preset);
+  } finally {
+    fs.writeFileSync(file, original);
+  }
+}
+
 async function caseShipped() {
   if (!SHIPPED) return;
   await quitApp();
@@ -435,6 +467,7 @@ async function main() {
   await sleep(1200);
   screenshot("setup-assistant");
   await quitApp(first);
+  casePresetMove();
 
   const conf = cli(["--configure", `server=${SERVER}`, `forward=${forwardSpec}`, "setup-done=1", "lang=en", "update-check=0", "autostart=0"]);
   record("configure server + forward target", conf.code === 0, conf.out.trim().slice(0, 200));

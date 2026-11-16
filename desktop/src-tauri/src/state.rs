@@ -3,7 +3,7 @@
 
 use linkwache_core::api::{HttpApi, DEFAULT_TIMEOUT};
 use linkwache_core::engine::{CheckResult, Prepared};
-use linkwache_core::settings::Settings;
+use linkwache_core::settings::{Preset, Settings};
 use linkwache_core::store::Paths;
 use serde::Serialize;
 use std::collections::HashMap;
@@ -16,6 +16,16 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 /// Build-time default server (repository variable in CI); never hard-coded in the source.
 pub fn default_server() -> &'static str {
     option_env!("LINKWACHE_DEFAULT_SERVER").unwrap_or("")
+}
+
+/// Earlier built-in addresses (repository variable in CI) that installations still following the
+/// preset move away from; installations from 0.5.0/0.5.1 did not record that they follow it.
+pub fn preset_migrate_from() -> &'static str {
+    option_env!("LINKWACHE_PRESET_MIGRATE_FROM").unwrap_or("")
+}
+
+pub fn preset() -> Preset {
+    Preset::new(default_server(), preset_migrate_from())
 }
 
 pub fn system_locale() -> String {
@@ -79,7 +89,7 @@ impl AppState {
     }
 
     pub fn settings(&self) -> Settings {
-        Settings::load_or_create(&self.paths, default_server(), &system_locale()).unwrap_or_default()
+        Settings::load_or_create(&self.paths, &preset(), &system_locale()).unwrap_or_default()
     }
 
     /// Read-modify-write of the settings file.

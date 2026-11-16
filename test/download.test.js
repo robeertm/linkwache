@@ -151,7 +151,7 @@ test("no inline script, no inline handler, no external resources on the page (CS
     const inline = [...h.matchAll(/<script\b([^>]*)>/g)].filter((m) => !/\bsrc=/.test(m[1]) && !/type="application\/json"/.test(m[1]));
     assert.equal(inline.length, 0, l);
     assert.ok(!/\son[a-z]+\s*=/i.test(h), l + " inline handler");
-    assert.ok(!/<(img|script|link)[^>]+(src|href)="https?:\/\/(?!github\.com)/.test(h.replace(/rel="alternate"[^>]*>/g, "")), l);
+    assert.ok(!/<(img|script|link)[^>]+(src|href)="https?:\/\/(?!github\.com)/.test(h.replace(/rel="(alternate|canonical)"[^>]*>/g, "")), l);
   }
 });
 

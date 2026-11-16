@@ -13,6 +13,8 @@ class LinkwacheApp : Application() {
     override fun onCreate() {
         super.onCreate()
         prefs = Prefs(this)
+        // Installations that follow the built-in address move along with it (an own address stays).
+        if (prefs.migrateServer()) cache.clear()
         // Load the suffix list and the cache early so the first link is checked quickly.
         thread(name = "lw-warmup", isDaemon = true) {
             Psl.suffix("warm.example.org")

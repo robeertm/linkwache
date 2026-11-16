@@ -12,6 +12,11 @@ export function paypalLink(env) {
   return "";
 }
 
+/** The public address of this installation (operator setting PUBLIC_URL / SITE_URL), without a trailing slash. */
+export function siteUrl(env) {
+  return String(env.SITE_URL || "").replace(/\/+$/, "");
+}
+
 function langSwitch(lang, path) {
   // kein Inline-JavaScript mehr: der Pfad steckte in onchange und ließ sich über /r/<id> zu Code machen (XSS)
   return `<select class="lang" aria-label="Language" data-path="${esc(path)}">` +
@@ -25,9 +30,9 @@ export function page({ lang, title, body, env, noindex = false, extraHead = "", 
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(t(lang, "site.desc"))}">
-${noindex ? '<meta name="robots" content="noindex">' : LANGS.map((l) => `<link rel="alternate" hreflang="${l}" href="${esc(env.SITE_URL)}${esc(path)}?lang=${l}">`).join("")}
+${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" href="${esc(siteUrl(env))}${esc(path)}?lang=${lang}">` + LANGS.map((l) => `<link rel="alternate" hreflang="${l}" href="${esc(siteUrl(env))}${esc(path)}?lang=${l}">`).join("") + `<link rel="alternate" hreflang="x-default" href="${esc(siteUrl(env))}${esc(path)}">`}
 <link rel="stylesheet" href="/style.css?v=${esc(env.ASSET_VER || "1")}"><script src="/theme.js?v=${esc(env.ASSET_VER || "1")}"></script><link rel="icon" href="/icon.svg"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#0c0d16">
-<meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(t(lang, "site.desc"))}">
+<meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(t(lang, "site.desc"))}"><meta property="og:url" content="${esc(siteUrl(env))}${esc(path)}">
 ${extraHead}<script type="application/json" id="lw">${JSON.stringify(cfg).replace(/</g, "\\u003c")}</script></head><body>
 <header class="top"><a class="brand" href="/?lang=${lang}"><span class="wappen"><img src="/icon.svg" alt=""></span><span>${esc(env.SITE_NAME || "Linkwache")}<small>${esc(t(lang, "site.tagline"))}</small></span></a>
 <nav><a href="/?lang=${lang}#so-gehts">${esc(t(lang, "nav.how"))}</a><a href="/download?lang=${lang}">${tp(lang, "dl.nav", env)}</a><a href="/impressum.html">${esc(t(lang, "nav.legal"))}</a><button class="theme" id="theme" type="button" aria-label="Theme">🌙</button>${langSwitch(lang, path)}</nav></header>

@@ -26,7 +26,7 @@ simple = { limit = 20, period = 60 }
 [vars]
 SITE_NAME = "Linkwache"
 # Öffentliche Adresse der Seite (für Ergebnis-Links in Mail/Telegram). Ohne Schrägstrich am Ende.
-SITE_URL = "https://linkwache.de"
+SITE_URL = "https://linkwache.example.org"
 # Spendenknopf: PayPal.me-Name ODER PayPal-Mailadresse (leer = kein Knopf)
 PAYPAL_ME = ""
 PAYPAL_MAIL = ""
