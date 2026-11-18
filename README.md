@@ -132,6 +132,28 @@ installs with one click after verifying the update signature, keeping a backup o
 version; settings, allowlist and history stay. Design and API: [docs/DESKTOP.md](docs/DESKTOP.md),
 [docs/API.md](docs/API.md); building and signing: [desktop/README.md](desktop/README.md).
 
+## Reserve server (fallback)
+
+The apps (desktop app, browser extension including Safari, Android app) can switch to a **reserve server** when
+the main server is unreachable (timeout, no connection, server error). The reserve is the same check code
+(`src/reserve.js`) as a Cloudflare Worker that serves only the app API, with nothing stored (no KV, logging off).
+It is used only with the built-in server address; a user who entered an own server never uses it. The full
+contract (when to switch, time budget, switching back) is in [docs/FALLBACK.md](docs/FALLBACK.md).
+
+- **Build variable:** `LINKWACHE_FALLBACK_SERVER` (e.g. `https://<name>.<account>.workers.dev`), read at build time
+  like `LINKWACHE_DEFAULT_SERVER`; in CI the repository variable of the same name. Empty = no reserve.
+- **Deploy:**
+  ```
+  npx wrangler deploy -c deploy/cloudflare/wrangler.toml
+  npx wrangler secret put SAFE_BROWSING_KEY -c deploy/cloudflare/wrangler.toml   # optional, recommended
+  ```
+  Free plan: 100,000 requests a day; one check is one request plus about eight sub-requests (limit 50).
+- **Watchdog:** a monitor can probe the reserve with `"probe": true` (see [docs/API.md](docs/API.md)).
+- **Privacy:** only while the main server is down, the app sends the same check request to the reserve (link
+  reduced as usual, language, scope, random installation id, app name/version); Cloudflare technically also sees the
+  device's IP address. Nothing is stored there; rate limits use hashed in-memory keys. Cloudflare acts as processor;
+  the privacy page of the site describes it.
+
 ## Stack
 
 One Cloudflare Worker (`src/index.js`) with static assets, a KV namespace for results (90 days,

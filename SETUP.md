@@ -140,6 +140,18 @@ trägst du selbst ein. `.dev.vars` (lokale Schlüssel für `wrangler dev`) ist i
 
 ---
 
+## Reserve-Server (optional)
+
+Fällt der Hauptserver aus, können die Apps auf einen Reserve-Server ausweichen (nur ohne eigene Serveradresse).
+Der Reserve-Server ist ein kleiner Cloudflare-Worker nur für die App-Schnittstelle, ohne Speicher:
+
+```
+npx wrangler deploy -c deploy/cloudflare/wrangler.toml
+npx wrangler secret put SAFE_BROWSING_KEY -c deploy/cloudflare/wrangler.toml   # optional
+```
+Dann die ausgegebene Adresse als Repository-Variable `LINKWACHE_FALLBACK_SERVER` eintragen, damit die nächsten
+App-Builds sie kennen. Einzelheiten: `docs/FALLBACK.md`. Die Datenschutzseite beschreibt die Reserve bereits.
+
 ## Variante B · Selbst gehostet auf einer Synology (oder jedem Docker-Host)
 
 Statt Cloudflare: derselbe Code als Node-Dienst im Container (`server/index.js`, `Dockerfile`,

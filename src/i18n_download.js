@@ -22,6 +22,7 @@ DOWNLOAD.de = {
   "dl.android.soon": "Android: kommt bald.", "dl.android.soon.p": "Bis dahin: Link in der Android-„Teilen“-Auswahl an die Linkwache schicken (siehe Startseite).",
   "dl.ios.h": "iPhone und iPad", "dl.ios.p": "Für Apple-Handys gibt es keine App zum Laden — mit dem Kurzbefehl prüfst du Links direkt aus dem „Teilen“-Menü.", "dl.ios.link": "Zum Kurzbefehl",
   "dl.none.h": "Die Downloads werden gerade vorbereitet", "dl.none.p": "Eine veröffentlichte Version ist gerade nicht abrufbar. Bitte in ein paar Minuten noch einmal schauen — oder direkt auf der Release-Seite nachsehen.", "dl.none.link": "Release-Seite auf GitHub öffnen",
+  "dl.reserve": "Ist der Hauptserver nicht erreichbar, weichen die Apps auf einen Reserveserver aus — nur mit der eingebauten Serveradresse. Einzelheiten im <a href=\"/datenschutz.html?lang={lang}\">Datenschutz</a>.",
   "dl.win.h": "Windows: die erste Warnung",
   "dl.win.p": "Der Installer ist noch nicht mit einem Entwicklerzertifikat signiert. Deshalb zeigt Windows SmartScreen beim ersten Start eine blaue Meldung. Das ist bei neuer, unsignierter Software normal. Prüfe optional die Prüfsumme (unten) und gehe so vor:",
   "dl.win.s1": "Auf <b>Weitere Informationen</b> klicken.", "dl.win.s2": "Dann auf <b>Trotzdem ausführen</b> klicken.",
@@ -61,7 +62,7 @@ DOWNLOAD.de = {
   "privacy.app.5": "<b>Update-Suche:</b> Die Apps fragen direkt bei der GitHub-API nach einer neuen Fassung (öffentliche Release-Liste dieses Projekts). Dabei sieht GitHub deine IP-Adresse; die Linkwache erfährt davon nichts. Die Suche lässt sich in den Einstellungen abschalten.",
   "privacy.dl.h": "Download-Seite",
   "privacy.dl.p": "Die Dateien auf der Download-Seite liegen bei GitHub (Release-Speicher des Code-Hosts, GitHub Inc., USA); beim Herunterladen sieht GitHub deine IP-Adresse. Die Linkwache selbst liefert die Dateien nicht aus und setzt dabei nichts auf deinem Gerät.",
-  "privacy.stand": "Stand: 16. November 2026. Diese Übersetzung dient dem Verständnis; maßgeblich ist die deutsche Fassung.",
+  "privacy.stand": "Stand: 18. November 2026. Diese Übersetzung dient dem Verständnis; maßgeblich ist die deutsche Fassung.",
 };
 
 DOWNLOAD.en = {
@@ -82,6 +83,7 @@ DOWNLOAD.en = {
   "dl.android.soon": "Android: coming soon.", "dl.android.soon.p": "Until then: send links to Linkwache from the Android “Share” sheet (see the home page).",
   "dl.ios.h": "iPhone and iPad", "dl.ios.p": "There is no app to download for Apple phones — the shortcut checks links straight from the “Share” menu.", "dl.ios.link": "Go to the shortcut",
   "dl.none.h": "Downloads are being prepared", "dl.none.p": "No published version can be fetched right now. Please look again in a few minutes — or check the releases page directly.", "dl.none.link": "Open the releases page on GitHub",
+  "dl.reserve": "If the main server is unreachable, the apps fall back to a reserve server — only with the built-in server address. Details in the <a href=\"/datenschutz.html?lang={lang}\">privacy notice</a>.",
   "dl.win.h": "Windows: the first warning",
   "dl.win.p": "The installer is not signed with a developer certificate yet, so Windows SmartScreen shows a blue notice on first start. That is normal for new, unsigned software. Optionally check the checksum (below) and proceed like this:",
   "dl.win.s1": "Click <b>More info</b>.", "dl.win.s2": "Then click <b>Run anyway</b>.",
@@ -121,7 +123,7 @@ DOWNLOAD.en = {
   "privacy.app.5": "<b>Update check:</b> the apps ask the GitHub API directly for a new version (the public release list of this project). GitHub sees your IP address when they do; Linkwache learns nothing about it. The check can be switched off in the settings.",
   "privacy.dl.h": "Download page",
   "privacy.dl.p": "The files on the download page are hosted by GitHub (release storage of the code host, GitHub Inc., USA); when you download, GitHub sees your IP address. Linkwache itself does not serve the files and sets nothing on your device in doing so.",
-  "privacy.stand": "Last updated: 16 November 2026. This translation is for understanding; the German version is authoritative.",
+  "privacy.stand": "Last updated: 18 November 2026. This translation is for understanding; the German version is authoritative.",
 };
 
 DOWNLOAD.tr = {
@@ -142,6 +144,7 @@ DOWNLOAD.tr = {
   "dl.android.soon": "Android: yakında.", "dl.android.soon.p": "O zamana kadar: Android’in “Paylaş” menüsünden bağlantıları Linkwache’ye gönder (ana sayfaya bak).",
   "dl.ios.h": "iPhone ve iPad", "dl.ios.p": "Apple telefonlar için indirilecek bir uygulama yok — kısayol, bağlantıları doğrudan “Paylaş” menüsünden kontrol eder.", "dl.ios.link": "Kısayola git",
   "dl.none.h": "İndirmeler hazırlanıyor", "dl.none.p": "Şu anda yayımlanmış bir sürüme ulaşılamıyor. Birkaç dakika sonra tekrar bak — ya da doğrudan sürümler sayfasına göz at.", "dl.none.link": "GitHub’da sürümler sayfasını aç",
+  "dl.reserve": "Ana sunucuya ulaşılamazsa uygulamalar bir yedek sunucuya geçer — yalnızca yerleşik sunucu adresiyle. Ayrıntılar <a href=\"/datenschutz.html?lang={lang}\">gizlilik bildiriminde</a>.",
   "dl.win.h": "Windows: ilk uyarı",
   "dl.win.p": "Yükleyici henüz bir geliştirici sertifikasıyla imzalı değil; bu yüzden Windows SmartScreen ilk başlatmada mavi bir bildirim gösterir. Yeni, imzasız yazılımlarda bu normaldir. İstersen aşağıdaki sağlama toplamını kontrol et ve şöyle devam et:",
   "dl.win.s1": "<b>Daha fazla bilgi</b>’ye tıkla.", "dl.win.s2": "Sonra <b>Yine de çalıştır</b>’a tıkla.",
@@ -181,7 +184,7 @@ DOWNLOAD.tr = {
   "privacy.app.5": "<b>Güncelleme kontrolü:</b> Uygulamalar yeni sürümü doğrudan GitHub API’sine sorar (bu projenin herkese açık sürüm listesi). Bu sırada GitHub IP adresini görür; Linkwache bundan haberdar olmaz. Kontrol ayarlardan kapatılabilir.",
   "privacy.dl.h": "İndirme sayfası",
   "privacy.dl.p": "İndirme sayfasındaki dosyalar GitHub’da barındırılır (kod barındırıcısının sürüm deposu, GitHub Inc., ABD); indirirken GitHub IP adresini görür. Linkwache dosyaları kendisi sunmaz ve bu sırada cihazına hiçbir şey kaydetmez.",
-  "privacy.stand": "Güncelleme: 16 Kasım 2026. Bu çeviri anlamak içindir; bağlayıcı olan Almanca metindir.",
+  "privacy.stand": "Güncelleme: 18 Kasım 2026. Bu çeviri anlamak içindir; bağlayıcı olan Almanca metindir.",
 };
 
 DOWNLOAD.pl = {
@@ -202,6 +205,7 @@ DOWNLOAD.pl = {
   "dl.android.soon": "Android: wkrótce.", "dl.android.soon.p": "Do tego czasu: wysyłaj linki do Linkwache z menu „Udostępnij” w Androidzie (zob. strona główna).",
   "dl.ios.h": "iPhone i iPad", "dl.ios.p": "Na telefony Apple nie ma aplikacji do pobrania — skrót sprawdza linki prosto z menu „Udostępnij”.", "dl.ios.link": "Przejdź do skrótu",
   "dl.none.h": "Pliki do pobrania są w przygotowaniu", "dl.none.p": "Opublikowana wersja jest teraz niedostępna. Zajrzyj za kilka minut — albo sprawdź bezpośrednio stronę wydań.", "dl.none.link": "Otwórz stronę wydań na GitHubie",
+  "dl.reserve": "Gdy serwer główny jest nieosiągalny, aplikacje przełączają się na serwer zapasowy — tylko przy wbudowanym adresie serwera. Szczegóły w <a href=\"/datenschutz.html?lang={lang}\">informacji o ochronie danych</a>.",
   "dl.win.h": "Windows: pierwsze ostrzeżenie",
   "dl.win.p": "Instalator nie jest jeszcze podpisany certyfikatem dewelopera, więc Windows SmartScreen pokazuje przy pierwszym uruchomieniu niebieski komunikat. Przy nowym, niepodpisanym oprogramowaniu to normalne. Opcjonalnie sprawdź sumę kontrolną (niżej) i postępuj tak:",
   "dl.win.s1": "Kliknij <b>Więcej informacji</b>.", "dl.win.s2": "Potem kliknij <b>Uruchom mimo to</b>.",
@@ -241,7 +245,7 @@ DOWNLOAD.pl = {
   "privacy.app.5": "<b>Sprawdzanie aktualizacji:</b> aplikacje pytają o nową wersję bezpośrednio API GitHuba (publiczna lista wydań tego projektu). GitHub widzi przy tym twój adres IP; Linkwache nic o tym nie wie. Sprawdzanie można wyłączyć w ustawieniach.",
   "privacy.dl.h": "Strona pobierania",
   "privacy.dl.p": "Pliki na stronie pobierania są hostowane przez GitHub (magazyn wydań hosta kodu, GitHub Inc., USA); podczas pobierania GitHub widzi Twój adres IP. Sama Linkwache nie wydaje plików i niczego przy tym nie zapisuje na Twoim urządzeniu.",
-  "privacy.stand": "Stan: 16 listopada 2026. To tłumaczenie służy zrozumieniu; wiążąca jest wersja niemiecka.",
+  "privacy.stand": "Stan: 18 listopada 2026. To tłumaczenie służy zrozumieniu; wiążąca jest wersja niemiecka.",
 };
 
 DOWNLOAD.ru = {
@@ -262,6 +266,7 @@ DOWNLOAD.ru = {
   "dl.android.soon": "Android: скоро.", "dl.android.soon.p": "А пока отправляйте ссылки в Linkwache через меню «Поделиться» в Android (см. главную страницу).",
   "dl.ios.h": "iPhone и iPad", "dl.ios.p": "Для телефонов Apple приложения для скачивания нет — быстрая команда проверяет ссылки прямо из меню «Поделиться».", "dl.ios.link": "К быстрой команде",
   "dl.none.h": "Загрузки готовятся", "dl.none.p": "Опубликованная версия сейчас недоступна. Загляните через несколько минут — или откройте страницу релизов напрямую.", "dl.none.link": "Открыть страницу релизов на GitHub",
+  "dl.reserve": "Если основной сервер недоступен, приложения переключаются на резервный сервер — только со встроенным адресом сервера. Подробности в <a href=\"/datenschutz.html?lang={lang}\">заявлении о конфиденциальности</a>.",
   "dl.win.h": "Windows: первое предупреждение",
   "dl.win.p": "Установщик пока не подписан сертификатом разработчика, поэтому при первом запуске Windows SmartScreen показывает синее окно. Для новой неподписанной программы это нормально. При желании проверьте контрольную сумму (ниже) и действуйте так:",
   "dl.win.s1": "Нажмите <b>Подробнее</b>.", "dl.win.s2": "Затем нажмите <b>Выполнить в любом случае</b>.",
@@ -301,7 +306,7 @@ DOWNLOAD.ru = {
   "privacy.app.5": "<b>Проверка обновлений:</b> приложения спрашивают о новой версии напрямую у API GitHub (открытый список выпусков этого проекта). При этом GitHub видит твой IP-адрес; Linkwache об этом ничего не узнаёт. Проверку можно отключить в настройках.",
   "privacy.dl.h": "Страница загрузки",
   "privacy.dl.p": "Файлы на странице загрузки размещены на GitHub (хранилище релизов хостинга кода, GitHub Inc., США); при скачивании GitHub видит ваш IP-адрес. Сама Linkwache файлы не раздаёт и при этом ничего не сохраняет на вашем устройстве.",
-  "privacy.stand": "Актуально на 16 ноября 2026 г. Перевод дан для понимания; обязательной является немецкая версия.",
+  "privacy.stand": "Актуально на 18 ноября 2026 г. Перевод дан для понимания; обязательной является немецкая версия.",
 };
 
 DOWNLOAD.es = {
@@ -322,6 +327,7 @@ DOWNLOAD.es = {
   "dl.android.soon": "Android: próximamente.", "dl.android.soon.p": "Mientras tanto: envía enlaces a Linkwache desde el menú «Compartir» de Android (ver la página de inicio).",
   "dl.ios.h": "iPhone y iPad", "dl.ios.p": "Para los móviles de Apple no hay una app que descargar: el atajo comprueba los enlaces directamente desde el menú «Compartir».", "dl.ios.link": "Ir al atajo",
   "dl.none.h": "Las descargas se están preparando", "dl.none.p": "Ahora mismo no se puede obtener una versión publicada. Vuelve a mirar en unos minutos, o consulta directamente la página de versiones.", "dl.none.link": "Abrir la página de versiones en GitHub",
+  "dl.reserve": "Si el servidor principal no está disponible, las aplicaciones pasan a un servidor de reserva, solo con la dirección de servidor integrada. Detalles en la <a href=\"/datenschutz.html?lang={lang}\">política de privacidad</a>.",
   "dl.win.h": "Windows: el primer aviso",
   "dl.win.p": "El instalador aún no está firmado con un certificado de desarrollador, así que Windows SmartScreen muestra un aviso azul en el primer arranque. Es normal en software nuevo y sin firmar. Comprueba opcionalmente la suma de verificación (abajo) y continúa así:",
   "dl.win.s1": "Haz clic en <b>Más información</b>.", "dl.win.s2": "Después haz clic en <b>Ejecutar de todas formas</b>.",
@@ -361,7 +367,7 @@ DOWNLOAD.es = {
   "privacy.app.5": "<b>Búsqueda de actualizaciones:</b> las apps preguntan directamente a la API de GitHub por una versión nueva (la lista pública de versiones de este proyecto). GitHub ve tu dirección IP al hacerlo; Linkwache no se entera. La búsqueda se puede desactivar en los ajustes.",
   "privacy.dl.h": "Página de descargas",
   "privacy.dl.p": "Los archivos de la página de descargas están alojados en GitHub (almacenamiento de versiones del host de código, GitHub Inc., EE. UU.); al descargar, GitHub ve tu dirección IP. Linkwache no sirve los archivos por sí misma y no instala nada en tu dispositivo al hacerlo.",
-  "privacy.stand": "Actualizado: 16 de noviembre de 2026. Esta traducción es orientativa; la versión alemana es la vinculante.",
+  "privacy.stand": "Actualizado: 18 de noviembre de 2026. Esta traducción es orientativa; la versión alemana es la vinculante.",
 };
 
 DOWNLOAD.fr = {
@@ -382,6 +388,7 @@ DOWNLOAD.fr = {
   "dl.android.soon": "Android : bientôt disponible.", "dl.android.soon.p": "D’ici là : envoyez les liens à Linkwache depuis le menu « Partager » d’Android (voir la page d’accueil).",
   "dl.ios.h": "iPhone et iPad", "dl.ios.p": "Il n’y a pas d’application à télécharger pour les téléphones Apple — le raccourci vérifie les liens directement depuis le menu « Partager ».", "dl.ios.link": "Aller au raccourci",
   "dl.none.h": "Les téléchargements sont en préparation", "dl.none.p": "Aucune version publiée n’est disponible pour le moment. Revenez dans quelques minutes — ou consultez directement la page des versions.", "dl.none.link": "Ouvrir la page des versions sur GitHub",
+  "dl.reserve": "Si le serveur principal est injoignable, les applications basculent vers un serveur de secours — uniquement avec l’adresse de serveur intégrée. Détails dans la <a href=\"/datenschutz.html?lang={lang}\">politique de confidentialité</a>.",
   "dl.win.h": "Windows : le premier avertissement",
   "dl.win.p": "L’installateur n’est pas encore signé avec un certificat de développeur ; Windows SmartScreen affiche donc un message bleu au premier lancement. C’est normal pour un logiciel récent et non signé. Vous pouvez vérifier la somme de contrôle (plus bas) et procéder ainsi :",
   "dl.win.s1": "Cliquez sur <b>Informations complémentaires</b>.", "dl.win.s2": "Puis cliquez sur <b>Exécuter quand même</b>.",
@@ -421,7 +428,7 @@ DOWNLOAD.fr = {
   "privacy.app.5": "<b>Recherche de mises à jour :</b> les applications interrogent directement l’API de GitHub pour une nouvelle version (liste publique des versions de ce projet). GitHub voit alors ton adresse IP ; Linkwache n’en sait rien. La recherche peut être désactivée dans les réglages.",
   "privacy.dl.h": "Page de téléchargement",
   "privacy.dl.p": "Les fichiers de la page de téléchargement sont hébergés par GitHub (stockage des versions de l’hébergeur de code, GitHub Inc., États-Unis) ; lors du téléchargement, GitHub voit votre adresse IP. Linkwache ne distribue pas elle-même les fichiers et ne dépose rien sur votre appareil à cette occasion.",
-  "privacy.stand": "Mise à jour : 16 novembre 2026. Cette traduction est fournie pour la compréhension ; la version allemande fait foi.",
+  "privacy.stand": "Mise à jour : 18 novembre 2026. Cette traduction est fournie pour la compréhension ; la version allemande fait foi.",
 };
 
 DOWNLOAD.it = {
@@ -442,6 +449,7 @@ DOWNLOAD.it = {
   "dl.android.soon": "Android: in arrivo.", "dl.android.soon.p": "Nel frattempo: invia i link a Linkwache dal menu «Condividi» di Android (vedi la pagina iniziale).",
   "dl.ios.h": "iPhone e iPad", "dl.ios.p": "Per i telefoni Apple non c’è un’app da scaricare: il comando rapido controlla i link direttamente dal menu «Condividi».", "dl.ios.link": "Vai al comando rapido",
   "dl.none.h": "I download sono in preparazione", "dl.none.p": "Al momento non è disponibile una versione pubblicata. Riprova tra qualche minuto, oppure guarda direttamente la pagina delle versioni.", "dl.none.link": "Apri la pagina delle versioni su GitHub",
+  "dl.reserve": "Se il server principale non è raggiungibile, le app passano a un server di riserva — solo con l’indirizzo del server integrato. Dettagli nell’<a href=\"/datenschutz.html?lang={lang}\">informativa sulla privacy</a>.",
   "dl.win.h": "Windows: il primo avviso",
   "dl.win.p": "Il programma di installazione non è ancora firmato con un certificato di sviluppatore, quindi Windows SmartScreen mostra un avviso blu al primo avvio. È normale per un software nuovo e non firmato. Se vuoi, controlla il checksum (sotto) e procedi così:",
   "dl.win.s1": "Fai clic su <b>Ulteriori informazioni</b>.", "dl.win.s2": "Poi fai clic su <b>Esegui comunque</b>.",
@@ -481,5 +489,5 @@ DOWNLOAD.it = {
   "privacy.app.5": "<b>Ricerca aggiornamenti:</b> le app chiedono una nuova versione direttamente all’API di GitHub (l’elenco pubblico delle versioni di questo progetto). GitHub vede così il tuo indirizzo IP; Linkwache non ne sa nulla. La ricerca si può disattivare nelle impostazioni.",
   "privacy.dl.h": "Pagina di download",
   "privacy.dl.p": "I file nella pagina di download sono ospitati da GitHub (archivio delle versioni dell’host del codice, GitHub Inc., USA); durante il download GitHub vede il tuo indirizzo IP. Linkwache non distribuisce i file in prima persona e non imposta nulla sul tuo dispositivo in questa occasione.",
-  "privacy.stand": "Aggiornato: 16 novembre 2026. Questa traduzione serve alla comprensione; fa fede la versione tedesca.",
+  "privacy.stand": "Aggiornato: 18 novembre 2026. Questa traduzione serve alla comprensione; fa fede la versione tedesca.",
 };

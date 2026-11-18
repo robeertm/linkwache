@@ -2,6 +2,38 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
+## 0.8.0 — 2026-11-18
+
+### Added — reserve server when the main server is unreachable
+- The desktop app, the browser extension (Chromium, Firefox, Safari) and the Android app know a second check
+  server. When the main server does not answer (timeout, no connection, server error, a gateway page instead of an
+  answer), the same check goes straight to the reserve server; the whole check stays within 8 seconds.
+- The apps remember for five minutes that the main server is down and go to the reserve directly, probe the main
+  server in the background at most once a minute and switch back as soon as it answers.
+- An answer from the reserve shows a quiet note "Checked via the reserve server" (all eight languages).
+- No switch for answers the reserve would give the same way: a refused installation id (the app makes a new one
+  and repeats once on the same server), other request errors, a refused origin, too many checks.
+- Only for the built-in server address: a server address entered by the user never gets a foreign reserve.
+- Build variable `LINKWACHE_FALLBACK_SERVER` (repository variable, empty = no reserve, nothing in the source).
+  Contract: `docs/FALLBACK.md`.
+- Reserve server: the same check code as a Cloudflare Worker that serves only the app API (`src/reserve.js`,
+  `deploy/cloudflare/wrangler.toml`): no website, nothing stored, no sandbox scans (so it cannot use up the main
+  server's urlscan budget), per-minute limits per installation and per IP, a tighter lookup budget. Runs on the free
+  plan.
+
+### Added — watchdog probe
+- `POST /api/v1/check` with `"probe": true` runs the whole request path with heuristics only: no outside lookup, not
+  cached, not counted as use. The operator's watchdog uses it every minute.
+
+### Changed
+- DNS-over-HTTPS is asked by name when the code runs on Cloudflare Workers (direct IP fetches are refused there).
+- The client API's lookup budget can be tightened with `LITE_BUDGET_MS` (used by the reserve).
+
+### Privacy
+- Privacy page, imprint and download page in all eight languages: in normal operation nothing goes to the reserve;
+  only when the main server fails, the app sends the same reduced request (scheme, host, path, language, scope,
+  random installation id, app version) to the reserve server operated by Cloudflare, Inc. as processor.
+
 ## 0.7.1 — 2026-11-18
 
 ### Fixed — "could not be checked" on every click in Safari

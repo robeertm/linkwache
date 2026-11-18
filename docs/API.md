@@ -84,6 +84,18 @@ repeated clicks.
 No open proxy: the server never fetches the target page (only shortener HEAD hops, as before,
 with the same blocked targets: private/loopback addresses, non-http schemes).
 
+## Reserve server
+
+When the main server is unreachable, the apps send the same request to a reserve server (a Cloudflare Worker with
+only this API and `GET /api/health`, `role: "reserve"`), see [FALLBACK.md](FALLBACK.md). Nothing is stored there.
+
+## Watchdog probe
+
+`POST /api/v1/check` with `"probe": true` in the body (and the usual installation id header) is for monitors that
+check whether the check path works. The server answers from its own heuristics only: **no outside lookup**, the
+probe is **not counted** in the statistics and **not cached**. The same installation id requirement and rate limits
+apply. The answer carries `"probe": true`.
+
 ## Native messaging (extension ↔ desktop app)
 
 Host name `app.linkwache.desktop`; the desktop app installs the host manifest for Chrome,

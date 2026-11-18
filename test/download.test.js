@@ -164,7 +164,7 @@ test("home page carries the quiet hint to /download, the nav links it, the priva
     assert.match(priv, /2026/);
   }
   const de = await (await get(envWith(FIX), "/datenschutz.html?lang=de")).text();
-  assert.match(de, /16\. November 2026/);
+  assert.match(de, /18\. November 2026/);
 });
 
 test("download page shows the release date per language, never as ISO", async () => {

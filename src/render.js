@@ -156,6 +156,7 @@ export function privacyPage(lang, env) {
   const body = `<div class="legal">
   <h1>${P("privacy.h1")}</h1><p>${P("privacy.resp")}</p>
   <h2>${P("privacy.host.h")}</h2><p>${P("privacy.host.p")}</p>
+  <h2>${P("privacy.reserve.h")}</h2><p>${P("privacy.reserve.p")}</p><p>${P("privacy.reserve.p2")}</p>
   <h2>${P("privacy.store.h")}</h2><ul><li>${P("privacy.store.1")}</li><li>${P("privacy.store.2")}</li><li>${P("privacy.store.3")}</li></ul>
   <h2>${P("privacy.logs.h")}</h2><p>${P("privacy.logs.p")}</p><p>${P("privacy.stats.p")}</p>
   <h2>${P("privacy.flow.h")}</h2><p>${P("privacy.flow.p")}</p><ul><li>${P("privacy.flow.1")}</li><li>${P("privacy.flow.2")}</li><li>${P("privacy.flow.3")}</li><li>${P("privacy.flow.4")}</li><li>${P("privacy.flow.5")}</li></ul><p>${P("privacy.basis")}</p>
@@ -293,6 +294,6 @@ export function downloadPage(lang, env, { ua = "", os = "" } = {}) {
     <h4>${P("dl.ext.firefox.h")}</h4>${steps(lang, env, ["dl.ext.f1", "dl.ext.f2", "dl.ext.f3"])}<p class="small">${P("dl.ext.f.note")}</p>
     <h4>${P("dl.ext.safari.h")}</h4><p>${P("dl.ext.s.lead")}</p>${steps(lang, env, ["dl.ext.s1", "dl.ext.s2", "dl.ext.s3"])}<p class="small">${P("dl.ext.s.note")}</p><p><a href="${SAFARI_GUIDE}" rel="noopener">${P("dl.ext.s.src")}</a></p></div></details>`;
   }
-  body += `</section><p class="small">${P("dl.ios.p")} <a href="/kurzbefehl.html?lang=${lang}">${P("dl.ios.link")}</a></p></div>`;
+  body += `</section><p class="small">${P("dl.ios.p")} <a href="/kurzbefehl.html?lang=${lang}">${P("dl.ios.link")}</a></p><p class="small">${P("dl.reserve")}</p></div>`;
   return page({ lang, title: `${P("dl.title")} · ${env.SITE_NAME || "Linkwache"}`, body, env, path: "/download" });
 }
