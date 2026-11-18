@@ -108,7 +108,15 @@ else
   ditto "$APP" "$TARGET"
 fi
 # Register with Launch Services so Safari lists the extension right away.
-/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$TARGET" >/dev/null 2>&1 || true
+LSREGISTER=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
+"$LSREGISTER" -f "$TARGET" >/dev/null 2>&1 || true
+# The build copy in safari/build carries the same extension: Launch Services registered it when xcodebuild made it, so
+# Safari would list "Linkwache" twice (one of them vanishing on the next build). Unregister and delete it.
+"$LSREGISTER" -u "$APP" >/dev/null 2>&1 || true
+rm -rf "$BUILD"
+if "$LSREGISTER" -dump 2>/dev/null | grep -F "$BUILD/" | grep -q "Linkwache"; then
+  echo "Note: Launch Services still lists a copy under $BUILD; it disappears after the next login."
+fi
 [ "$OPEN" = 1 ] && open "$TARGET"
 
 cat <<MSG

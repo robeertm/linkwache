@@ -17,6 +17,8 @@ All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 - Warning page: **Check again**; when the browser blocks the server, **Allow access** (asks the browser for the
   check server's site access) with the steps for Safari and Chromium, and **Open settings**.
 - Settings page: **Test connection** runs one real check and answers in plain words.
+- `safari/scripts/build-local.sh` unregisters and deletes the build copy after installing, so Safari no longer lists
+  the extension twice.
 
 ### Privacy
 - Tokens and signatures in a link's query (for example `jwt`, `token`, `sig`, `X-Amz-Signature`, long opaque values)

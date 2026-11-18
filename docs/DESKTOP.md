@@ -314,7 +314,8 @@ safari/scripts/build-local.sh --adhoc    # without an Apple ID
 The script builds the extension, builds the app with `xcodebuild` (team from `DEVELOPMENT_TEAM` or the
 "Apple Development" certificate Xcode created for the Personal Team), verifies the signature, replaces
 `/Applications/Linkwache for Safari.app` (the previous version stays as a backup until the copy has
-succeeded), registers it with Launch Services and opens it. Then in Safari: *Settings → Extensions* →
+succeeded), registers it with Launch Services, unregisters and deletes the build copy in `safari/build` (otherwise
+Safari lists the extension twice), and opens it. Then in Safari: *Settings → Extensions* →
 tick **Linkwache** and allow it on all websites. `LINKWACHE_DEFAULT_SERVER=https://…` presets the
 server address; otherwise it is set once in the extension's settings. The team id never goes into the
 repository: it comes from the environment or from `safari/Config/Local.xcconfig` (gitignored, see
