@@ -44,6 +44,7 @@ jobs:
         working-directory: android
         env:
           LINKWACHE_DEFAULT_SERVER: ${{ vars.LINKWACHE_DEFAULT_SERVER }}
+          LINKWACHE_FALLBACK_SERVER: ${{ vars.LINKWACHE_FALLBACK_SERVER }}
           LINKWACHE_PRESET_MIGRATE_FROM: ${{ vars.LINKWACHE_PRESET_MIGRATE_FROM }}
         run: >
           ./gradlew --no-daemon --stacktrace
@@ -70,6 +71,7 @@ jobs:
           "$BT/apksigner" sign --ks /tmp/smoke.p12 --ks-pass pass:android --ks-key-alias smoke \
             --out dist/app-release-debugsigned.apk "dist/Linkwache-android-$V-unsigned.apk"
           echo "default server set: ${{ vars.LINKWACHE_DEFAULT_SERVER != '' }}" > dist/build-info.txt
+          echo "fallback server set: ${{ vars.LINKWACHE_FALLBACK_SERVER != '' }}" >> dist/build-info.txt
           echo "commit: ${{ github.sha }}" >> dist/build-info.txt
       - uses: actions/upload-artifact@v4
         with:

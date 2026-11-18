@@ -28,6 +28,7 @@ jobs:
     timeout-minutes: 40
     env:
       LINKWACHE_DEFAULT_SERVER: ${{ vars.LINKWACHE_DEFAULT_SERVER }}
+      LINKWACHE_FALLBACK_SERVER: ${{ vars.LINKWACHE_FALLBACK_SERVER }}
       LINKWACHE_PRESET_MIGRATE_FROM: ${{ vars.LINKWACHE_PRESET_MIGRATE_FROM }}
     steps:
       - uses: actions/checkout@v4

@@ -19,6 +19,8 @@ fun versionCodeOf(v: String): Int {
 
 // Default server address, set at build time (empty = the setup assistant asks for one).
 val defaultServer: String = (System.getenv("LINKWACHE_DEFAULT_SERVER") ?: providers.gradleProperty("defaultServer").orNull ?: "").trim()
+// Reserve server address (docs/FALLBACK.md), set at build time (empty = no reserve).
+val fallbackServer: String = (System.getenv("LINKWACHE_FALLBACK_SERVER") ?: providers.gradleProperty("fallbackServer").orNull ?: "").trim()
 // Earlier default addresses that installations still following the default move away from.
 val presetMigrateFrom: String = (System.getenv("LINKWACHE_PRESET_MIGRATE_FROM") ?: providers.gradleProperty("presetMigrateFrom").orNull ?: "").trim()
 
@@ -33,6 +35,7 @@ android {
         versionName = repoVersion
         versionCode = versionCodeOf(repoVersion)
         buildConfigField("String", "DEFAULT_SERVER", "\"" + defaultServer.replace("\"", "") + "\"")
+        buildConfigField("String", "FALLBACK_SERVER", "\"" + fallbackServer.replace("\"", "") + "\"")
         buildConfigField("String", "PRESET_MIGRATE_FROM", "\"" + presetMigrateFrom.replace("\"", "").replace("\\", "").replace(Regex("\\s+"), " ") + "\"")
         buildConfigField("String", "UPDATE_REPO", "\"robeertm/linkwache\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

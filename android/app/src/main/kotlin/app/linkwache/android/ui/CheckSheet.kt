@@ -224,6 +224,7 @@ private fun GreenContent(s: SheetState.Done) {
     LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth().height(4.dp), color = sig.ok, trackColor = sig.okBg, drawStopIndicator = {})
     Spacer(Modifier.height(10.dp))
     Text(t("android.sheet.opening", "browser" to s.browser), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    ReserveNote(s.r)
 }
 
 @Composable
@@ -234,6 +235,17 @@ private fun LinkLines(r: CheckResult) {
             Text(r.target, style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace), maxLines = 3, overflow = TextOverflow.Ellipsis)
         }
     }
+}
+
+/** Quiet note: the answer came from the reserve server. */
+@Composable
+private fun ReserveNote(r: CheckResult) {
+    if (!r.viaReserve) return
+    Spacer(Modifier.height(8.dp))
+    Text(
+        t("warn.via.reserve"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.testTag("sheet-reserve-note"),
+    )
 }
 
 @Composable
@@ -323,6 +335,7 @@ private fun WarnContent(s: SheetState.Done, a: SheetActions, countdownFrom: Int)
     Text(t("warn.findings"), style = MaterialTheme.typography.titleSmall)
     Spacer(Modifier.height(10.dp))
     FindingsList(s.r.findings)
+    ReserveNote(s.r)
     Footer()
     Spacer(Modifier.height(18.dp))
     PrimaryButton(t("btn.dontopen"), "btn-dont-open", a::close)
@@ -356,6 +369,7 @@ private fun RedContent(s: SheetState.Done, a: SheetActions, revealRedStep: Boole
         Spacer(Modifier.height(10.dp))
         FindingsList(s.r.findings)
         Text(Texts.verdictAdvice(ctx, s.r), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(top = 14.dp))
+        ReserveNote(s.r)
         Spacer(Modifier.height(18.dp))
         PrimaryButton(t("btn.close"), "btn-close", a::close)
         Spacer(Modifier.height(4.dp))

@@ -26,6 +26,10 @@ class Prefs(context: Context) {
     val server: String?
         get() = ServerPreset.effective(serverOverride, BuildConfig.DEFAULT_SERVER, PRESET_MIGRATE_FROM)
 
+    /** The reserve server: only while the built-in address is in use, never for an address of the user's own. */
+    val reserveServer: String?
+        get() = ServerPreset.reserve(serverOverride, BuildConfig.DEFAULT_SERVER, PRESET_MIGRATE_FROM, BuildConfig.FALLBACK_SERVER)
+
     /**
      * Drop a stored address that only repeats the current or an earlier built-in one, so the
      * installation follows the preset again. An address of the user's own stays. Returns true when

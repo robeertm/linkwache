@@ -74,7 +74,7 @@ test("err.install twice: reason install (not 'no connection'), only one renewal"
 test("network failure: repeated once, then reason network with the server host", async () => {
   const p = player(netError());
   const r = await run(p.f, { hasAccess: async () => true });
-  assert.deepEqual(r, { ok: false, reason: "network", host: "lw.example" });
+  assert.deepEqual(r, { ok: false, reason: "network", host: "lw.example", fo: true });
   assert.equal(p.calls.length, 2);
   const q = player(netError(), res(ANSWER));
   assert.equal((await run(q.f)).ok, true, "a passing hiccup heals with the repeat");
@@ -100,7 +100,7 @@ test("timeout: reason timeout (TimeoutError and AbortError), no repeat", async (
   for (const e of [timeoutError(), Object.assign(new Error("aborted"), { name: "AbortError" })]) {
     const p = player(e);
     const r = await run(p.f);
-    assert.equal(r.reason, "timeout", e.name);
+    assert.equal(r.reason, "timeout", e.name); assert.equal(r.fo, true);
     assert.equal(p.calls.length, 1);
   }
 });
@@ -113,13 +113,15 @@ test("timeout: the request really carries an abort signal (6 s default)", async 
 
 test("status answers: 403 refused, 429 rate, 5xx server, other 400 server, broken answer server", async () => {
   const cases = [
-    [res({ error: "forbidden" }, 403), "refused", 403], [res({ error: "err.rate" }, 429), "rate", 429],
-    [res({ error: "x" }, 500), "server", 500], [res({ error: "err.nolink" }, 400), "server", 400],
-    [new Response("<html>", { status: 502 }), "server", 502], [res({ api: 2 }), "server", 200], [new Response("not json"), "server", 200],
+    [res({ error: "forbidden" }, 403), "refused", 403, false], [res({ error: "err.rate" }, 429), "rate", 429, false],
+    [res({ error: "x" }, 500), "server", 500, true], [res({ error: "err.nolink" }, 400), "server", 400, false],
+    [new Response("<html>", { status: 502 }), "server", 502, true], [res({ api: 2 }), "server", 200, true], [new Response("not json"), "server", 200, true],
+    [new Response("<html>", { status: 403 }), "server", 403, true], [new Response("<html>", { status: 400 }), "server", 400, true],
+    [res({ error: "x" }, 413), "server", 413, false],
   ];
-  for (const [answer, reason, status] of cases) {
+  for (const [answer, reason, status, fo] of cases) {
     const r = await run(player(answer).f);
-    assert.deepEqual(r, { ok: false, reason, host: "lw.example", status }, reason + " " + status);
+    assert.deepEqual(r, { ok: false, reason, host: "lw.example", status, ...(fo ? { fo: true } : {}) }, reason + " " + status);
   }
 });
 

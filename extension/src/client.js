@@ -29,7 +29,8 @@ export const validAnswer = (j) => !!j && j.api === 1 && ["gruen", "gelb", "rot"]
  * @param o.installId  async () => current id (creates one when missing)
  * @param o.renewId    async () => a fresh id, stored (after the server refused the old one)
  * @param o.hasAccess  async (origin) => true | false | null (null = cannot tell); asked only after a network failure
- * @returns { ok: true, res } or { ok: false, reason, status?, host }
+ * @param o.noRetry    do not repeat once after a network failure (the reserve server is the second try instead)
+ * @returns { ok: true, res } or { ok: false, reason, status?, host, fo? }  (fo: true = worth a try on the reserve server, docs/FALLBACK.md)
  */
 export async function checkServer(o) {
   const host = hostOf(o.server);
@@ -37,7 +38,7 @@ export async function checkServer(o) {
   const endpoint = o.server.replace(/\/$/, "") + "/api/v1/check";
   const ms = o.timeoutMs || TIMEOUT_MS;
   const signalFor = o.signalFor || ((n) => timeoutSignal(n));
-  const fail = (reason, status) => ({ ok: false, reason, host, ...(status ? { status } : {}) });
+  const fail = (reason, status, fo) => ({ ok: false, reason, host, ...(status ? { status } : {}), ...(fo ? { fo: true } : {}) });
   let renewed = false, retriedNet = false;
   for (;;) {
     let r;
@@ -48,11 +49,11 @@ export async function checkServer(o) {
         body: JSON.stringify(o.body), signal: signalFor(ms),
       });
     } catch (e) {
-      if (isTimeout(e)) return fail("timeout");
+      if (isTimeout(e)) return fail("timeout", 0, true);
       // A blocked request and a dead network look the same to fetch (TypeError). Only the permission lookup tells them apart.
       if (o.hasAccess) { let a = null; try { a = await o.hasAccess(new URL(o.server).origin); } catch { a = null; } if (a === false) return fail("access"); }
-      if (!retriedNet) { retriedNet = true; await wait(o.retryDelayMs ?? 400); continue; }
-      return fail("network");
+      if (!retriedNet && !o.noRetry) { retriedNet = true; await wait(o.retryDelayMs ?? 400); continue; }
+      return fail("network", 0, true);
     }
     let j = null;
     try { j = await r.json(); } catch { j = null; }
@@ -60,9 +61,11 @@ export async function checkServer(o) {
       if (!renewed && o.renewId) { renewed = true; await o.renewId(); continue; }
       return fail("install", 400);
     }
-    if (r.status === 403) return fail("refused", 403);
+    // Failover-worthy (docs/FALLBACK.md): status >= 500, an error page that is not JSON, a 2xx that is not a v1 answer.
+    // A JSON answer with 4xx is the server's own word and the reserve would say the same.
+    if (r.status === 403 && j) return fail("refused", 403);
     if (r.status === 429) return fail("rate", 429);
-    if (!r.ok) return fail("server", r.status);
-    return validAnswer(j) ? { ok: true, res: j } : fail("server", r.status);
+    if (!r.ok) return fail("server", r.status, r.status >= 500 || !j);
+    return validAnswer(j) ? { ok: true, res: j } : fail("server", r.status, true);
   }
 }

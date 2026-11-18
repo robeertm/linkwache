@@ -5,6 +5,7 @@ pub mod allowlist;
 pub mod api;
 pub mod cache;
 pub mod engine;
+pub mod failover;
 pub mod forward;
 pub mod heuristics;
 pub mod history;

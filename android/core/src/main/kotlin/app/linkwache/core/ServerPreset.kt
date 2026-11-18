@@ -33,4 +33,11 @@ object ServerPreset {
     /** The address in use: the user's own one, otherwise the preset; null when there is none. */
     fun effective(override: String?, preset: String?, migrateFrom: List<String>): String? =
         keepOverride(override, preset, migrateFrom) ?: Link.validServer(preset) ?: Link.validServer(override)
+
+    /** The reserve address: only while the built-in address is in use (never for an own address), and not the main address itself. */
+    fun reserve(override: String?, preset: String?, migrateFrom: List<String>, fallback: String?): String? {
+        val p = Link.validServer(preset) ?: return null
+        if (effective(override, preset, migrateFrom) != p) return null
+        return Link.validServer(fallback)?.takeIf { it != p }
+    }
 }

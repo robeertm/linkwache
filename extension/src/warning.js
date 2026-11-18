@@ -17,7 +17,7 @@ async function load() {
     const url = h.slice(3);
     const r = await api.runtime.sendMessage({ t: "recheck", url });
     if (!r) return null;
-    return { u: r.target, s: r.stufe === "gruen" ? "gelb" : r.stufe, f: r.findings, w: r.wrapped, m: "same", ...(r.why ? { e: r.why, h: r.host || "", c: r.status || 0 } : {}) };
+    return { u: r.target, s: r.stufe === "gruen" ? "gelb" : r.stufe, f: r.findings, w: r.wrapped, m: "same", ...(r.why ? { e: r.why, h: r.host || "", c: r.status || 0 } : {}), ...(r.via ? { v: r.via } : {}) };
   }
   return null;
 }
@@ -38,7 +38,7 @@ function showWhy(lang, d) {
     $("retry").disabled = true;
     const r = await api.runtime.sendMessage({ t: "recheck", url: d.u }).catch(() => null);
     if (r && r.stufe === "gruen") { location.href = d.u; return; }
-    const next = r ? { u: d.u, s: r.stufe, f: r.findings || [], w: d.w, m: d.m, ...(r.why ? { e: r.why, h: r.host || "", c: r.status || 0 } : {}) } : d;
+    const next = r ? { u: d.u, s: r.stufe, f: r.findings || [], w: d.w, m: d.m, ...(r.why ? { e: r.why, h: r.host || "", c: r.status || 0 } : {}), ...(r.via ? { v: r.via } : {}) } : d;
     location.hash = "#d=" + b64urlEncode(next);
     location.reload();
   });
@@ -81,6 +81,7 @@ async function main() {
   $("url").textContent = defang(maskSecrets(d.u));   // tokens and signatures in the query are shortened, never shown in full
   if (d.w) { $("wrapped").hidden = false; $("wrapped").textContent = t(lang, "ext.w.wrapped"); }
   if (level === "off") showWhy(lang, d);
+  if (d.v === "reserve") { $("via").hidden = false; $("via").textContent = t(lang, "ext.w.via.reserve"); }
 
   let findings = (d.f || []).filter((f) => f.stufe !== "info" || level === "off");
   if (level === "off" && !findings.length) findings = localAssess(d.u).findings.filter((f) => f.stufe !== "info");

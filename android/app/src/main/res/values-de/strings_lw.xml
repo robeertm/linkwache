@@ -240,4 +240,5 @@
     <string name="lw_warn_title_gelb" formatted="false">Verdächtiger Link</string>
     <string name="lw_warn_title_offline" formatted="false">Konnte nicht geprüft werden</string>
     <string name="lw_warn_title_rot" formatted="false">Gefährlicher Link – blockiert</string>
+    <string name="lw_warn_via_reserve" formatted="false">Über den Reserve-Server geprüft</string>
 </resources>

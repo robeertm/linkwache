@@ -53,6 +53,8 @@
     $("nofindings").hidden = shown.length > 0;
     $("nofindings").textContent = st === "offline" ? LW.t("dt.warn.local.none") : LW.t("dt.warn.nofindings");
     $("source").textContent = st === "offline" ? "" : LW.t(SOURCE[r.source] || SOURCE.server);
+    $("via").hidden = r.via !== "reserve" || st === "offline";
+    $("via").textContent = r.via === "reserve" ? LW.t("dt.warn.via.reserve") : "";
     // Actions
     const red = isRed(r);
     $("know").hidden = !red || redStep;

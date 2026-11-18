@@ -61,4 +61,6 @@ data class CheckResult(
     /** Server verdict was shortened by redirects (shortener chain), informational. */
     val chain: List<String> = emptyList(),
     val elapsedMs: Long = 0,
+    /** The server answer came from the reserve server (shows a quiet note). */
+    val viaReserve: Boolean = false,
 )

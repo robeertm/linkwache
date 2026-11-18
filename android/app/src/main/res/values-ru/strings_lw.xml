@@ -240,4 +240,5 @@
     <string name="lw_warn_title_gelb" formatted="false">Подозрительная ссылка</string>
     <string name="lw_warn_title_offline" formatted="false">Не удалось проверить</string>
     <string name="lw_warn_title_rot" formatted="false">Опасная ссылка – заблокирована</string>
+    <string name="lw_warn_via_reserve" formatted="false">Проверено через резервный сервер</string>
 </resources>

@@ -3,6 +3,7 @@
 
 use linkwache_core::api::{HttpApi, DEFAULT_TIMEOUT};
 use linkwache_core::engine::{CheckResult, Prepared};
+use linkwache_core::failover::{reserve_for, DownState, FailoverApi};
 use linkwache_core::settings::{Preset, Settings};
 use linkwache_core::store::Paths;
 use serde::Serialize;
@@ -16,6 +17,18 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 /// Build-time default server (repository variable in CI); never hard-coded in the source.
 pub fn default_server() -> &'static str {
     option_env!("LINKWACHE_DEFAULT_SERVER").unwrap_or("")
+}
+
+/// Build-time reserve server (repository variable in CI, docs/FALLBACK.md); empty = no reserve.
+pub fn fallback_server() -> &'static str {
+    option_env!("LINKWACHE_FALLBACK_SERVER").unwrap_or("")
+}
+
+/// The failing-over client for these settings: the reserve is used only while the effective server is the built-in one.
+pub fn failover_api(s: &Settings, down: &std::sync::Arc<DownState>) -> FailoverApi<HttpApi> {
+    let mk = |server: &str| HttpApi::new(server, &s.install_id, VERSION, DEFAULT_TIMEOUT);
+    let reserve = reserve_for(&s.server, default_server(), fallback_server()).map(|r| mk(&r));
+    FailoverApi::new(mk(&s.server), reserve, down.clone())
 }
 
 /// Earlier built-in addresses (repository variable in CI) that installations still following the
@@ -72,6 +85,8 @@ pub struct AppState {
     pub pending: Mutex<HashMap<u64, Pending>>,
     pub update: Mutex<UpdateInfo>,
     pub settings_lock: Mutex<()>,
+    /// "Main server is down" mark, shared by every check while the app runs (reserve server, docs/FALLBACK.md).
+    pub down: std::sync::Arc<DownState>,
 }
 
 impl AppState {
@@ -85,6 +100,7 @@ impl AppState {
             pending: Mutex::new(HashMap::new()),
             update: Mutex::new(UpdateInfo { state: "idle".into(), current: VERSION.into(), inapp, ..Default::default() }),
             settings_lock: Mutex::new(()),
+            down: DownState::new(),
         }
     }
 
@@ -101,8 +117,8 @@ impl AppState {
         r
     }
 
-    pub fn api(&self, s: &Settings) -> HttpApi {
-        HttpApi::new(&s.server, &s.install_id, VERSION, DEFAULT_TIMEOUT)
+    pub fn api(&self, s: &Settings) -> FailoverApi<HttpApi> {
+        failover_api(s, &self.down)
     }
 
     pub fn next_id(&self) -> u64 {

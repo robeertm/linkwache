@@ -46,6 +46,9 @@ pub struct CheckResult {
     pub server: Option<Value>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_entry: Option<String>,
+    /// `reserve` when the answer came from the reserve server (docs/FALLBACK.md): the window shows a quiet note.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub via: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -96,6 +99,7 @@ fn base_result(p: &Prepared) -> CheckResult {
         local: p.local.clone(),
         server: None,
         allow_entry: None,
+        via: None,
     }
 }
 
@@ -177,8 +181,11 @@ impl<'a, A: CheckApi> Engine<'a, A> {
     pub fn remote(&self, p: &Prepared, lang: &str) -> CheckResult {
         let req = Request { url: reduce(&p.target, self.settings.scope), lang: lang.into(), scope: self.settings.scope.as_str().into() };
         match self.api.check(&req) {
-            Ok(v) => {
-                let r = merge(p, &v, "server");
+            Ok(mut v) => {
+                // The mark of the reserve belongs to this answer only, never into the cache.
+                let via = v.as_object_mut().and_then(|o| o.remove("via")).and_then(|x| x.as_str().map(String::from)).filter(|x| x == "reserve");
+                let mut r = merge(p, &v, "server");
+                r.via = via;
                 let ttl = v.get("cacheTtl").and_then(|t| t.as_u64());
                 let s_stufe = v.get("stufe").and_then(|x| x.as_str()).unwrap_or("gelb").to_string();
                 let mut c = Cache::load(&self.paths.cache());

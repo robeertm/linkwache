@@ -11,7 +11,6 @@ mod tray;
 mod ui;
 mod updates;
 
-use linkwache_core::api::{HttpApi, DEFAULT_TIMEOUT};
 use linkwache_core::settings::Settings;
 use linkwache_core::store::Paths;
 use state::{preset, system_locale, AppState, VERSION};
@@ -25,9 +24,10 @@ fn link_args(args: &[String]) -> Vec<String> {
 fn native_messaging_host() -> i32 {
     let paths = Paths::default_location();
     let _ = Settings::load_or_create(&paths, &preset(), &system_locale());
+    let down = linkwache_core::failover::DownState::new();
     let stdin = std::io::stdin();
     let stdout = std::io::stdout();
-    let r = linkwache_core::nm::serve(&mut stdin.lock(), &mut stdout.lock(), &paths, VERSION, &|s: &Settings| HttpApi::new(&s.server, &s.install_id, VERSION, DEFAULT_TIMEOUT));
+    let r = linkwache_core::nm::serve(&mut stdin.lock(), &mut stdout.lock(), &paths, VERSION, &|s: &Settings| state::failover_api(s, &down));
     if r.is_ok() {
         0
     } else {

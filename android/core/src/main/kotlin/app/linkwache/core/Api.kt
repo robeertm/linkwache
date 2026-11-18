@@ -27,19 +27,28 @@ data class ServerVerdict(
     val raw: String,
     /** Rules version of the server (0.5.3 = 2); answers before that carry none (= 1). */
     val rules: Int = 1,
+    /** The answer came from the reserve server (docs/FALLBACK.md). */
+    val viaReserve: Boolean = false,
 )
 
 sealed class ApiError(val reason: String) : Exception(reason) {
     data object NoServer : ApiError("noserver")
     data object Timeout : ApiError("timeout")
     class Network(detail: String) : ApiError("network") { override val message = detail }
-    class Status(val code: Int, val error: String) : ApiError(if (code == 429) "rate" else "server")
+    /** [json]: the error body was a JSON object (the server's own answer, not a proxy or gateway page). */
+    class Status(val code: Int, val error: String, val json: Boolean = true) : ApiError(if (code == 429) "rate" else "server")
     class BadResponse(detail: String) : ApiError("server") { override val message = detail }
 }
 
 fun interface CheckApi {
     @Throws(ApiError::class)
     fun check(req: CheckRequest): ServerVerdict
+}
+
+/** A check API whose hard timeout is chosen per call (the failover budget, docs/FALLBACK.md). */
+interface TimedCheckApi : CheckApi {
+    @Throws(ApiError::class)
+    fun check(req: CheckRequest, timeoutMs: Long): ServerVerdict
 }
 
 object V1 {
@@ -78,24 +87,34 @@ object V1 {
 /** The real HTTP client with a hard overall timeout (the check never waits longer). */
 class HttpCheckApi(
     private val server: String?,
-    private val installId: String,
+    /** Read on every call, so a renewed installation id is used by the repeat. */
+    private val installId: () -> String,
     private val clientVersion: String,
-    timeoutMs: Long = DEFAULT_TIMEOUT_MS,
+    private val timeoutMs: Long = DEFAULT_TIMEOUT_MS,
     base: OkHttpClient = OkHttpClient(),
-) : CheckApi {
-    private val http = base.newBuilder()
-        .callTimeout(timeoutMs, TimeUnit.MILLISECONDS)
-        .connectTimeout(minOf(timeoutMs, 4000), TimeUnit.MILLISECONDS)
+) : TimedCheckApi {
+    constructor(
+        server: String?, installId: String, clientVersion: String,
+        timeoutMs: Long = DEFAULT_TIMEOUT_MS, base: OkHttpClient = OkHttpClient(),
+    ) : this(server, { installId }, clientVersion, timeoutMs, base)
+
+    private val base = base.newBuilder()
         .followRedirects(false)
         .followSslRedirects(false)
         .retryOnConnectionFailure(false)
         .build()
 
-    override fun check(req: CheckRequest): ServerVerdict {
+    override fun check(req: CheckRequest): ServerVerdict = check(req, timeoutMs)
+
+    override fun check(req: CheckRequest, timeoutMs: Long): ServerVerdict {
+        val http = base.newBuilder()
+            .callTimeout(timeoutMs, TimeUnit.MILLISECONDS)
+            .connectTimeout(minOf(timeoutMs, 4000), TimeUnit.MILLISECONDS)
+            .build()
         val s = Link.validServer(server) ?: throw ApiError.NoServer
         val request = Request.Builder()
             .url("$s/api/v1/check")
-            .header("x-linkwache-install", installId)
+            .header("x-linkwache-install", installId())
             .header("x-linkwache-client", "android/$clientVersion")
             .header("user-agent", "Linkwache-Android/$clientVersion")
             .post(V1.body(req).toRequestBody(JSON))
@@ -104,8 +123,9 @@ class HttpCheckApi(
             http.newCall(request).execute().use { r ->
                 val text = r.body?.string().orEmpty()
                 if (!r.isSuccessful) {
-                    val err = try { JSONObject(text).optString("error") } catch (e: JSONException) { "" }
-                    throw ApiError.Status(r.code, err)
+                    var json = true
+                    val err = try { JSONObject(text).optString("error") } catch (e: JSONException) { json = false; "" }
+                    throw ApiError.Status(r.code, err, json)
                 }
                 return V1.parse(text)
             }

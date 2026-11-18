@@ -8,6 +8,7 @@
 # Options: --adhoc, --no-install (only build into safari/build), --no-open, --dest DIR (instead of /Applications).
 # Environment: LINKWACHE_DEFAULT_SERVER=https://... builds the extension with this server address preset
 # (otherwise the address is set once in the extension's settings).
+# Optional: LINKWACHE_FALLBACK_SERVER=https://... reserve server used when the main one is unreachable (docs/FALLBACK.md)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"

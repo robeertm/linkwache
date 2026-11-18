@@ -3,6 +3,7 @@
 // project in safari/ copies into its app extension; dist/safari-app-strings.json carries the container app's texts.
 //   node extension/scripts/build.mjs [chromium] [firefox] [safari]    (no argument: all three) No runtime bundler: every script is one self-contained file.
 //   LINKWACHE_DEFAULT_SERVER=https://... npm run build:extension    (default server address; empty otherwise)
+//   LINKWACHE_FALLBACK_SERVER=https://...                            (reserve server, docs/FALLBACK.md; empty otherwise)
 //   LINKWACHE_PRESET_MIGRATE_FROM="https://... https://..."           (earlier default addresses installations move away from)
 import fs from "node:fs";
 import path from "node:path";
@@ -16,6 +17,7 @@ const DIST = process.env.LINKWACHE_EXT_DIST ? path.resolve(process.env.LINKWACHE
 const pkg = JSON.parse(fs.readFileSync(path.join(EXT, "..", "package.json"), "utf8"));
 const VERSION = pkg.version;
 const DEFAULT_SERVER = process.env.LINKWACHE_DEFAULT_SERVER || "";
+const FALLBACK_SERVER = process.env.LINKWACHE_FALLBACK_SERVER || "";
 const PRESET_MIGRATE_FROM = process.env.LINKWACHE_PRESET_MIGRATE_FROM || "";
 const KEY_PREFIXES = ["ext.", "f.", "pat.", "v.", "stufe.", "age."];
 export const TARGETS = ["chromium", "firefox", "safari"];
@@ -86,7 +88,7 @@ async function buildTarget(target) {
   await build({
     entryPoints: ENTRIES.map((e) => path.join(EXT, "src", e + ".js")), outdir: out, bundle: true, format: "iife", target: "es2022",
     platform: "browser", plugins: [stringsPlugin], legalComments: "none", logLevel: "warning",
-    define: { LW_TARGET: JSON.stringify(target), LW_DEFAULT_SERVER: JSON.stringify(DEFAULT_SERVER), LW_PRESET_MIGRATE_FROM: JSON.stringify(PRESET_MIGRATE_FROM) },
+    define: { LW_TARGET: JSON.stringify(target), LW_DEFAULT_SERVER: JSON.stringify(DEFAULT_SERVER), LW_FALLBACK_SERVER: JSON.stringify(FALLBACK_SERVER), LW_PRESET_MIGRATE_FROM: JSON.stringify(PRESET_MIGRATE_FROM) },
   });
   for (const f of STATIC) fs.copyFileSync(path.join(EXT, f), path.join(out, f));
   fs.cpSync(path.join(EXT, "icons"), path.join(out, "icons"), { recursive: true });

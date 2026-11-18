@@ -240,4 +240,5 @@
     <string name="lw_warn_title_gelb" formatted="false">Enlace sospechoso</string>
     <string name="lw_warn_title_offline" formatted="false">No se pudo comprobar</string>
     <string name="lw_warn_title_rot" formatted="false">Enlace peligroso – bloqueado</string>
+    <string name="lw_warn_via_reserve" formatted="false">Comprobado mediante el servidor de reserva</string>
 </resources>

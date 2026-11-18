@@ -22,7 +22,6 @@ import app.linkwache.android.ui.SheetState
 import app.linkwache.core.CheckResult
 import app.linkwache.core.Decision
 import app.linkwache.core.Engine
-import app.linkwache.core.HttpCheckApi
 import app.linkwache.core.Level
 import app.linkwache.core.Link
 import app.linkwache.core.Outcome
@@ -87,7 +86,7 @@ class CheckActivity : ComponentActivity(), SheetActions {
             return
         }
         val t0 = SystemClock.elapsedRealtime()
-        val engine = Engine(prefs.engineSettings(), HttpCheckApi(prefs.server, prefs.installId, BuildConfig.VERSION_NAME), lw.cache)
+        val engine = Engine(prefs.engineSettings(), lw.checkApi(), lw.cache)
         val lang = Texts.lang(this)
         job = lifecycleScope.launch {
             val d = withContext(Dispatchers.Default) { engine.prepare(raw) }
@@ -125,7 +124,7 @@ class CheckActivity : ComponentActivity(), SheetActions {
     private fun show(r: CheckResult, t0: Long) {
         val ms = SystemClock.elapsedRealtime() - t0
         result = r.copy(elapsedMs = ms)
-        Log.i(TAG, "check outcome=${r.outcome} source=${r.source} reason=${r.reason} ms=$ms server=${serverTag(lw.prefs.server)}")
+        Log.i(TAG, "check outcome=${r.outcome} source=${r.source} reason=${r.reason} reserve=${r.viaReserve} ms=$ms server=${serverTag(lw.prefs.server)}")
         state = SheetState.Done(result!!, Browsers.label(this, lw.prefs.forwardPackage))
         if (r.outcome == Outcome.GRUEN) {
             lifecycleScope.launch {

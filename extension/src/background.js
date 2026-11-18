@@ -2,8 +2,10 @@
 // Decides for every intercepted link: allowlist -> cache -> local heuristics -> desktop app or server. Never opens silently
 // when the check fails. Docs: docs/DESKTOP.md sections 4-6, docs/API.md.
 import { api } from "./api.js";
-import { getAll, set, installId, renewInstallId, effectiveServer } from "./store.js";
+import { getAll, set, installId, renewInstallId, effectiveServer, PRESET, FALLBACK } from "./store.js";
 import { checkServer } from "./client.js";
+import { checkWithFailover, reserveFor, probeHealth, PROBE_MS } from "./failover.js";
+import { timeoutSignal } from "./platform.js";
 import { t, pickLang } from "./i18n.js";
 import * as native from "./native.js";
 import { features, createTab, TARGET } from "./platform.js";
@@ -23,11 +25,21 @@ const hasAccess = api.permissions && typeof api.permissions.contains === "functi
   ? (origin) => api.permissions.contains({ origins: [origin + "/*"] })
   : null;
 
-/** { ok: true, res } or { ok: false, reason, host, status? } — see client.js for the reasons. */
-async function serverCheck(target, st, lang) {
-  const out = await checkServer({
-    server: effectiveServer(st.settings), body: { url: reduceForSend(target, st.settings.scope), lang, scope: st.settings.scope },
-    client: "extension/" + VERSION, fetch: (u, o) => fetch(u, o), installId, renewId: renewInstallId, hasAccess,
+// Down-state of the main server lives in storage: the service worker is restarted often (docs/FALLBACK.md).
+const downState = {
+  get: async () => (await api.storage.local.get("primaryDown")).primaryDown || null,
+  set: (v) => (v ? api.storage.local.set({ primaryDown: v }) : api.storage.local.remove("primaryDown")),
+};
+
+/** { ok: true, res, via? } or { ok: false, reason, host, status? } — see client.js for the reasons, failover.js for the reserve. */
+async function serverCheck(target, st, lang, noReserve = false) {
+  const body = { url: reduceForSend(target, st.settings.scope), lang, scope: st.settings.scope };
+  const server = effectiveServer(st.settings);
+  const out = await checkWithFailover({
+    server, reserve: noReserve ? "" : reserveFor(server, PRESET, FALLBACK), now: () => Date.now(), state: downState,
+    check: (srv, x) => checkServer({ server: srv, body, client: "extension/" + VERSION, fetch: (u, o) => fetch(u, o), installId, renewId: renewInstallId,
+      hasAccess: x.access === false ? undefined : hasAccess, ...(x.timeoutMs ? { timeoutMs: x.timeoutMs } : {}), noRetry: !!x.noRetry }),
+    probe: (srv) => probeHealth(srv, (u, o) => fetch(u, o), timeoutSignal(PROBE_MS)),
   });
   // One line in the extension's console (Safari: Develop → Web Extension Background Content), never the link itself.
   if (!out.ok) console.warn("[Linkwache] check failed:", out.reason, out.status || "", out.host || "(no server)");
@@ -60,18 +72,19 @@ export async function evaluate(raw) {
   let res = null;
   if (F.native && (native.appInfo() || (await native.hello(VERSION)))) res = await native.check(reduceForSend(target, st.settings.scope), lang);
   const fromApp = !!res;
+  let via = "";
   if (res && res.offline) return { ...base, stufe: "off", findings: slimFindings(res.local && res.local.findings), source: "app" };
   if (!res) {
     const out = await serverCheck(target, st, lang);
     if (!out.ok) return { ...base, stufe: "off", findings: local.findings.filter((f) => f.stufe !== "info"), source: "local", why: out.reason, host: out.host, status: out.status };
-    res = out.res;
+    res = out.res; via = out.via || "";
   }
 
   const findings = slimFindings(res.findings);
   const rules = Number(res.rules) || (fromApp ? RULES : 1);
   if (rules > RULES) await newerRules(rules);
   await remember(key, domain, res.stufe, findings, ttlFor(res.stufe, res.cacheTtl), rules);
-  return { ...base, stufe: res.stufe, findings, source: res.source || "server" };
+  return { ...base, stufe: res.stufe, findings, source: res.source || "server", ...(via ? { via } : {}) };
 }
 
 async function remember(key, domain, stufe, findings, ttl, rules) {
@@ -143,7 +156,7 @@ if (F.webNavigation) {
 // ── Opening ──────────────────────────────────────────────────────────────────
 function warnUrl(r, mode) {
   return warningBase() + "#d=" + b64urlEncode({ u: r.target, s: r.stufe, f: r.findings.slice(0, 10), w: r.wrapped, m: mode === "same" ? "same" : "new",
-    ...(r.why ? { e: r.why, h: r.host || "", c: r.status || 0 } : {}) });
+    ...(r.why ? { e: r.why, h: r.host || "", c: r.status || 0 } : {}), ...(r.via ? { v: r.via } : {}) });
 }
 async function openIn(sender, url, mode) {
   const tab = sender.tab;
@@ -200,7 +213,7 @@ api.runtime.onMessage.addListener((m, sender, reply) => {
       }
       case "testServer": {
         const st = await getAll();
-        const out = await serverCheck("https://connection-test.example/", st, langOf(st.settings));
+        const out = await serverCheck("https://connection-test.example/", st, langOf(st.settings), true);   // tests the configured (main) server only
         return out.ok ? { ok: true, host: new URL(effectiveServer(st.settings)).host, server: out.res.server || "" } : out;
       }
       case "appStatus": return F.native ? (await native.hello(VERSION)) || null : { unsupported: true, target: TARGET };

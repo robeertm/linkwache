@@ -143,6 +143,17 @@ LINKWACHE_DEFAULT_SERVER=https://example.org ./gradlew :app:assembleRelease   # 
   `LINKWACHE_PRESET_MIGRATE_FROM` (build-time, earlier presets separated by commas or spaces)
   drops a stored copy of an earlier preset at start; an address of the user's own stays.
 
+### Reserve server
+
+`LINKWACHE_FALLBACK_SERVER` (build-time, in CI the repository variable of the same name; empty = none) sets the
+address of the reserve server. While the built-in address is in use, a check that fails for a network or server
+reason (timeout, no connection, status 500 or higher, a non-JSON error page, a malformed 2xx answer) is repeated on
+the reserve within a total budget of 8 seconds; the main server is remembered as down for 5 minutes and probed
+in the background (`/api/health`, at most once a minute). An address the user entered never gets a reserve.
+An answer from the reserve shows a quiet note in the sheet. A rejected installation id (`400 err.install`) is
+renewed and the check repeated once on the same server. The full contract is in [FALLBACK.md](FALLBACK.md); the
+logic is `core/.../Failover.kt` (unit tests: `FailoverTest`).
+
 ### Continuous integration
 
 `.github/workflows/android.yml` runs on every change below `android/`:

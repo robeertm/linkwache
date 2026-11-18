@@ -269,3 +269,19 @@ fn cached_answer_of_older_rules_is_asked_again() {
     let r = r.unwrap();
     assert_eq!((r.stufe.as_str(), r.source.as_str()), ("gruen", "server"));
 }
+
+#[test]
+fn reserve_answer_is_marked_and_the_mark_is_not_cached() {
+    let (_d, paths, s) = setup();
+    let mut v = green();
+    v["via"] = json!("reserve");
+    let api = Mock::new(Ok(v));
+    let e = Engine { paths: &paths, settings: &s, api: &api };
+    let (_, r) = e.check("https://shop.example.com/a", "en");
+    let r = r.unwrap();
+    assert_eq!((r.stufe.as_str(), r.via.as_deref()), ("gruen", Some("reserve")));
+    assert!(r.server.as_ref().unwrap().get("via").is_none());
+    let (_, r2) = e.check("https://shop.example.com/a", "en");
+    let r2 = r2.unwrap();
+    assert_eq!((r2.source.as_str(), r2.via), ("cache", None), "a cached answer is not 'via reserve'");
+}

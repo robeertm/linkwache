@@ -115,11 +115,11 @@ class Engine(
             // heuristics and may soften one with more knowledge, e.g. http to a well-known site, 0.5.3).
             val worse = localOnly.isNotEmpty() && p.local.level.severity > v.level.severity
             return if (worse) {
-                r.copy(findings = findings, source = source, chain = v.chain)
+                r.copy(findings = findings, source = source, chain = v.chain, viaReserve = v.viaReserve)
             } else {
                 r.copy(
                     outcome = v.level.toOutcome(), findings = findings, source = source, chain = v.chain,
-                    kurzKey = v.kurzKey ?: r.kurzKey, ratKey = v.ratKey ?: r.ratKey, kurz = v.kurz, rat = v.rat,
+                    kurzKey = v.kurzKey ?: r.kurzKey, ratKey = v.ratKey ?: r.ratKey, kurz = v.kurz, rat = v.rat, viaReserve = v.viaReserve,
                 )
             }
         }

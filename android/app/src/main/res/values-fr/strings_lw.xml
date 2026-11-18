@@ -240,4 +240,5 @@
     <string name="lw_warn_title_gelb" formatted="false">Lien suspect</string>
     <string name="lw_warn_title_offline" formatted="false">Vérification impossible</string>
     <string name="lw_warn_title_rot" formatted="false">Lien dangereux – bloqué</string>
+    <string name="lw_warn_via_reserve" formatted="false">Vérifié via le serveur de secours</string>
 </resources>

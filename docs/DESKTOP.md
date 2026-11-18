@@ -157,6 +157,18 @@ Target: under 1 s from click to open for clean, known links.
 Shared test vectors (`test/vectors/heuristics.json`) are run by both the JavaScript tests and the
 Rust tests so the port cannot drift from the server.
 
+## 5a. Reserve server
+
+When the main server fails for real (timeout, no connection, status 500 or higher, an error page that is not JSON,
+a 2xx that is not a v1 answer), the check goes to a reserve server with the same request. The reserve address is
+baked in at build time (`LINKWACHE_FALLBACK_SERVER`, empty = none) and used only while the effective server is the
+built-in one; a user's own server never gets a reserve. Time budget: main 4.5 s, reserve `min(6 s, 8 s - elapsed)`,
+whole check at most 8 s. The main server is remembered as down for 5 minutes (shared by all checks while the app
+runs); meanwhile a background thread probes `GET /api/health` at most once a minute to switch back. An answer from
+the reserve is marked `via: "reserve"` and the result window shows the quiet note "Checked via the reserve server".
+Logic: `desktop/core/src/failover.rs` (tests with a fake backend and a fake clock). Contract: [FALLBACK.md](FALLBACK.md).
+The browser extension (incl. Safari) follows the same contract in `extension/src/failover.js`.
+
 ## 6. Privacy
 
 - Local checks first. The server only receives what it needs.

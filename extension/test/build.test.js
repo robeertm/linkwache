@@ -64,3 +64,12 @@ test("zips exist, are valid and carry the manifest at the root; Safari has none 
     execFileSync("unzip", ["-tq", z]);
   }
 });
+
+test("no reserve address baked into the build when LINKWACHE_FALLBACK_SERVER is empty", () => {
+  for (const t of ["chromium", "firefox"]) {
+    const bg = rd(t, "background.js");
+    assert.ok(!/workers\.dev|reserve\.[a-z]+\.example/.test(bg), t + " has no reserve host");
+    assert.match(bg, /primaryDown/, "failover logic is bundled");
+    assert.ok(!/LW_FALLBACK_SERVER/.test(bg), "the define is replaced at build time");
+  }
+});

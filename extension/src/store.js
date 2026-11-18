@@ -4,6 +4,8 @@ import { normServer, parsePresetList, applyPreset } from "./preset.js";
 
 /** Built-in server address and earlier ones to move away from (build-time, see scripts/build.mjs). */
 export const PRESET = normServer(typeof LW_DEFAULT_SERVER === "string" ? LW_DEFAULT_SERVER : "");
+/** Reserve server address (build-time LINKWACHE_FALLBACK_SERVER, empty = none), used only with the built-in address, docs/FALLBACK.md. */
+export const FALLBACK = normServer(typeof LW_FALLBACK_SERVER === "string" ? LW_FALLBACK_SERVER : "");
 export const PRESET_MIGRATE_FROM = parsePresetList(typeof LW_PRESET_MIGRATE_FROM === "string" ? LW_PRESET_MIGRATE_FROM : "", PRESET);
 
 export const DEFAULTS = { server: PRESET, serverPreset: PRESET, scope: "url", paused: false, lang: "auto" };
