@@ -1,0 +1,35 @@
+# Linkwache reserve server (docs/FALLBACK.md): the app API only, as a Cloudflare Worker on the free plan.
+# Deploy from the repository root:
+#   npx wrangler deploy -c deploy/cloudflare/wrangler.toml
+#   npx wrangler secret put SAFE_BROWSING_KEY -c deploy/cloudflare/wrangler.toml   (optional, recommended)
+# The address is https://linkwache-reserve.<account>.workers.dev; put it into the repository variable
+# LINKWACHE_FALLBACK_SERVER so the next app builds know it.
+name = "linkwache-reserve"
+main = "../../src/reserve.js"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+preview_urls = false
+
+# No KV, no static files, no cron: nothing is stored on the reserve.
+
+# Per installation and per IP and minute (the keys are hashed with the day, never stored). Same figures as the
+# main server's per-minute limits; the free plan allows 100,000 requests a day for the whole account.
+[[ratelimits]]
+name = "V1_LIMIT"
+namespace_id = "2061"
+simple = { limit = 60, period = 60 }
+
+[[ratelimits]]
+name = "V1_IP_LIMIT"
+namespace_id = "2062"
+simple = { limit = 120, period = 60 }
+
+[vars]
+SITE_NAME = "Linkwache"
+# Tighter lookup budget than the main server (unwrap, first pass, urlscan search) so the reserve answers within
+# the 6 s the apps give it, even when one provider hangs.
+LITE_BUDGET_MS = "1500,2000,800"
+
+[observability]
+enabled = false

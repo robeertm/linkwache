@@ -17,16 +17,24 @@ const within = (p, ms) => ms ? Promise.race([p, new Promise((_, rej) => setTimeo
 // even when one provider hangs (each provider alone may take up to 6 s on the website path).
 export const LITE_BUDGET = { unwrap: 2000, first: 2500, second: 1200 };
 
+/** Lookup budget of the client API; LITE_BUDGET_MS="unwrap,first,second" tightens it (the reserve server, docs/FALLBACK.md). */
+export function liteBudget(env) {
+  const p = String(env?.LITE_BUDGET_MS || "").split(",").map((x) => Number(x.trim()));
+  if (p.length !== 3 || p.some((x) => !Number.isFinite(x) || x < 100 || x > 10000)) return LITE_BUDGET;
+  return { unwrap: p[0], first: p[1], second: p[2] };
+}
+
 // lite (client API v1): never submits a sandbox scan, searches urlscan only when the first pass is not green,
 // skips crt.sh (it only ever adds an info finding without weight and is often slow), and keeps every lookup
 // inside LITE_BUDGET. The website path (lite = false) behaves exactly as before.
 export async function runCheck(rawInput, env, { withScan = true, lite = false } = {}) {
   if (lite) withScan = false;
+  const B = liteBudget(env);
   const input = normalizeInput(rawInput);
   if (!input) return { error: "err.nolink" };
 
   const { finalUrl, chain } = lite
-    ? await within(unwrapShortener(input), LITE_BUDGET.unwrap).catch(() => ({ finalUrl: input, chain: [input] }))
+    ? await within(unwrapShortener(input), B.unwrap).catch(() => ({ finalUrl: input, chain: [input] }))
     : await unwrapShortener(input);
   const url = finalUrl;
   const h = hostInfo(url);
@@ -39,7 +47,7 @@ export async function runCheck(rawInput, env, { withScan = true, lite = false } 
   }
 
   const skipped = { ok: false, e: "lite" };
-  const lim = lite ? LITE_BUDGET.first : 0;
+  const lim = lite ? B.first : 0;
   let [dns, rdap, ct, sb, uh, uhu, pt, us] = await Promise.all([
     settle(within(dnsFacts(h.host, h.domain), lim)),
     settle(within(rdapFacts(h.domain), lim)),
@@ -63,7 +71,7 @@ export async function runCheck(rawInput, env, { withScan = true, lite = false } 
   };
   let v = verdict(assemble(), { url });
   if (lite && v.stufe !== "gruen") {
-    us = await settle(within(urlscanSearch(h.domain), LITE_BUDGET.second));
+    us = await settle(within(urlscanSearch(h.domain), B.second));
     v = verdict(assemble(), { url });
   }
 

@@ -121,11 +121,15 @@ export async function unwrapShortener(url) {
 
 // DNS über HTTPS, per IP angesprochen: Namen wie dns.google werden von manchen
 // Filtern (NextDNS „Umgehungen blockieren“) auf 0.0.0.0 umgebogen. Erst 1.1.1.1, dann 8.8.8.8.
+// On Cloudflare Workers a fetch to a Cloudflare IP address is refused ("direct IP access"), so the resolver is asked
+// by name there; no filter sits between a Worker and its resolver.
+const ON_WORKERS = globalThis.navigator?.userAgent === "Cloudflare-Workers";
+const DOH_FIRST = ON_WORKERS ? "https://cloudflare-dns.com/dns-query" : "https://1.1.1.1/dns-query";
 async function doh(name, type) {
   const q = `name=${encodeURIComponent(name)}&type=${type}`;
   let j;
   try {
-    const r = await fetchTimeout(`https://1.1.1.1/dns-query?${q}`, { headers: { accept: "application/dns-json" } }, 4000);
+    const r = await fetchTimeout(`${DOH_FIRST}?${q}`, { headers: { accept: "application/dns-json" } }, 4000);
     j = await r.json();
   } catch {
     const r = await fetchTimeout(`https://8.8.8.8/resolve?${q}`, {}, 4000);
