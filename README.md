@@ -148,6 +148,10 @@ contract (when to switch, time budget, switching back) is in [docs/FALLBACK.md](
   npx wrangler secret put SAFE_BROWSING_KEY -c deploy/cloudflare/wrangler.toml   # optional, recommended
   ```
   Free plan: 100,000 requests a day; one check is one request plus about eight sub-requests (limit 50).
+  Without an interactive login: `deploy/cloudflare/deploy.sh --subdomain <name> --set-repo-variable <owner>/<repo>`
+  with an API token (template "Edit Cloudflare Workers") in `~/.config/cloudflare/token` (0600); it registers the
+  workers.dev subdomain if the account has none, deploys, optionally sets the Safe Browsing secret (`SB_KEY_CMD`),
+  checks the reserve and sets the repository variable.
 - **Watchdog:** a monitor can probe the reserve with `"probe": true` (see [docs/API.md](docs/API.md)).
 - **Privacy:** only while the main server is down, the app sends the same check request to the reserve (link
   reduced as usual, language, scope, random installation id, app name/version); Cloudflare technically also sees the
