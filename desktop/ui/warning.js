@@ -52,9 +52,12 @@
     $("findingshead").hidden = shown.length === 0;
     $("nofindings").hidden = shown.length > 0;
     $("nofindings").textContent = st === "offline" ? LW.t("dt.warn.local.none") : LW.t("dt.warn.nofindings");
-    $("source").textContent = st === "offline" ? "" : LW.t(SOURCE[r.source] || SOURCE.server);
-    $("via").hidden = r.via !== "reserve" || st === "offline";
-    $("via").textContent = r.via === "reserve" ? LW.t("dt.warn.via.reserve") : "";
+    // An answer from the reserve server replaces the source line (never both: "checked by the server" + "via reserve").
+    const viaReserve = r.via === "reserve" && st !== "offline";
+    $("source").hidden = viaReserve;
+    $("source").textContent = st === "offline" || viaReserve ? "" : LW.t(SOURCE[r.source] || SOURCE.server);
+    $("via").hidden = !viaReserve;
+    $("via").textContent = viaReserve ? LW.t("dt.warn.via.reserve") : "";
     // Actions
     const red = isRed(r);
     $("know").hidden = !red || redStep;

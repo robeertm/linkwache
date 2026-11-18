@@ -16,6 +16,7 @@
       findings: [F("tld", "gelb", { tld: "top" }), F("lure", "info", { words: "login" }), F("db-clean", "info", { n: 3 })],
       local: local("gelb", [F("tld", "gelb", { tld: "top" })]),
     },
+    "amber-reserve": null,
     red: {
       url: "https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpaypal.com.secure-login.example%2Fkonto%2Fverify&data=05",
       target: "https://paypal.com.secure-login.example/konto/verify", unwrapped: true,
@@ -68,7 +69,7 @@
         case "bootstrap": return { lang, platform, version: "0.5.0" };
         case "toast_state": return toasts[fixture] || toasts["toast-checking"];
         case "get_result": {
-          const r = results[fixture] || results.amber;
+          const r = fixture === "amber-reserve" ? { ...results.amber, via: "reserve" } : results[fixture] || results.amber;
           return { id: 1, result: r, waitMs: q.get("wait") ? Number(q.get("wait")) : 2400, redStep: false };
         }
         case "get_settings": return settings;

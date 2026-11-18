@@ -28,6 +28,7 @@ STATES = [
     ("toast-refused", "toast.html", TOAST, "fixture=toast-refused", None),
     ("warning-amber", "warning.html", WARN, "fixture=amber", None),
     ("warning-amber-ready", "warning.html", WARN, "fixture=amber&wait=0", None),
+    ("warning-amber-reserve", "warning.html", WARN, "fixture=amber-reserve&wait=0", None),
     ("warning-red", "warning.html", WARN, "fixture=red", None),
     ("warning-red-second-step", "warning.html", WARN, "fixture=red-step", "click:#know"),
     ("warning-offline", "warning.html", WARN, "fixture=offline", None),
