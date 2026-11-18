@@ -107,6 +107,13 @@ export async function apiV1Check(req, env, ctx, lang) {
   const url = reduceUrl(String(body.url || "").slice(0, 4000), body.scope === "domain" ? "domain" : "url");
   if (!url) return json({ error: "err.nolink", message: t(lang, "err.nolink") }, 400);
 
+  // Watchdog probe: the whole request path with heuristics only, no outside lookup, not cached, not counted as use.
+  if (body.probe === true) {
+    const pr = await runCheck(url, env, { lite: true, offline: true });
+    if (pr.error) return json({ error: pr.error, message: t(lang, pr.error) }, 400);
+    return json({ ...shape(pr, lang), probe: true });
+  }
+
   const now = Date.now();
   const key = RULES + "|" + url; // cached results of older rules are never reused
   let hit = cache.get(key);

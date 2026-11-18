@@ -250,3 +250,16 @@ test("privacy: tokens in the query never reach outside services (Safe Browsing, 
   const scan = calls.find((c) => c.url.includes("urlscan.io/api/v1/scan/"));
   assert.equal(JSON.parse(scan.init.body).url, "https://files.example.org/a/b.png?size=2", "harmless parameters stay");
 });
+
+test("watchdog probe: full request path, heuristics only, no outside lookup, not counted", async () => {
+  const work = [];
+  const env = makeEnv({ METRICS: { work: (w) => work.push(w) } });
+  const r = await post(env, { url: "https://example.com/", probe: true });
+  assert.equal(r.status, 200);
+  const d = await r.json();
+  assert.equal(d.api, 1); assert.equal(d.probe, true); assert.ok(["gruen", "gelb", "rot"].includes(d.stufe));
+  assert.equal(calls.length, 0, "no outside lookup");
+  assert.equal(work.length, 0, "not counted as use");
+  const bad = await post(env, { url: "https://example.com/", probe: true }, { "x-linkwache-install": "x" });
+  assert.equal(bad.status, 400, "install id still required");
+});

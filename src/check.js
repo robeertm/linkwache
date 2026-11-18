@@ -27,13 +27,15 @@ export function liteBudget(env) {
 // lite (client API v1): never submits a sandbox scan, searches urlscan only when the first pass is not green,
 // skips crt.sh (it only ever adds an info finding without weight and is often slow), and keeps every lookup
 // inside LITE_BUDGET. The website path (lite = false) behaves exactly as before.
-export async function runCheck(rawInput, env, { withScan = true, lite = false } = {}) {
-  if (lite) withScan = false;
+// offline (probe of the operator's watchdog, POST /api/v1/check with probe: true): heuristics only, no outside lookup
+// at all — exercises the whole request path without asking any provider.
+export async function runCheck(rawInput, env, { withScan = true, lite = false, offline = false } = {}) {
+  if (lite || offline) withScan = false;
   const B = liteBudget(env);
   const input = normalizeInput(rawInput);
   if (!input) return { error: "err.nolink" };
 
-  const { finalUrl, chain } = lite
+  const { finalUrl, chain } = offline ? { finalUrl: input, chain: [input] } : lite
     ? await within(unwrapShortener(input), B.unwrap).catch(() => ({ finalUrl: input, chain: [input] }))
     : await unwrapShortener(input);
   const url = finalUrl;
@@ -48,7 +50,7 @@ export async function runCheck(rawInput, env, { withScan = true, lite = false } 
 
   const skipped = { ok: false, e: "lite" };
   const lim = lite ? B.first : 0;
-  let [dns, rdap, ct, sb, uh, uhu, pt, us] = await Promise.all([
+  let [dns, rdap, ct, sb, uh, uhu, pt, us] = offline ? [skipped, skipped, skipped, skipped, skipped, skipped, skipped, skipped] : await Promise.all([
     settle(within(dnsFacts(h.host, h.domain), lim)),
     settle(within(rdapFacts(h.domain), lim)),
     lite ? skipped : settle(ctFacts(h.domain)),
@@ -70,7 +72,7 @@ export async function runCheck(rawInput, env, { withScan = true, lite = false } 
     return all;
   };
   let v = verdict(assemble(), { url });
-  if (lite && v.stufe !== "gruen") {
+  if (lite && !offline && v.stufe !== "gruen") {
     us = await settle(within(urlscanSearch(h.domain), B.second));
     v = verdict(assemble(), { url });
   }
