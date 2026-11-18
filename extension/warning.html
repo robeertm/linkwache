@@ -7,6 +7,7 @@
     <span id="badge" class="badge"></span>
     <h1 id="title"></h1>
     <p id="lead" class="lead"></p>
+    <div id="whyBox" class="why" hidden><p id="why"></p><p id="whyServer" class="small"></p><p id="guide" class="small" hidden></p></div>
     <div class="target"><span class="lbl" id="targetLbl"></span><b id="domain" class="domain"></b><code id="url"></code><span id="wrapped" class="small" hidden></span></div>
     <h2 id="findLbl"></h2>
     <ul id="findings" class="findings"></ul>
@@ -15,6 +16,11 @@
       <button id="back" class="btn primary" type="button"></button>
       <button id="open" class="btn ghost" type="button" disabled></button>
       <button id="step" class="linkbtn" type="button" hidden></button>
+    </div>
+    <div id="offActions" class="actions" hidden>
+      <button id="retry" class="btn ghost" type="button"></button>
+      <button id="grant" class="btn ghost" type="button" hidden></button>
+      <button id="settings" class="btn ghost" type="button" hidden></button>
     </div>
     <label id="alwaysRow" class="check" hidden><input id="always" type="checkbox"><span id="alwaysLbl"></span></label>
     <div id="confirm" class="confirm" hidden>

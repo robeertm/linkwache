@@ -29,6 +29,19 @@ export async function installId() {
   return id;
 }
 
+/** A fresh install id, stored (the server refused the old one: self-healing, see client.js). */
+export async function renewInstallId() {
+  const id = randomHex(16);
+  await api.storage.local.set({ install: id });
+  return id;
+}
+
+/** The address checks go to: the stored one, or the built-in preset while the field is empty. */
+export function effectiveServer(settings, preset = PRESET) {
+  const s = String((settings && settings.server) || "").trim();
+  return s || preset || "";
+}
+
 export function validServer(s) {
   if (!s) return false;
   try { const u = new URL(s); return (u.protocol === "https:" || (u.protocol === "http:" && /^(localhost|127\.0\.0\.1|\[::1\])$/.test(u.hostname))) && !u.search && !u.hash; } catch { return false; }

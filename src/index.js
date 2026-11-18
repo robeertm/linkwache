@@ -12,7 +12,7 @@ import { handleTelegram } from "./telegram.js";
 import { extractUrls, sha256hex, esc } from "./util.js";
 import { pickLang, t, verdictText } from "./i18n.js";
 import { VERSION } from "./version.js";
-import { apiV1Check } from "./api_v1.js";
+import { apiV1Check, v1Preflight, withV1Cors } from "./api_v1.js";
 import { RULES } from "./lists.js";
 
 const TTL = 90 * 86400;
@@ -25,7 +25,8 @@ export default {
     try {
       if (p === "/" || p === "/index.html") return html(homePage(lang, env), 200, lang);
       if (p === "/api/check" && req.method === "POST") return apiCheck(req, env, ctx, lang);
-      if (p === "/api/v1/check" && req.method === "POST") return apiV1Check(req, env, ctx, lang);
+      if (p === "/api/v1/check" && req.method === "POST") return withV1Cors(req, await apiV1Check(req, env, ctx, lang));
+      if (p === "/api/v1/check" && req.method === "OPTIONS") return v1Preflight(req);
       if (p.startsWith("/api/result/")) return apiResult(p.slice("/api/result/".length), env, ctx, lang);
       if (p.startsWith("/r/")) return resultPage(p.slice(3), env, ctx, lang);
       if (p === "/impressum.html") return html(legalPage(lang, env), 200, lang);

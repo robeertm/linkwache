@@ -201,3 +201,52 @@ test("health reports the supported API versions; the website check still stores 
   assert.equal(j.scan.status, "pending");
   assert.ok(calls.some((c) => c.url.includes("urlscan.io/api/v1/search")), "website still searches urlscan on every check");
 });
+
+// Safari applies CORS to the extension's background page when the server's host is not (yet) granted: without an
+// answer to the preflight the request never leaves the browser (0.7.1, "could not be checked" on every click).
+test("CORS: extension origins get a preflight answer and the allow-origin header, web pages never", async () => {
+  const env = makeEnv();
+  const pre = (origin) => worker.fetch(new Request("https://example.test/api/v1/check", { method: "OPTIONS", headers: {
+    ...(origin ? { origin } : {}), "access-control-request-method": "POST", "access-control-request-headers": "content-type,x-linkwache-install,x-linkwache-client" } }), env, ctxOf());
+  for (const o of ["safari-web-extension://3F2504E0-4F89-11D3-9A0C-0305E82C3301", "chrome-extension://abcdefghijklmnopabcdefghijklmnop", "moz-extension://1b2c3d4e-0000-4000-8000-000000000000"]) {
+    const r = await pre(o);
+    assert.equal(r.status, 204, o);
+    assert.equal(r.headers.get("access-control-allow-origin"), o);
+    assert.match(r.headers.get("access-control-allow-headers"), /x-linkwache-install/);
+    assert.match(r.headers.get("access-control-allow-headers"), /x-linkwache-client/);
+    assert.match(r.headers.get("access-control-allow-headers"), /content-type/);
+    assert.equal(r.headers.get("access-control-allow-methods"), "POST");
+    const p = await post(env, { url: "https://a.example/" }, { origin: o });
+    assert.equal(p.status, 200);
+    assert.equal(p.headers.get("access-control-allow-origin"), o, "the answer itself is readable for the extension");
+    const bad = await post(env, { url: "https://a.example/" }, { origin: o, "x-linkwache-install": "" });
+    assert.equal(bad.status, 400);
+    assert.equal(bad.headers.get("access-control-allow-origin"), o, "error answers are readable too (err.install, not a network error)");
+  }
+  for (const o of ["https://evil.example", "null", "", "safari-web-extension://x/../evil"]) {
+    const r = await pre(o);
+    assert.equal(r.status, 403, o || "(no origin)");
+    assert.equal(r.headers.get("access-control-allow-origin"), null, o);
+  }
+  const web = await post(env, { url: "https://a.example/" }, { origin: "https://example.test", "sec-fetch-site": "same-origin" });
+  assert.equal(web.headers.get("access-control-allow-origin"), null, "no CORS header for web pages");
+});
+
+test("privacy: tokens in the query never reach outside services (Safe Browsing, URLhaus, PhishTank, urlscan)", async () => {
+  router = (url, init) => url.includes("urlscan.io/api/v1/scan/") ? jres({ uuid: "u-2" }) : calm(url, init);
+  const env = makeEnv({ SAFE_BROWSING_KEY: "sb-key", URLHAUS_KEY: "uh-key" });
+  const b64 = (o) => Buffer.from(JSON.stringify(o)).toString("base64url");
+  const secret = [b64({ alg: "HS256" }), b64({ path: "/x.png" }), "c2lnbmF0dXJlc2lnbmF0dXJl"].join(".");   // a dummy JWT, built at runtime (leak scan)
+  const res = await worker.fetch(new Request("https://example.test/api/check", { method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ url: `https://files.example.org/a/b.png?jwt=${secret}&X-Amz-Signature=0123456789abcdef0123456789abcdef&size=2` }) }), env, ctxOf());
+  assert.equal(res.status, 200);
+  const outside = calls.filter((c) => /safebrowsing|urlhaus|phishtank|urlscan\.io\/api\/v1\/scan/.test(c.url));
+  assert.ok(outside.length >= 3, "the outside services were asked");
+  for (const c of outside) {
+    const sent = c.url + " " + String(c.init.body || "");
+    assert.ok(!sent.includes(secret) && !sent.includes(encodeURIComponent(secret)), "no token at " + c.url.slice(0, 40));
+    assert.ok(!sent.includes("0123456789abcdef0123456789abcdef"), "no signature at " + c.url.slice(0, 40));
+  }
+  const scan = calls.find((c) => c.url.includes("urlscan.io/api/v1/scan/"));
+  assert.equal(JSON.parse(scan.init.body).url, "https://files.example.org/a/b.png?size=2", "harmless parameters stay");
+});

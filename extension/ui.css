@@ -14,6 +14,9 @@ h2{font-size:.78rem;letter-spacing:.07em;text-transform:uppercase;color:var(--le
 .small{font-size:.86rem;color:var(--leise);display:block}
 .lbl{display:block;font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--leise)}
 .badge{display:inline-block;padding:.18rem .7rem;border-radius:999px;font-size:.76rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--rand)}
+.why{border:1px solid var(--rand);border-left:4px solid var(--akzent);background:var(--feld);border-radius:.8rem;padding:.7rem .9rem;margin:.6rem 0}
+#offActions{margin-top:.7rem}
+.why p{margin:0}.why p+p{margin-top:.35rem}.why #why{font-weight:600}
 .target{border:1px solid var(--rand);background:var(--feld);border-radius:.8rem;padding:.7rem .9rem;margin:.6rem 0}
 .domain{display:block;font-size:1.5rem;line-height:1.2;overflow-wrap:anywhere;margin:.15rem 0 .3rem}
 code{font:.84rem ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-wrap:anywhere;word-break:break-all;color:var(--leise)}
@@ -46,6 +49,6 @@ input[type=url],input[type=text],select{width:100%;font:inherit;padding:.65rem .
 .chips li{display:flex;align-items:center;gap:.4rem;padding:.25rem .3rem .25rem .8rem;border:1px solid var(--rand);border-radius:999px;background:var(--feld);overflow-wrap:anywhere}
 .chips button{font:inherit;font-size:.8rem;border:0;border-radius:999px;padding:.2rem .6rem;cursor:pointer;background:var(--karte);color:var(--leise)}
 .log{list-style:none;padding:0;margin:.3rem 0;font-size:.9rem}.log li{padding:.3rem 0;border-bottom:1px solid var(--rand);overflow-wrap:anywhere}
-.error{color:var(--rot);font-size:.9rem}.ok{color:var(--ok);min-height:1.2em}
-@media (max-width:520px){h1{font-size:1.35rem}.domain{font-size:1.25rem}.card{padding:1rem}.btn{flex:1 1 100%;text-align:center}.actions{gap:.5rem}}
+.error{color:var(--rot);font-size:.9rem}.test{margin-top:.7rem}.ok{color:var(--ok);min-height:1.2em}
+@media (max-width:520px){#offActions{margin-top:.5rem}h1{font-size:1.35rem}.domain{font-size:1.25rem}.card{padding:1rem}.btn{flex:1 1 100%;text-align:center}.actions{gap:.5rem}}
 [hidden]{display:none!important}

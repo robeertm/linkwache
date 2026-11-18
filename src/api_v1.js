@@ -36,6 +36,38 @@ export function v1Allowed(req) {
   try { return new URL(origin).host === new URL(req.url).host; } catch { return false; }
 }
 
+// CORS for extension pages only. Chromium and Firefox skip CORS for hosts the extension holds a permission for;
+// Safari applies it to the background page whenever the user has not (yet) granted the server's host. Without these
+// headers Safari blocks the request before it is sent and the extension can only say "could not be checked".
+// Web pages never get them: their Origin is an http(s) origin, which an extension scheme cannot be faked into.
+const CORS_HEADERS = "content-type, x-linkwache-install, x-linkwache-client";
+
+/** Origin of an extension page, or "" (a web page, a native client without Origin, or nothing). */
+export function extensionOrigin(req) {
+  const o = String(req.headers.get("origin") || "");
+  return EXT_ORIGIN.test(o) && /^[a-z-]+:\/\/[A-Za-z0-9._-]+$/.test(o) ? o : "";
+}
+
+/** OPTIONS /api/v1/check: allow POST with the client headers for extension origins, refuse everything else. */
+export function v1Preflight(req) {
+  const o = extensionOrigin(req);
+  if (!o) return new Response(null, { status: 403, headers: { "cache-control": "no-store" } });
+  return new Response(null, { status: 204, headers: {
+    "access-control-allow-origin": o, "access-control-allow-methods": "POST", "access-control-allow-headers": CORS_HEADERS,
+    "access-control-max-age": "86400", vary: "origin", "cache-control": "no-store",
+  } });
+}
+
+/** Add the CORS answer headers to a /api/v1/check response when an extension page asked. */
+export function withV1Cors(req, res) {
+  const o = extensionOrigin(req);
+  if (!o) return res;
+  const h = new Headers(res.headers);
+  h.set("access-control-allow-origin", o);
+  h.set("vary", "origin");
+  return new Response(res.body, { status: res.status, headers: h });
+}
+
 async function over(limiter, key) {
   if (!limiter) return null;
   const r = await limiter.limit({ key });

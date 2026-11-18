@@ -2,6 +2,32 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
+## 0.7.1 — 2026-11-18
+
+### Fixed — "could not be checked" on every click in Safari
+- The extension no longer reports every failed check as "no connection or no answer from the server". It tells the
+  reasons apart (no server address, no site access for the check server, no connection, timeout, installation id
+  refused, request refused, too many checks, server error) and the warning page names the reason and the check
+  server, in all eight languages.
+- The server answers the CORS preflight of `POST /api/v1/check` for extension origins and adds
+  `access-control-allow-origin` to every answer to an extension page. Safari applies CORS to an extension's
+  background page whenever the server's host is not granted; until now it blocked the request before it was sent.
+- Self-healing: when the server refuses the installation id, the extension makes a new one and repeats the check
+  once; a passing network failure is repeated once. An empty server field checks against the built-in address.
+- Warning page: **Check again**; when the browser blocks the server, **Allow access** (asks the browser for the
+  check server's site access) with the steps for Safari and Chromium, and **Open settings**.
+- Settings page: **Test connection** runs one real check and answers in plain words.
+
+### Privacy
+- Tokens and signatures in a link's query (for example `jwt`, `token`, `sig`, `X-Amz-Signature`, long opaque values)
+  are removed before the website check asks outside services (Safe Browsing, URLhaus, PhishTank, urlscan). The app
+  API never received the query in the first place.
+- The warning page shows such values shortened (`jwt=eyJh…`) instead of in full.
+
+### Notes
+- Desktop app and Android app already named these reasons (no server, timeout, no connection, server, too many
+  checks) and keep a valid installation id locally; unchanged in this release.
+
 ## 0.7.0 — 2026-11-16
 
 ### Added — usage figures for the operator (self-hosted build)

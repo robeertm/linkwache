@@ -2,14 +2,14 @@
 // Decides for every intercepted link: allowlist -> cache -> local heuristics -> desktop app or server. Never opens silently
 // when the check fails. Docs: docs/DESKTOP.md sections 4-6, docs/API.md.
 import { api } from "./api.js";
-import { getAll, set, installId, validServer, DEFAULTS } from "./store.js";
+import { getAll, set, installId, renewInstallId, effectiveServer } from "./store.js";
+import { checkServer } from "./client.js";
 import { t, pickLang } from "./i18n.js";
 import * as native from "./native.js";
-import { features, timeoutSignal, createTab, TARGET } from "./platform.js";
+import { features, createTab, TARGET } from "./platform.js";
 import { hostInfo } from "../../src/util.js";
 import { prepare, isAllowed, localAssess, reduceForSend, cacheKey, cacheFresh, ttlFor, decide, b64urlEncode, slimFindings, normalizeHttp, RULES, purgeOlderRules } from "./logic.js";
 
-const TIMEOUT_MS = 6000;
 const CACHE_MAX = 400;
 const VERSION = api.runtime.getManifest().version;
 const F = features(TARGET, api);
@@ -19,19 +19,19 @@ const warningBase = () => api.runtime.getURL("warning.html");
 const langOf = (settings) => pickLang(settings.lang, api.i18n?.getUILanguage?.() || "en");
 
 // ── Check pipeline ───────────────────────────────────────────────────────────
+const hasAccess = api.permissions && typeof api.permissions.contains === "function"
+  ? (origin) => api.permissions.contains({ origins: [origin + "/*"] })
+  : null;
+
+/** { ok: true, res } or { ok: false, reason, host, status? } — see client.js for the reasons. */
 async function serverCheck(target, st, lang) {
-  if (!validServer(st.settings.server)) return null;
-  const body = JSON.stringify({ url: reduceForSend(target, st.settings.scope), lang, scope: st.settings.scope });
-  try {
-    const r = await fetch(st.settings.server.replace(/\/$/, "") + "/api/v1/check", {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-linkwache-install": await installId(), "x-linkwache-client": "extension/" + VERSION },
-      body, signal: timeoutSignal(TIMEOUT_MS),
-    });
-    if (!r.ok) return null;
-    const j = await r.json();
-    return j && j.api === 1 && ["gruen", "gelb", "rot"].includes(j.stufe) ? j : null;
-  } catch { return null; }
+  const out = await checkServer({
+    server: effectiveServer(st.settings), body: { url: reduceForSend(target, st.settings.scope), lang, scope: st.settings.scope },
+    client: "extension/" + VERSION, fetch: (u, o) => fetch(u, o), installId, renewId: renewInstallId, hasAccess,
+  });
+  // One line in the extension's console (Safari: Develop → Web Extension Background Content), never the link itself.
+  if (!out.ok) console.warn("[Linkwache] check failed:", out.reason, out.status || "", out.host || "(no server)");
+  return out;
 }
 
 /** Returns { stufe: gruen|gelb|rot|off, findings, target, wrapped, domain, source } or null when the link is not http(s). */
@@ -61,8 +61,11 @@ export async function evaluate(raw) {
   if (F.native && (native.appInfo() || (await native.hello(VERSION)))) res = await native.check(reduceForSend(target, st.settings.scope), lang);
   const fromApp = !!res;
   if (res && res.offline) return { ...base, stufe: "off", findings: slimFindings(res.local && res.local.findings), source: "app" };
-  if (!res) res = await serverCheck(target, st, lang);
-  if (!res) return { ...base, stufe: "off", findings: local.findings.filter((f) => f.stufe !== "info"), source: "local" };
+  if (!res) {
+    const out = await serverCheck(target, st, lang);
+    if (!out.ok) return { ...base, stufe: "off", findings: local.findings.filter((f) => f.stufe !== "info"), source: "local", why: out.reason, host: out.host, status: out.status };
+    res = out.res;
+  }
 
   const findings = slimFindings(res.findings);
   const rules = Number(res.rules) || (fromApp ? RULES : 1);
@@ -139,7 +142,8 @@ if (F.webNavigation) {
 
 // ── Opening ──────────────────────────────────────────────────────────────────
 function warnUrl(r, mode) {
-  return warningBase() + "#d=" + b64urlEncode({ u: r.target, s: r.stufe, f: r.findings.slice(0, 10), w: r.wrapped, m: mode === "same" ? "same" : "new" });
+  return warningBase() + "#d=" + b64urlEncode({ u: r.target, s: r.stufe, f: r.findings.slice(0, 10), w: r.wrapped, m: mode === "same" ? "same" : "new",
+    ...(r.why ? { e: r.why, h: r.host || "", c: r.status || 0 } : {}) });
 }
 async function openIn(sender, url, mode) {
   const tab = sender.tab;
@@ -193,6 +197,11 @@ api.runtime.onMessage.addListener((m, sender, reply) => {
       case "recheck": {
         const r = await evaluate(m.url);
         return r ? { ...r, level: decide(r.stufe).level } : null;
+      }
+      case "testServer": {
+        const st = await getAll();
+        const out = await serverCheck("https://connection-test.example/", st, langOf(st.settings));
+        return out.ok ? { ok: true, host: new URL(effectiveServer(st.settings)).host, server: out.res.server || "" } : out;
       }
       case "appStatus": return F.native ? (await native.hello(VERSION)) || null : { unsupported: true, target: TARGET };
       case "clearCache": {

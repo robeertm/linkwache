@@ -25,3 +25,12 @@ export function findingView(lang, f) {
   if (f.key === "urlscan-verdict") return { titel: t(lang, k, p), text: t(lang, p.brands ? "f.urlscan-verdict.b" : "f.urlscan-verdict.t", p) };
   return { titel: t(lang, k, p), text: t(lang, k + ".t", p) };
 }
+
+/** Why a check did not finish (reasons of client.js) -> translated sentence; "" for an unknown or missing reason. */
+const WHY = {
+  noserver: "ext.w.why.noserver", access: "ext.w.why.access", network: "ext.w.why.network", timeout: "ext.w.why.timeout",
+  install: "ext.w.why.install", refused: "ext.w.why.refused", rate: "ext.w.why.rate", server: "ext.w.why.server",
+};
+export function whyText(lang, reason, code = 0) {
+  return WHY[reason] ? t(lang, WHY[reason], { code: code || "–" }) : "";
+}

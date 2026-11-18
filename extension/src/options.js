@@ -2,7 +2,7 @@
 import { api } from "./api.js";
 import { getAll, set, validServer, randomHex, PRESET } from "./store.js";
 import { presetMarkFor } from "./preset.js";
-import { t, pickLang, LANGS } from "./i18n.js";
+import { t, pickLang, LANGS, whyText } from "./i18n.js";
 
 const $ = (id) => document.getElementById(id);
 const NAMES = { de: "Deutsch", en: "English", tr: "Türkçe", pl: "Polski", ru: "Русский", es: "Español", fr: "Français", it: "Italiano" };
@@ -16,7 +16,7 @@ function texts() {
   $("appLbl").textContent = t(lang, "ext.o.app");
   $("serverLbl").textContent = t(lang, "ext.o.server"); $("serverHint").textContent = t(lang, "ext.o.server.hint"); $("serverBad").textContent = t(lang, "ext.o.server.bad");
   $("scopeLbl").textContent = t(lang, "ext.o.scope"); $("scopeUrl").textContent = t(lang, "ext.o.scope.url"); $("scopeDomain").textContent = t(lang, "ext.o.scope.domain");
-  $("langLbl").textContent = t(lang, "ext.o.lang");
+  $("langLbl").textContent = t(lang, "ext.o.lang"); $("test").textContent = t(lang, "ext.o.test");
   $("allowLbl").textContent = t(lang, "ext.o.allow"); $("allowEmpty").textContent = t(lang, "ext.o.allow.empty"); $("allowAdd").textContent = t(lang, "ext.o.allow.add");
   $("logLbl").textContent = t(lang, "ext.o.log"); $("logEmpty").textContent = t(lang, "ext.o.log.empty");
   $("privacy").textContent = t(lang, "ext.o.privacy"); $("clear").textContent = t(lang, "ext.o.clear"); $("reset").textContent = t(lang, "ext.o.reset");
@@ -51,12 +51,26 @@ async function saveSettings() {
   texts(); lists(); flash(t(lang, "ext.o.saved"));
 }
 
+/** "Test connection": one real check of a harmless address, the answer in plain words (same reasons as the warning page). */
+async function testServer() {
+  const out = $("testOut");
+  $("test").disabled = true; out.hidden = false; out.className = "small"; out.textContent = "…";
+  const r = await api.runtime.sendMessage({ t: "testServer" }).catch(() => null);
+  $("test").disabled = false;
+  if (r && r.ok) { out.className = "ok small"; out.textContent = t(lang, "ext.o.test.ok", { host: r.host, v: r.server || "?" }); return; }
+  out.className = "error";
+  const why = whyText(lang, r && r.reason, r && r.status) || whyText(lang, "network");
+  out.textContent = t(lang, "ext.o.test.fail") + " " + why + (r && r.host ? " (" + r.host + ")" : "");
+}
+
 async function main() {
   st = await getAll();
   lang = pickLang(st.settings.lang, (api.i18n && api.i18n.getUILanguage && api.i18n.getUILanguage()) || navigator.language);
   document.documentElement.lang = lang;
   texts(); lists();
   $("server").value = st.settings.server; $("paused").checked = st.settings.paused;
+  if (PRESET) $("server").placeholder = PRESET;   // an empty field checks against the built-in address
+  $("test").addEventListener("click", testServer);
   document.querySelector(`input[name=scope][value=${st.settings.scope === "domain" ? "domain" : "url"}]`).checked = true;
   for (const el of [$("server"), $("paused"), $("lang"), ...document.querySelectorAll("input[name=scope]")]) el.addEventListener("change", saveSettings);
   $("allowForm").addEventListener("submit", async (e) => {

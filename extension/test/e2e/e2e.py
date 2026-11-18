@@ -31,6 +31,8 @@ class H(BaseHTTPRequestHandler):
         API.append({"body": body, "origin": self.headers.get("origin"), "install": self.headers.get("x-linkwache-install"), "client": self.headers.get("x-linkwache-client")})
         if DELAY["v"]: time.sleep(DELAY["v"])
         host = body["url"].split("/")[2]
+        if host.startswith("install-always") or (host.startswith("install-once") and sum(1 for a in API if a["body"]["url"].split("/")[2] == host) == 1):
+            return self._send(400, json.dumps({"error": "err.install", "message": "no valid installation id"}), "application/json")
         amber = host.startswith("amber")
         out = {"api": 1, "rules": 2, "stufe": "gelb" if amber else "gruen", "score": 3 if amber else 0, "kurzKey": "v.gelb.one" if amber else "v.gruen", "ratKey": "x", "kurz": "", "rat": "",
                "url": body["url"], "host": {"host": host, "domain": host, "unicodeHost": host}, "chain": [host],
@@ -177,7 +179,34 @@ def main():
                     for w, h, tag in ((1280, 800, "wide"), (390, 844, "phone")):
                         page.set_viewport_size({"width": w, "height": h}); shot(page, f"warning-offline-{tag}-{scheme}")
                 page.set_viewport_size({"width": 1280, "height": 800}); page.emulate_media(color_scheme="light")
-                page.click("#back"); page.wait_for_timeout(800)
+                ok(page.is_visible("#whyBox") and "No connection to the check server" in page.inner_text("#why"), "offline: honest reason shown: " + page.inner_text("#why"))
+                ok("127.0.0.1:1" in page.inner_text("#whyServer"), "offline: the server address is named: " + page.inner_text("#whyServer"))
+                ok(page.is_visible("#retry") and page.inner_text("#retry") == "Check again", "offline: 'Check again' offered")
+                # check again after the server is back: green -> the target opens
+                settings(); page.click("#retry"); page.wait_for_url("http://offline-shop.example/**", timeout=9000)
+                ok("TARGET-OK offline-shop.example" in page.content(), "offline: 'Check again' with the server back opens the target")
+
+                # 7b. server refuses the install id once -> a new id, the check repeats by itself (self-healing)
+                def click_link(href, lid="dyn"):
+                    mail(); page.evaluate("([h, i]) => { const a = document.createElement('a'); a.id = i; a.href = h; a.textContent = i; document.body.prepend(a); }", [href, lid]); page.click("#" + lid)
+                sw.evaluate("() => chrome.storage.local.set({cache: {}, once: {}})")
+                before_id = store().get("install"); n = len(API)
+                click_link("http://install-once-shop.example/x"); page.wait_for_url("http://install-once-shop.example/**", timeout=9000)
+                ok(len(API) == n + 2 and API[-2]["install"] != API[-1]["install"], "err.install: repeated once with a new install id")
+                ok(store().get("install") not in (None, before_id), "err.install: the new id is stored")
+                # server keeps refusing -> reason 'installation id', never 'no connection'
+                click_link("http://install-always-shop.example/x"); page.wait_for_url(f"chrome-extension://{EXT_ID}/warning.html**", timeout=9000)
+                page.wait_for_selector("#app:not([hidden])")
+                ok("installation id" in page.inner_text("#why"), "err.install twice: reason named: " + page.inner_text("#why"))
+                shot(page, "warning-offline-install-wide-light")
+
+                # 7c. tokens in the link are shortened on the warning page and never sent
+                n = len(API)
+                click_link("http://amber-token.example/img.png?jwt=" + ".".join(["eyJhbGciOiJIUzI1NiJ9", "eyJzdWIiOiJ4In0", "c2lnbmF0dXJlLXRlc3Q"]) + "&size=2")   # dummy, joined at runtime (leak scan)
+                page.wait_for_url(f"chrome-extension://{EXT_ID}/warning.html**", timeout=9000); page.wait_for_selector("#app:not([hidden])")
+                shown = page.inner_text("#url")
+                ok("eyJh…" in shown and "eyJzdWIi" not in shown and "size=2" in shown, "token shortened on the warning page: " + shown)
+                ok(API[-1]["body"]["url"] == "http://amber-token.example/img.png", "token never sent: " + API[-1]["body"]["url"])
 
                 # 8. pause: links open without interception
                 settings(paused=True); page.wait_for_timeout(300)
@@ -192,6 +221,9 @@ def main():
                 ok(op.is_visible("#serverBad"), "options: invalid server address refused")
                 op.fill("#server", server); op.dispatch_event("#server", "change"); op.fill("#allowIn", "example.org"); op.press("#allowIn", "Enter")
                 ok("example.org" in store().get("allow", []), "options: allowlist entry saved")
+                op.click("#test"); t2 = time.time()
+                while (op.is_hidden("#testOut") or len(op.inner_text("#testOut")) < 4) and time.time() - t2 < 9: op.wait_for_timeout(100)   # no wait_for_function: the page CSP forbids eval
+                ok("Connected to 127.0.0.1:" in op.inner_text("#testOut"), "options: test connection names the server: " + op.inner_text("#testOut"))
                 for scheme in ("dark", "light"):
                     op.emulate_media(color_scheme=scheme)
                     for w, h, tag in ((1280, 900, "wide"), (390, 900, "phone")):

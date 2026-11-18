@@ -64,14 +64,15 @@ function hit(list, redKey, p, { exact, url, domain }) {
  * pt  PhishTank     { ok, listed, valid, verified, url }
  * us  urlscan search { ok, hits:[{url, malicious}] }
  */
-export function listFindings({ url, domain, sb, uh, uhu, pt, us }) {
+/** ext = the URL as the outside services were asked (secrets stripped, src/redact.js); defaults to url. */
+export function listFindings({ url, ext, domain, sb, uh, uhu, pt, us }) {
   const ctx = { url, domain };
   const f = [];
   if (sb?.ok && sb.matches?.length) f.push(hit("Google Safe Browsing", "safebrowsing", { types: sb.matches.join(", ") }, { ...ctx, exact: true }));
   if (uhu?.ok && uhu.listed) f.push(hit("URLhaus", "urlhaus-url", {}, { ...ctx, exact: true }));
   else if (uh?.ok && uh.listed) f.push(hit("URLhaus", "urlhaus", { n: uh.count }, { ...ctx, exact: false }));
   if (pt?.ok && pt.listed && pt.valid) {
-    const exact = !pt.url || sameListedUrl(pt.url, url);
+    const exact = !pt.url || sameListedUrl(pt.url, ext || url);
     f.push(hit("PhishTank", "phishtank", { verified: !!pt.verified }, { ...ctx, exact }));
   }
   const bad = (us?.ok && us.hits || []).filter((h) => h.malicious);

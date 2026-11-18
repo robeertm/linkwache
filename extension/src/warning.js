@@ -2,9 +2,11 @@
 // offline = "could not be checked" with the local assessment. Never opens by itself.
 import { api } from "./api.js";
 import { getAll } from "./store.js";
-import { t, pickLang, findingView } from "./i18n.js";
-import { b64urlDecode, localAssess, COUNTDOWN_SECONDS } from "./logic.js";
+import { t, pickLang, findingView, whyText } from "./i18n.js";
+import { b64urlDecode, b64urlEncode, localAssess, COUNTDOWN_SECONDS } from "./logic.js";
+import { TARGET } from "./platform.js";
 import { hostInfo } from "../../src/util.js";
+import { maskSecrets } from "../../src/redact.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -15,12 +17,49 @@ async function load() {
     const url = h.slice(3);
     const r = await api.runtime.sendMessage({ t: "recheck", url });
     if (!r) return null;
-    return { u: r.target, s: r.stufe === "gruen" ? "gelb" : r.stufe, f: r.findings, w: r.wrapped, m: "same" };
+    return { u: r.target, s: r.stufe === "gruen" ? "gelb" : r.stufe, f: r.findings, w: r.wrapped, m: "same", ...(r.why ? { e: r.why, h: r.host || "", c: r.status || 0 } : {}) };
   }
   return null;
 }
 
 function defang(u) { return u.replace(/^http/i, "hxxp").replace(/\./g, "[.]"); }
+
+/** Why the check did not finish, with what helps: check again, allow access (asks the browser), open the settings. */
+function showWhy(lang, d) {
+  const why = whyText(lang, d.e, d.c);
+  if (why) {
+    $("whyBox").hidden = false;
+    $("why").textContent = why;
+    if (d.h) $("whyServer").textContent = t(lang, "ext.w.server") + ": " + d.h; else $("whyServer").hidden = true;
+  }
+  $("offActions").hidden = false;
+  $("retry").textContent = t(lang, "ext.w.retry");
+  $("retry").addEventListener("click", async () => {
+    $("retry").disabled = true;
+    const r = await api.runtime.sendMessage({ t: "recheck", url: d.u }).catch(() => null);
+    if (r && r.stufe === "gruen") { location.href = d.u; return; }
+    const next = r ? { u: d.u, s: r.stufe, f: r.findings || [], w: d.w, m: d.m, ...(r.why ? { e: r.why, h: r.host || "", c: r.status || 0 } : {}) } : d;
+    location.hash = "#d=" + b64urlEncode(next);
+    location.reload();
+  });
+  if (d.e === "access") {
+    $("guide").hidden = false;
+    $("guide").textContent = t(lang, TARGET === "safari" ? "ext.w.guide.safari" : "ext.w.guide.other");
+    if (api.permissions && api.permissions.request && d.h) {
+      $("grant").hidden = false;
+      $("grant").textContent = t(lang, "ext.w.grant");
+      // permissions.request must run in the click itself (user gesture), so no await before it.
+      $("grant").addEventListener("click", () => {
+        api.permissions.request({ origins: ["https://" + d.h + "/*"] }).then((ok) => { if (ok) $("retry").click(); }, () => {});
+      });
+    }
+  }
+  if (d.e === "noserver" || d.e === "access") {
+    $("settings").hidden = false;
+    $("settings").textContent = t(lang, "ext.w.settings");
+    $("settings").addEventListener("click", () => api.runtime.openOptionsPage());
+  }
+}
 
 async function main() {
   const st = await getAll();
@@ -39,8 +78,9 @@ async function main() {
   $("lead").textContent = t(lang, "ext.w.lead." + level);
   $("targetLbl").textContent = t(lang, "ext.w.target");
   $("domain").textContent = h.isIdn ? h.unicodeHost + " (" + h.host + ")" : h.host;
-  $("url").textContent = defang(d.u);
+  $("url").textContent = defang(maskSecrets(d.u));   // tokens and signatures in the query are shortened, never shown in full
   if (d.w) { $("wrapped").hidden = false; $("wrapped").textContent = t(lang, "ext.w.wrapped"); }
+  if (level === "off") showWhy(lang, d);
 
   let findings = (d.f || []).filter((f) => f.stufe !== "info" || level === "off");
   if (level === "off" && !findings.length) findings = localAssess(d.u).findings.filter((f) => f.stufe !== "info");

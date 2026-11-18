@@ -335,6 +335,31 @@ Forwarding from the container app to the desktop app would need an App Group or 
 tied to a signing team — that would rule out the ad-hoc build, so it is deliberately left out. The
 container app's `SafariWebExtensionHandler` only answers "unsupported".
 
+### When every click says "could not be checked"
+
+<p>
+<img src="screenshots/safari/safari-webkit-warning-access-de-light.png" width="460" alt="Safari build: check server blocked, reason with the steps and the Allow access button (WebKit)">
+<img src="screenshots/safari/safari-webkit-warning-access-en-dark.png" width="200" alt="The same on a narrow window, dark mode">
+</p>
+
+Since 0.7.1 the warning page names the reason and the check server, and offers **Check again**. The settings
+page (Safari → Settings → Extensions → Linkwache → Settings) has **Test connection**, which runs one real check
+and answers in the same words. The reasons:
+
+| Reason on the page | What it means | What helps |
+|---|---|---|
+| No valid server address | the field is empty and the build has no preset, or the address is invalid | enter the server address in the settings (or rebuild with `LINKWACHE_DEFAULT_SERVER=https://…`) |
+| The browser does not let Linkwache reach the check server | Safari blocked the request: the extension has no site access to the server's host | **Allow access** on the page, or Safari → Settings → Extensions → Linkwache → *Edit Websites …* → *Other Websites* → *Allow* |
+| No connection to the check server | no network, DNS, TLS or proxy problem on the way | check the network; the server host is shown on the page |
+| No answer within 6 seconds | server too slow or the connection hangs | check again later |
+| Refused (installation id) | the server refused the id twice (a new id is made automatically after the first refusal) | settings → *Create a new installation id*, then check again |
+| Refused (origin not allowed) / server error / too many checks | the server answered with 403, 5xx/unusable answer, or 429 | server side; the status code is shown |
+
+Since 0.7.1 the server also answers the CORS preflight for extension origins ([API](API.md)), so a check works even
+when Safari treats the server like any other website. To look inside the background page: Safari → *Develop* →
+*Web Extension Background Content* → *Linkwache*; a failed check logs one line `[Linkwache] check failed: <reason>
+<status> <host>` (never the link).
+
 ### Updates
 
 The free build cannot update itself: replacing an app in place safely needs a signed, notarised update

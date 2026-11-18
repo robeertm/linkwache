@@ -7,6 +7,7 @@ import {
 } from "./checks.js";
 import { listFindings, softenHttp, RULES } from "./lists.js";
 import { verdict } from "./verdict.js";
+import { stripSecrets } from "./redact.js";
 
 const settle = (p) => p.then((v) => ({ ok: true, v }), (e) => ({ ok: false, e: String(e).slice(0, 120) }));
 // A lookup that is not back in time counts as failed (its request may still finish in the background).
@@ -29,6 +30,8 @@ export async function runCheck(rawInput, env, { withScan = true, lite = false } 
     : await unwrapShortener(input);
   const url = finalUrl;
   const h = hostInfo(url);
+  // Outside services (Safe Browsing, URLhaus, PhishTank, urlscan) never see tokens or signatures from the query.
+  const ext = stripSecrets(url);
   const heur = softenHttp(heuristics(url).findings, h.domain, h.host);
   if (chain.length > 1) {
     const th = hostInfo(chain[chain.length - 1]);
@@ -41,10 +44,10 @@ export async function runCheck(rawInput, env, { withScan = true, lite = false } 
     settle(within(dnsFacts(h.host, h.domain), lim)),
     settle(within(rdapFacts(h.domain), lim)),
     lite ? skipped : settle(ctFacts(h.domain)),
-    settle(within(safeBrowsing(url, env.SAFE_BROWSING_KEY), lim)),
+    settle(within(safeBrowsing(ext, env.SAFE_BROWSING_KEY), lim)),
     settle(within(urlhaus(h.host, env.URLHAUS_KEY), lim)),
-    settle(within(urlhausUrl(url, env.URLHAUS_KEY), lim)),
-    settle(within(phishtank(url), lim)),
+    settle(within(urlhausUrl(ext, env.URLHAUS_KEY), lim)),
+    settle(within(phishtank(ext), lim)),
     lite ? skipped : settle(urlscanSearch(h.domain)),
   ]);
 
@@ -55,7 +58,7 @@ export async function runCheck(rawInput, env, { withScan = true, lite = false } 
     if (ct.ok && ct.v.ok && ct.v.count === 0 && dns.ok && dns.v.resolves) {
       all.push({ key: "ct-none", stufe: "info", p: {} });
     }
-    all.push(...listFindings({ url, domain: h.domain, sb: sb.ok ? sb.v : null, uh: uh.ok ? uh.v : null, uhu: uhu.ok ? uhu.v : null, pt: pt.ok ? pt.v : null, us: us.ok ? us.v : null }));
+    all.push(...listFindings({ url, ext, domain: h.domain, sb: sb.ok ? sb.v : null, uh: uh.ok ? uh.v : null, uhu: uhu.ok ? uhu.v : null, pt: pt.ok ? pt.v : null, us: us.ok ? us.v : null }));
     return all;
   };
   let v = verdict(assemble(), { url });
@@ -67,7 +70,7 @@ export async function runCheck(rawInput, env, { withScan = true, lite = false } 
   let scan = null;
   // Tagesbudget für urlscan (Node-Betrieb): ist es aufgebraucht, wird ohne Sandbox geprüft
   if (withScan && env.URLSCAN_KEY && dns.ok && dns.v.resolves && (!env.SCAN_BUDGET || env.SCAN_BUDGET.take())) {
-    const s = await settle(urlscanSubmit(url, env.URLSCAN_KEY));
+    const s = await settle(urlscanSubmit(ext, env.URLSCAN_KEY));
     scan = s.ok && s.v.ok ? { uuid: s.v.uuid, status: "pending", submitted: Date.now() } : { status: "unavailable", why: s.ok ? (s.v.text || s.v.status) : s.e };
   } else if (withScan) {
     scan = { status: "skipped" };

@@ -12,6 +12,19 @@ Request headers:
 - `x-linkwache-client: desktop/<version>`, `extension/<version>` or `android/<version>` (informational)
 - Browser pages from other web origins are refused (403); requests without `Origin` (desktop)
   and from `chrome-extension://`, `moz-extension://`, `safari-web-extension://` are allowed.
+- CORS (0.7.1): `OPTIONS /api/v1/check` from an extension origin answers 204 with
+  `access-control-allow-origin: <that origin>`, `access-control-allow-methods: POST` and
+  `access-control-allow-headers: content-type, x-linkwache-install, x-linkwache-client`; every answer to an
+  extension origin (also 400/403/429) carries `access-control-allow-origin`, so the client can read the error.
+  Other origins get 403 on the preflight and no CORS headers. Chromium and Firefox skip CORS for hosts the
+  extension holds a permission for; Safari applies it to the background page whenever the server's host is not
+  granted, and without these headers it blocks the request before it is sent.
+
+Client behaviour on errors (extension 0.7.1, `extension/src/client.js`): `400 err.install` → the client makes a
+new installation id and repeats the request once; a network failure is repeated once, unless the browser reports
+that the extension has no access to the server's host (then reason `access`); a timeout is never repeated. The
+warning page names the reason (`noserver`, `access`, `network`, `timeout`, `install`, `refused`, `rate`, `server`)
+and the server host instead of a general "no connection".
 
 Request body:
 ```json
