@@ -67,3 +67,9 @@ installation id and the client header. Nothing else (no history, no settings).
 - No sandbox scans: the app API never submits one, so the reserve needs no urlscan key and cannot use up the main
   server's daily urlscan budget. Optional secret: `SAFE_BROWSING_KEY` (and `URLHAUS_KEY`).
 - Free plan: 100,000 requests a day; one check is one request plus about eight sub-requests (limit 50).
+- Deploy with `deploy/cloudflare/deploy.sh` and an API token (template "Edit Cloudflare Workers"); no interactive
+  login. On a brand-new account the freshly registered workers.dev subdomain and the new script are not visible to
+  every API call at once: the script retries the deploy and then switches the workers.dev route on explicitly.
+- Monitoring the reserve: Cloudflare refuses requests whose user agent is the bare default of some HTTP libraries
+  (for example `Python-urllib/3.x`, answered with 403). Monitors must send their own user agent; the apps already do
+  (`Linkwache-Desktop/<version>`, `Linkwache-Android/<version>`, the browser's own).

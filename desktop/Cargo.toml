@@ -4,7 +4,7 @@ members = ["core", "src-tauri", "e2e/fakebrowser"]
 default-members = ["core"]
 
 [workspace.package]
-version = "0.8.0"
+version = "0.8.1"
 edition = "2021"
 publish = false
 

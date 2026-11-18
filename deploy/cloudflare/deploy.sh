@@ -48,7 +48,22 @@ URL="https://linkwache-reserve.$CUR.workers.dev"
 echo "   reserve address: $URL"
 
 echo "4/6 deploy"
-npx --yes wrangler deploy -c deploy/cloudflare/wrangler.toml 2>&1 | grep -v -i token | tail -5
+# A freshly registered subdomain or a brand-new script is not visible to every API call at once (wrangler then
+# fails with "could not register" or "This Worker does not exist"): retry, then switch the workers.dev route on
+# explicitly through the API.
+DLOG="$(mktemp)"
+for i in 1 2 3 4 5 6; do
+  if npx --yes wrangler deploy -c deploy/cloudflare/wrangler.toml > "$DLOG" 2>&1; then
+    grep -v -i token "$DLOG" | tail -5; break
+  fi
+  grep -v -i token "$DLOG" | grep -i -E "error|exist|register" | head -2 | sed 's/^/   /'
+  [ "$i" = 6 ] && { rm -f "$DLOG"; echo "   deploy failed" >&2; exit 4; }
+  echo "   retrying in 20 s ($i/5)"; sleep 20
+done
+rm -f "$DLOG"
+api -X POST "https://api.cloudflare.com/client/v4/accounts/$ACC/workers/scripts/linkwache-reserve/subdomain" \
+  --data '{"enabled":true,"previews_enabled":false}' \
+  | python3 -c "import json,sys; d=json.load(sys.stdin); assert d.get('success'), d.get('errors'); print('   workers.dev route on')"
 if [ -n "${SB_KEY_CMD:-}" ]; then
   bash -c "$SB_KEY_CMD" | tr -d '\r\n' | npx --yes wrangler secret put SAFE_BROWSING_KEY -c deploy/cloudflare/wrangler.toml 2>&1 | grep -v -i key | tail -1
 fi
@@ -65,7 +80,10 @@ printf '{"url":"https://example.com/","lang":"en"}' | curl -s -m 10 -X POST -H "
 
 echo "6/6 repository variable"
 if [ -n "$REPO" ]; then
-  gh variable set LINKWACHE_FALLBACK_SERVER -R "$REPO" --body "$URL" && echo "   LINKWACHE_FALLBACK_SERVER set — the next release builds the apps with the reserve"
+  # REST instead of `gh variable` (older gh releases lack that command): update, or create when missing.
+  gh api -X PATCH "repos/$REPO/actions/variables/LINKWACHE_FALLBACK_SERVER" -f name=LINKWACHE_FALLBACK_SERVER -f value="$URL" >/dev/null 2>&1 \
+    || gh api -X POST "repos/$REPO/actions/variables" -f name=LINKWACHE_FALLBACK_SERVER -f value="$URL" >/dev/null
+  echo "   LINKWACHE_FALLBACK_SERVER set — the next release builds the apps with the reserve"
 else
   echo "   skipped (--set-repo-variable owner/repo)"
 fi

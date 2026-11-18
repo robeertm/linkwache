@@ -2,6 +2,25 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
+## 0.8.1 — 2026-11-18
+
+### Changed — the reserve server is live
+- The reserve server runs. This is the first release whose desktop app, browser extensions and Android app are
+  built with `LINKWACHE_FALLBACK_SERVER` set, so they switch to the reserve when the main server is unreachable.
+  Verified against the live reserve: same verdicts as the main server, and a real outage test with the extension
+  (main server unreachable → reserve, note shown, main server probed and used again once it answers).
+
+### Fixed
+- `deploy/cloudflare/deploy.sh` works on a brand-new Cloudflare account: it retries the deploy while the freshly
+  registered workers.dev subdomain and the new script are not yet visible to every API call, and switches the
+  workers.dev route on explicitly.
+- `deploy.sh --set-repo-variable` uses the REST API, so it also works with older `gh` releases that lack
+  `gh variable`.
+
+### Docs
+- `docs/FALLBACK.md`: deploying with a token, and monitors must send their own user agent (Cloudflare refuses some
+  library defaults with 403). `SETUP.md`: the deploy script replaces the manual wrangler steps.
+
 ## 0.8.0 — 2026-11-18
 
 ### Added — reserve server when the main server is unreachable
