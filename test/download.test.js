@@ -213,3 +213,16 @@ test("Android: install help with a QR code to this page (not on an Android phone
   const none = await (await get({ ...envWith(FIX), SITE_URL: "http://plain.example.test" }, "/download?lang=en", UA.win)).text();
   assert.ok(!none.includes("<svg class=\"qr\""), "no QR without a public https address");
 });
+
+test("update check looks again soon while the release has no APK yet, and stops once it is attached", async () => {
+  const noApk = FIX;
+  const withApk = { ...FIX, assets: [...FIX.assets, { name: "Linkwache-android-0.5.0.apk", size: 1, browser_download_url: "https://github.com/x/y/a.apk", digest: "sha256:" + "d1".repeat(32) }] };
+  let calls = 0;
+  const fetchFn = async () => ({ ok: true, json: async () => (++calls >= 3 ? withApk : noApk), text: async () => "" });
+  const info = {};
+  const timer = startUpdateCheck(info, { current: "0.4.0", repo: "x/y", log() {}, every: 3600000, quick: 25, fetchFn });
+  await new Promise((r) => setTimeout(r, 400));
+  clearInterval(timer);
+  assert.equal(calls, 3, "two quick re-reads, then no more");
+  assert.ok(info.release.assets.some((a) => /\.apk$/.test(a.name)));
+});

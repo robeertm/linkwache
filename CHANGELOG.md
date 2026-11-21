@@ -2,6 +2,13 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
+## 0.8.5 — 2026-11-21
+
+### Download page
+- The server re-reads the release every five minutes while the latest release has no APK yet (instead of waiting for
+  the regular three-hour check). The APK is attached some minutes after the release appears; before, the page could
+  say "being prepared" for hours after it was there. After the APK is attached the page lists it within five minutes.
+
 ## 0.8.4 — 2026-11-21
 
 ### Android
