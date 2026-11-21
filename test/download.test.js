@@ -226,3 +226,14 @@ test("update check looks again soon while the release has no APK yet, and stops 
   assert.equal(calls, 3, "two quick re-reads, then no more");
   assert.ok(info.release.assets.some((a) => /\.apk$/.test(a.name)));
 });
+
+test("update check retries soon when the very first read fails (network not up right after a start)", async () => {
+  let calls = 0;
+  const fetchFn = async () => { if (++calls === 1) throw new Error("ENOTFOUND"); return { ok: true, json: async () => ({ ...FIX, assets: [...FIX.assets, { name: "Linkwache-android-0.5.0.apk", size: 1, browser_download_url: "https://github.com/x/y/a.apk", digest: "sha256:" + "d1".repeat(32) }] }), text: async () => "" }; };
+  const info = {};
+  const timer = startUpdateCheck(info, { current: "0.4.0", repo: "x/y", log() {}, every: 3600000, quick: 25, fetchFn });
+  await new Promise((r) => setTimeout(r, 300));
+  clearInterval(timer);
+  assert.equal(calls, 2, "one failure, one retry, then done (APK present)");
+  assert.ok(info.release && info.release.assets.length);
+});

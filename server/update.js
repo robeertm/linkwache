@@ -73,6 +73,7 @@ export async function fetchLatest(repo, fetchFn = fetch) {
 // info.latest is set only while a newer release exists; info.release always holds the latest published release (download page).
 export function startUpdateCheck(info, { current, repo, enabled = true, fetchFn = fetch, log = console.log, every = 3 * 3600000, quick = 5 * 60000 } = {}) { // every 3 h: assets attached after a release (APK, notarised macOS files) show up soon
   if (!enabled || !repo) return null;
+  const again = () => { if (quick > 0) { const t = setTimeout(run, quick); t.unref?.(); } };
   const run = async () => {
     try {
       const rel = await fetchRelease(repo, fetchFn);
@@ -84,11 +85,8 @@ export function startUpdateCheck(info, { current, repo, enabled = true, fetchFn 
       if (info.latest && info.latest !== was) log(`Update available: ${current} -> ${info.latest} (run scripts/aktualisieren.sh)`);
       // The Android APK is signed and attached some minutes AFTER the release appears: look again every
       // few minutes until it is there, so the download page never keeps saying "being prepared" for hours.
-      if (rel && quick > 0 && !rel.assets.some((a) => /\.apk$/i.test(a.name))) {
-        const t = setTimeout(run, quick);
-        t.unref?.();
-      }
-    } catch { /* offline or rate-limited: try again at the next regular check */ }
+      if (!rel || !rel.assets.some((a) => /\.apk$/i.test(a.name))) again();
+    } catch { again(); /* offline, rate-limited or the network is not up yet right after a start: retry soon, then at the regular check */ }
   };
   run();
   const timer = setInterval(run, every);

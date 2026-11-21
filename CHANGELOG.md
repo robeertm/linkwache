@@ -2,6 +2,13 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
+## 0.8.6 — 2026-11-21
+
+### Download page
+- A failed release read (for example the network not being up yet right after a container start) is retried after five
+  minutes instead of three hours. After the 0.8.5 rollout the page showed "Downloads are being prepared" until the
+  container was restarted by hand.
+
 ## 0.8.5 — 2026-11-21
 
 ### Download page

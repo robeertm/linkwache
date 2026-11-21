@@ -1,6 +1,6 @@
 {
   "name": "linkwache",
-  "version": "0.8.5",
+  "version": "0.8.6",
   "private": true,
   "description": "Linkwache — prüft verdächtige Links, ohne sie zu öffnen. Cloudflare Worker.",
   "type": "module",
