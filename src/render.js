@@ -4,12 +4,25 @@ import { STUFE_EMOJI } from "./verdict.js";
 import { t, findingText, verdictText, LANGS, LANG_NAMES } from "./i18n.js";
 import { PAGES } from "./i18n_pages.js";
 import { classify, detectOS, recommend, formatSize, REPO_RELEASES, SAFARI_GUIDE } from "./downloads.js";
+import qrcode from "qrcode-generator";
 
 /** Spendenlink: PayPal.me-Name oder eine PayPal-Mailadresse (klassischer Zahlungslink, geht mit jedem Konto). */
 export function paypalLink(env) {
   if (env.PAYPAL_ME) return "https://paypal.me/" + encodeURIComponent(env.PAYPAL_ME);
   if (env.PAYPAL_MAIL) return "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=" + encodeURIComponent(env.PAYPAL_MAIL) + "&item_name=" + encodeURIComponent("Linkwache — Kaffee") + "&currency_code=EUR";
   return "";
+}
+
+/** QR code as inline SVG (presentation attributes only, so the page CSP needs no inline style). */
+export function qrSvg(text, label) {
+  const q = qrcode(0, "M");
+  q.addData(text);
+  q.make();
+  const n = q.getModuleCount(), quiet = 4;
+  let d = "";
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += `M${c + quiet} ${r + quiet}h1v1h-1z`;
+  const size = n + 2 * quiet;
+  return `<svg class="qr" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" role="img" aria-label="${esc(label)}" shape-rendering="crispEdges"><rect width="${size}" height="${size}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;
 }
 
 /** The public address of this installation (operator setting PUBLIC_URL / SITE_URL), without a trailing slash. */
@@ -287,6 +300,12 @@ export function downloadPage(lang, env, { ua = "", os = "" } = {}) {
   for (const s of order) {
     if (!pkgs.some((p) => p.group === s)) continue;
     body += `<details class="karte helpbox"${s === sys ? " open" : ""}><summary>${P(s === "windows" ? "dl.win.h" : s === "macos" ? "dl.mac.h" : "dl.linux.h")}</summary>${helpFor(s, lang, env, pkgs)}</details>`;
+  }
+  if (pkgs.some((p) => p.group === "android")) {
+    const site = siteUrl(env);
+    const qr = sys !== "android" && /^https:\/\//.test(site)
+      ? `<figure class="qrbox">${qrSvg(`${site}/download?lang=${lang}`, String(P("dl.and.qr.alt")))}<figcaption class="small">${P("dl.and.qr")}</figcaption></figure>` : "";
+    body += `<details class="karte helpbox" id="android"${sys === "android" ? " open" : ""}><summary>${P("dl.and.h")}</summary><div class="help"><p>${P("dl.and.p")}</p>${steps(lang, env, ["dl.and.s1", "dl.and.s2", "dl.and.s3"])}${qr}</div></details>`;
   }
   if (pkgs.some((p) => p.group === "extension")) {
     body += `<details class="karte helpbox" id="ext"><summary>${P("dl.ext.h")}</summary><div class="help"><p>${P("dl.ext.lead")}</p>

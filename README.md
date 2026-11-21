@@ -58,7 +58,9 @@ step. Server unreachable: "Could not be checked" — nothing opens by itself.
 <img src="docs/screenshots/android/tablet-light-sheet-gelb.png" width="412" alt="Tablet">
 </p>
 
-**Install** (no app store for now):
+**Install** (no app store for now — every release carries the signed APK; scan to open the latest release on your phone):
+
+<img src="docs/android-download-qr.svg" width="140" alt="QR code: latest Linkwache release with the Android APK">
 
 1. Download `Linkwache-android-X.Y.Z.apk` from the [latest release](https://github.com/robeertm/linkwache/releases/latest)
    (or the `/download` page of a Linkwache site) and compare its SHA-256.

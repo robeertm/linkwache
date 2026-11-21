@@ -190,6 +190,8 @@ footer{margin-block:28px 34px;color:var(--leise);font-size:.88rem;border-top:1px
 .pkg.primary .pkg-head b{font-size:1.15rem}
 .pkg-head .small{display:block;overflow-wrap:anywhere}
 .pkg-head .btn{flex:0 0 auto}
+.qrbox{margin:14px 0 4px;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.qrbox .qr{width:176px;height:176px;border-radius:8px;border:1px solid var(--rand)}
 .sha{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
 .sha .lbl{font-size:.72rem;color:var(--leise);text-transform:uppercase;letter-spacing:.06em;flex:0 0 auto}
 .shaval{display:block;flex:1 1 18rem;min-width:0;word-break:break-all;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.78rem;padding:7px 9px;border:1px solid var(--rand);border-radius:.6rem;background:var(--feld);color:var(--text);overflow-wrap:anywhere}

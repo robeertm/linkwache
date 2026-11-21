@@ -130,7 +130,7 @@ test("UA decides the highlighted package; all packages stay listed", async () =>
   assert.match((await first(UA.linuxArm)).prim, /aarch64\.AppImage/);
   const android = await first(UA.android);
   assert.equal(android.prim, "");
-  assert.match(android.h, /Android: coming soon/);
+  assert.match(android.h, /Android: being prepared/);
   const ios = await first(UA.iphone);
   assert.match(ios.h, /kurzbefehl\.html\?lang=en/);
   assert.equal((await first(UA.win, "linux")).prim.includes("AppImage"), true, "?os= overrides the guess");
@@ -142,7 +142,7 @@ test("an APK in the release turns the Android line into a download", async () =>
   const withApk = { ...FIX, assets: [...FIX.assets, { name: "Linkwache-0.5.0.apk", size: 9437184, browser_download_url: "https://github.com/robeertm/linkwache/releases/download/v0.5.0/Linkwache-0.5.0.apk", digest: "sha256:" + "d1".repeat(32) }] };
   const h = await (await get(envWith(withApk), "/download?lang=en", UA.android)).text();
   assert.match(h, /class="pkg primary"[\s\S]*Linkwache-0\.5\.0\.apk/);
-  assert.ok(!h.includes("Android: coming soon"));
+  assert.ok(!h.includes("Android: being prepared"));
 });
 
 test("no inline script, no inline handler, no external resources on the page (CSP: script-src 'self')", async () => {
@@ -195,4 +195,21 @@ test("Safari build-it-yourself block renders in all 8 languages with the guide l
     for (const k of ["dl.ext.safari.h", "dl.ext.s.lead", "dl.ext.s1", "dl.ext.s2", "dl.ext.s3", "dl.ext.s.note"]) assert.ok(h.includes(PAGES[l][k]), l + " " + k);
     assert.ok(h.includes('href="' + SAFARI_GUIDE + '"') && h.includes(PAGES[l]["dl.ext.s.src"] + "</a>"), l + " guide link");
   }
+});
+
+test("Android: install help with a QR code to this page (not on an Android phone), steps in all languages", async () => {
+  const withApk = { ...FIX, assets: [...FIX.assets, { name: "Linkwache-android-0.5.0.apk", size: 1658458, browser_download_url: "https://github.com/robeertm/linkwache/releases/download/v0.5.0/Linkwache-android-0.5.0.apk", digest: "sha256:" + "d1".repeat(32) }] };
+  const env = { ...envWith(withApk), SITE_URL: "https://lw.example.test" };
+  for (const l of LANGS) {
+    const win = await (await get(env, "/download?lang=" + l, UA.win)).text();
+    assert.match(win, /<details class="karte helpbox" id="android">/, l);
+    assert.match(win, /<svg class="qr"[^>]*viewBox="0 0 (\d+) \1"/, l + " QR on the computer page");
+    assert.ok(win.includes(PAGES[l]["dl.and.s1"]), l);
+    assert.ok(!/style="/.test(win.match(/<svg class="qr"[\s\S]*?<\/svg>/)[0]), l + " no inline style in the QR (CSP)");
+    const and = await (await get(env, "/download?lang=" + l, UA.android)).text();
+    assert.match(and, /id="android" open/, l);
+    assert.ok(!and.includes('class="qr"'), l + " no QR on the phone itself");
+  }
+  const none = await (await get({ ...envWith(FIX), SITE_URL: "http://plain.example.test" }, "/download?lang=en", UA.win)).text();
+  assert.ok(!none.includes("<svg class=\"qr\""), "no QR without a public https address");
 });

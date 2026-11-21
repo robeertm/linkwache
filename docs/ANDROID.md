@@ -182,6 +182,24 @@ commit (tests, lint, emulator test) succeeded — and compares the digest GitHub
 local SHA-256. It never creates tags or releases. The download page and the in-app updater
 pick the APK up from the release.
 
+**Every release carries the APK**, also when nothing changed in `android/`: the app version
+always follows `package.json` (`versionName` = version, `versionCode` = major·10000 + minor·100
++ patch), and the Android workflow runs for every tag. `scripts/apk_nachweis.py` enforces it:
+
+- `python3 scripts/apk_nachweis.py verify [vX.Y.Z|latest]` checks the PUBLISHED release: the file
+  `Linkwache-android-X.Y.Z.apk` exists, `SHA256SUMS.txt` lists it with the right digest,
+  `apksigner` verifies the signature, the certificate is the one above and `versionName` /
+  `versionCode` match the release.
+- `scripts/vor_auslieferung.py` (the gate before a release) runs `verify latest` — a release
+  without a valid APK blocks the next one.
+- `python3 scripts/apk_nachweis.py heal [vX.Y.Z|latest|recent]` repairs a release without an
+  APK: it signs the APK of the tag's green Android run, attaches it (never overwriting an
+  existing file), rewrites `SHA256SUMS.txt` and verifies again. A timer on the build host runs
+  `heal recent` every ten minutes, so the APK shows up shortly after the release.
+
+The download page (`/download`) shows the APK for every Android visitor, an install guide in
+all eight languages and — on a computer — a QR code that opens the page on the phone.
+
 Emulator CI also installs the minified release build (signed with a throwaway test key,
 for this test only) and checks that the sheet renders and a link gets a verdict.
 

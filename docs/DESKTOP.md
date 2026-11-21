@@ -193,7 +193,7 @@ The contract for `POST /api/v1/check`, limits and the native-messaging protocol 
 light/dark, phone width). It detects the visitor's system and suggests the matching package;
 all packages stay visible: Windows (NSIS `.exe`, `.msi`), macOS (`.dmg`), Linux (AppImage,
 `.deb`, `.rpm`), browser extension for Chromium and Firefox (load-it-yourself with step-by-step
-instructions) and the Android APK ("coming soon" until a release carries one).
+instructions) and the Android APK ("being prepared" until the release carries one).
 
 - Files are **assets of the GitHub release** of the public repository; the page links them, so
   the self-hosted server carries no download traffic.

@@ -12,6 +12,11 @@ Checks, in this order (exit 0 and the line "VOR_AUSLIEFERUNG: GREEN" only if all
   5. CI on GitHub is green for HEAD: workflows Desktop (builds + end-to-end tests on Windows, macOS,
      Linux), Android and Commit identity. A workflow that did not run for HEAD (path filter) must have
      its latest completed run on main green. Needs the GitHub CLI (`gh`), skipped with --no-ci.
+  6. the latest PUBLISHED release carries a signed Android APK of its own version (checksum listed,
+     signature and certificate valid, versionName = version): scripts/apk_nachweis.py verify latest.
+     Every release must ship the APK, so a release without one blocks the next release until it
+     is attached (scripts/apk_nachweis.py heal does that; a timer on the build host runs it).
+     Skipped with --no-ci (needs GitHub and the Android build tools).
 Exit 1 = a check failed, 2 = could not run a check.
 """
 import json
@@ -68,6 +73,15 @@ def ci(repo):
     return good
 
 
+def apk_of_latest(repo):
+    r = run([sys.executable, "scripts/apk_nachweis.py", "verify", "latest", "--repo", repo])
+    lines = [l.strip() for l in r.stdout.splitlines() if l.strip()]
+    red = [l for l in lines if l.startswith("RED")]
+    head = lines[0].lstrip("= ") if lines else "no output"
+    return step("latest release carries a valid Android APK of its own version", r.returncode == 0,
+                head if r.returncode == 0 else (red[0][3:].strip() if red else (r.stderr.strip()[-200:] or head)))
+
+
 def main():
     args = sys.argv[1:]
     repo = args[args.index("--repo") + 1] if "--repo" in args else "robeertm/linkwache"
@@ -89,9 +103,10 @@ def main():
     dirty = run(["git", "status", "--porcelain", "--untracked-files=no"]).stdout.strip()
     ok &= step("working tree clean (the release ships HEAD)", not dirty, dirty[:200])
     if "--no-ci" in args:
-        print("  (CI check skipped)")
+        print("  (CI check and APK check skipped)")
     else:
         ok &= ci(repo)
+        ok &= apk_of_latest(repo)
     print("VOR_AUSLIEFERUNG: " + ("GREEN" if ok else "RED"))
     sys.exit(0 if ok else 1)
 

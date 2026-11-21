@@ -2,6 +2,29 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
+## 0.8.4 — 2026-11-21
+
+### Android
+- **Every release now carries the signed Android APK**, also when nothing changed in `android/`. Releases 0.8.2 and
+  0.8.3 had none because of the old "no Android change, no APK" rule; their APKs (same version as the release, same
+  signing certificate) are attached now.
+- `scripts/apk_nachweis.py`: `verify` checks the published release (APK present with the release version in its
+  name, listed in `SHA256SUMS.txt` with the right digest, signature valid, published certificate, `versionName` and
+  `versionCode` match); `heal` signs and attaches a missing APK from the tag's green Android run and never
+  overwrites an existing file. A timer on the build host runs `heal recent` every ten minutes.
+- The gate before a release (`scripts/vor_auslieferung.py`) runs `verify latest`: a release without a valid APK
+  blocks the next release.
+
+### Download page
+- New Android box with an install guide in all eight languages and, on a computer, a QR code that opens the page on
+  the phone (inline SVG, no external resource, no inline style; only with a public https address).
+- The line shown while a release has no APK yet no longer says "coming soon" but "being prepared" (the APK follows
+  within minutes).
+- README: QR code to the latest release, note that every release carries the APK.
+
+### Dependencies
+- `qrcode-generator` 2.0.4 (MIT, no dependencies) for the QR code.
+
 ## 0.8.3 — 2026-11-21
 
 ### Tests
