@@ -1,6 +1,6 @@
 {
   "name": "linkwache",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "private": true,
   "description": "Linkwache \u2014 pr\u00fcft verd\u00e4chtige Links, ohne sie zu \u00f6ffnen. Cloudflare Worker.",
   "type": "module",
@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "mimetext": "^3.0.24",
-    "postal-mime": "^3.0.0",
+    "postal-mime": "^4.2.1",
     "tldts": "^6.1.86"
   },
   "devDependencies": {

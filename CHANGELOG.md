@@ -2,6 +2,14 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
+## 0.8.2 — 2026-11-21
+
+### Security
+- Mail intake: `postal-mime` 3.0.0 -> 4.2.1 (fixes a high-severity quadratic CPU use when decoding a header with many
+  encoded words, GHSA-f2hq-32vh-53cc). The parser API is unchanged; all tests pass.
+- New CI workflow `security.yml`: `npm audit` (high/critical fail), `cargo audit` on the desktop lockfile and a
+  secret scan of the whole history; runs on dependency changes, weekly and on demand.
+
 ## 0.8.1 — 2026-11-18
 
 ### Changed — the reserve server is live

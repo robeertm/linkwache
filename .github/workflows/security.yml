@@ -1,0 +1,60 @@
+# Security gate: dependency audit (npm, cargo) and a secret scan of the whole history.
+# Runs only when dependencies or this file change, weekly, and on demand.
+name: Security
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'desktop/Cargo.lock'
+      - 'desktop/package-lock.json'
+      - '.github/workflows/security.yml'
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'desktop/Cargo.lock'
+      - 'desktop/package-lock.json'
+  schedule:
+    - cron: '23 5 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  npm-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: npm audit (high and critical fail the job)
+        run: |
+          for d in . desktop; do
+            [ -f "$d/package-lock.json" ] || continue
+            echo "== $d"
+            (cd "$d" && npm audit --omit=dev --package-lock-only --audit-level=high)
+          done
+
+  cargo-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-audit
+      - name: cargo audit (vulnerabilities fail, warnings are only shown)
+        run: cargo audit --file desktop/Cargo.lock
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks over the whole history
+        run: |
+          v=8.21.2
+          curl -fsSL "https://github.com/gitleaks/gitleaks/releases/download/v${v}/gitleaks_${v}_linux_x64.tar.gz" | tar -xz gitleaks
+          ./gitleaks detect --source . --redact --no-banner --exit-code 1
