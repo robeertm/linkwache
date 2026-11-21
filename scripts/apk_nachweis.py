@@ -29,6 +29,7 @@ import struct
 import subprocess
 import sys
 import tempfile
+import time
 import zipfile
 from pathlib import Path
 
@@ -173,8 +174,14 @@ def heal(repo, tag):
         pending = [x for x in android if x["status"] != "completed"]
         print("  Android CI for", tag, "is not green yet" + (" (still running)" if pending else " (no run / failed)"))
         return 3 if pending or not android else 1
-    r = subprocess.run([str(ROOT / "android/scripts/publish-apk.sh"), tag], env={**os.environ, "REPO": repo}, cwd=ROOT)
-    if r.returncode:
+    for attempt in range(3):  # the artefact download from GitHub sometimes times out; the attach itself is idempotent
+        r = subprocess.run([str(ROOT / "android/scripts/publish-apk.sh"), tag], env={**os.environ, "REPO": repo}, cwd=ROOT)
+        if r.returncode == 0:
+            break
+        print(f"  attach attempt {attempt + 1}/3 failed (exit {r.returncode})", flush=True)
+        if attempt < 2:
+            time.sleep(20)
+    else:
         return 1
     r = subprocess.run([str(ROOT / "desktop/scripts/sha256sums.sh"), tag], env={**os.environ, "GITHUB_REPOSITORY": repo},
                        cwd=ROOT, stdout=subprocess.DEVNULL)
