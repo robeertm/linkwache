@@ -2,6 +2,14 @@
 
 All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
+## 0.8.3 — 2026-11-21
+
+### Tests
+- New language checks in the gate: `test/android_i18n.test.js` (Android app texts: same keys, non-empty, same
+  placeholders in all eight languages, every `R.string.lw_*` used by the Kotlin code exists, generated resources up to
+  date) and `test/i18n_parity.test.js` (merged server/extension/desktop table: same keys and placeholders in every
+  language). Together with the existing extension and desktop checks, all surfaces are covered. No gaps found.
+
 ## 0.8.2 — 2026-11-21
 
 ### Security
