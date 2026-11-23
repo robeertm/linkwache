@@ -47,14 +47,14 @@ anyway" only after three seconds. Dangerous: blocked, opening only through a del
 step. Server unreachable: "Could not be checked" — nothing opens by itself.
 
 <p>
-<img src="docs/screenshots/android/phone-light-sheet-green.png" width="200" alt="No warning signs – opening">
-<img src="docs/screenshots/android/phone-light-sheet-gelb.png" width="200" alt="Suspicious link">
-<img src="docs/screenshots/android/phone-dark-sheet-rot.png" width="200" alt="Dangerous link – blocked">
-<img src="docs/screenshots/android/phone-dark-sheet-offline.png" width="200" alt="Could not be checked">
+<img src="docs/screenshots/android/phone-light-sheet-green.png" width="170" alt="No warning signs – opening">
+<img src="docs/screenshots/android/phone-light-sheet-gelb.png" width="170" alt="Suspicious link">
+<img src="docs/screenshots/android/phone-dark-sheet-rot.png" width="170" alt="Dangerous link – blocked">
+<img src="docs/screenshots/android/phone-dark-sheet-offline.png" width="170" alt="Could not be checked">
 </p>
 <p>
-<img src="docs/screenshots/android/phone-light-setup-4.png" width="200" alt="Setup: make Linkwache the default">
-<img src="docs/screenshots/android/phone-dark-home-update.png" width="200" alt="Protection status and update notice">
+<img src="docs/screenshots/android/phone-light-setup-4.png" width="170" alt="Setup: make Linkwache the default">
+<img src="docs/screenshots/android/phone-dark-home-update.png" width="170" alt="Protection status and update notice">
 <img src="docs/screenshots/android/tablet-light-sheet-gelb.png" width="412" alt="Tablet">
 </p>
 
