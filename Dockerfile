@@ -7,6 +7,8 @@ RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 COPY src ./src
 COPY public ./public
 COPY server ./server
+# Licence and third-party notices travel with the image.
+COPY LICENSE THIRD-PARTY-NOTICES.md ./
 RUN mkdir -p /data && chown -R node:node /data /app
 USER node
 EXPOSE 8080

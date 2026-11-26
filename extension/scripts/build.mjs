@@ -92,6 +92,8 @@ async function buildTarget(target) {
   });
   for (const f of STATIC) fs.copyFileSync(path.join(EXT, f), path.join(out, f));
   fs.cpSync(path.join(EXT, "icons"), path.join(out, "icons"), { recursive: true });
+  // The extension bundles only the project's own code (no third-party notices needed), but carries its licence.
+  fs.copyFileSync(path.join(EXT, "..", "LICENSE"), path.join(out, "LICENSE"));
   const base = JSON.parse(fs.readFileSync(path.join(EXT, "manifest.base.json"), "utf8"));
   const extra = JSON.parse(fs.readFileSync(path.join(EXT, `manifest.${target}.json`), "utf8"));
   const manifest = merge(merge(base, extra), { version: VERSION });

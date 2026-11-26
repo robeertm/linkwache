@@ -20,6 +20,10 @@
     "publisher": "Linkwache",
     "homepage": "https://github.com/robeertm/linkwache",
     "category": "Utility",
+    "resources": {
+      "../../LICENSE": "LICENSE",
+      "../../THIRD-PARTY-NOTICES.md": "THIRD-PARTY-NOTICES.md"
+    },
     "shortDescription": "Checks every link before it opens",
     "longDescription": "Linkwache is the link checker between your programs and your browser: links from mail, documents and messengers are checked for warning signs first; links without warning signs open right away, suspicious ones show a warning.",
     "icon": [

@@ -86,6 +86,13 @@ android {
 
 kotlin { jvmToolchain(17) }
 
+// Licence and third-party notices travel inside the APK (assets/LICENSE, assets/THIRD-PARTY-NOTICES.md).
+val copyNotices by tasks.registering(Copy::class) {
+    from(rootProject.file("../LICENSE"), rootProject.file("../THIRD-PARTY-NOTICES.md"))
+    into(layout.buildDirectory.dir("generated/notices"))
+}
+android.sourceSets.getByName("main").assets.srcDir(copyNotices.map { it.destinationDir })
+
 dependencies {
     implementation(project(":core"))
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
