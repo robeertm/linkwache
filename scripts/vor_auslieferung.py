@@ -11,7 +11,10 @@ Checks, in this order (exit 0 and the line "VOR_AUSLIEFERUNG: GREEN" only if all
   4. commit identities of all branches and tags (scripts/check_commit_identity.py --branches --tags)
   5. CI on GitHub is green for HEAD: workflows Desktop (builds + end-to-end tests on Windows, macOS,
      Linux), Android and Commit identity. A workflow that did not run for HEAD (path filter) must have
-     its latest completed run on main green. Needs the GitHub CLI (`gh`), skipped with --no-ci.
+     its latest completed run on main green. A run of HEAD that is still queued or running is
+     waited for (poll every 30 s, up to LINKWACHE_CI_WAIT_MIN minutes, default 45: Android takes
+     9-12 min) instead of counting as red; only a finished run decides. Needs the GitHub CLI (`gh`),
+     skipped with --no-ci.
   6. the latest PUBLISHED release carries a signed Android APK of its own version (checksum listed,
      signature and certificate valid, versionName = version): scripts/apk_nachweis.py verify latest.
      Every release must ship the APK, so a release without one blocks the next release until it
@@ -20,13 +23,17 @@ Checks, in this order (exit 0 and the line "VOR_AUSLIEFERUNG: GREEN" only if all
 Exit 1 = a check failed, 2 = could not run a check.
 """
 import json
+import os
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 WORKFLOWS = ["Desktop", "Android", "Commit identity"]
+CI_WAIT_MIN = float(os.environ.get("LINKWACHE_CI_WAIT_MIN", "45"))
+CI_POLL_S = float(os.environ.get("LINKWACHE_CI_POLL_S", "30"))
 
 
 def run(cmd, **kw):
@@ -47,13 +54,45 @@ def versions():
     return step("versions", bool(ok), f"package.json {pkg}, Cargo {cargo}, CHANGELOG {head.group(0)[3:] if head else '?'}"), pkg
 
 
-def ci(repo):
-    sha = run(["git", "rev-parse", "HEAD"]).stdout.strip()
+def head_runs(repo, sha):
     r = run(["gh", "api", f"repos/{repo}/actions/runs?head_sha={sha}&per_page=100"])
     if r.returncode:
         print("  cannot query GitHub:", r.stderr.strip()[:200])
         sys.exit(2)
-    runs = json.loads(r.stdout).get("workflow_runs", [])
+    return json.loads(r.stdout).get("workflow_runs", [])
+
+
+def unfinished(runs):
+    """Latest push run per gated workflow that has not completed yet."""
+    out = []
+    for wf in WORKFLOWS:
+        mine = [x for x in runs if x["name"] == wf and x["event"] == "push"]
+        if mine:
+            x = max(mine, key=lambda x: x["run_number"])
+            if x["status"] != "completed":
+                out.append(x)
+    return out
+
+
+def wait_for_runs(repo, sha, runs, wait_min=None, poll_s=None, now=time.monotonic, sleep=time.sleep):
+    """Wait while a run of HEAD is queued or in progress. Progress, not the clock, decides:
+    the deadline only guards against a run that never finishes (default 45 min, far above the
+    9-12 min of the slowest workflow). Returns the freshest run list."""
+    wait_min = CI_WAIT_MIN if wait_min is None else wait_min
+    poll_s = CI_POLL_S if poll_s is None else poll_s
+    deadline = now() + wait_min * 60
+    pending = unfinished(runs)
+    while pending and now() < deadline:
+        print("  ...  waiting for " + ", ".join(f"{x['name']} ({x['status']})" for x in pending), flush=True)
+        sleep(poll_s)
+        runs = head_runs(repo, sha)
+        pending = unfinished(runs)
+    return runs
+
+
+def ci(repo):
+    sha = run(["git", "rev-parse", "HEAD"]).stdout.strip()
+    runs = wait_for_runs(repo, sha, head_runs(repo, sha))
     good = True
     for wf in WORKFLOWS:
         mine = [x for x in runs if x["name"] == wf and x["event"] == "push"]

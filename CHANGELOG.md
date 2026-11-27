@@ -21,6 +21,7 @@ All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 - Tests that start the server wait for it with a deadline instead of 50 fixed polls, so a loaded machine only slows them down.
 - The hanging-provider test of the client API runs with a tightened lookup budget and releases the hanging lookup afterwards; the API test file went from about 10 s to 2 s (a pending 8 s timer kept the process alive).
 - Android emulator test, updater cases: after the 30 s base wait the test keeps waiting (up to 180 s) while the app still shows "Downloading" or "Checking signature", so a slow emulator is judged by progress instead of the clock (the phone job failed once on "updater signer" after 30 s on a slow runner while the same step normally takes 9 s). A case that still fails keeps a screenshot, the screen texts and the app log in the `proof` artifact.
+- The release gate (`scripts/vor_auslieferung.py`) waits for a CI run of the release commit that is still queued or running (poll every 30 s, up to 45 min, `LINKWACHE_CI_WAIT_MIN`) instead of counting it as red; only a finished run decides. The gate for 0.8.8 had started while the Android run was minutes from finishing green.
 
 ## 0.8.7 — 2026-11-26
 
