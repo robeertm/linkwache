@@ -4,6 +4,9 @@ All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
 ## [Unreleased]
 
+### Tests
+- Desktop updater evidence (`desktop/core/tests/updater_chain.rs`): signature check with the same minisign verifier the updater uses (good, tampered, truncated, foreign-key and garbage signatures), shipped public key well-formed and https-only endpoints, a refused update leaves the installed app untouched, backup before install, backup offer after three failed starts, rollback copy, settings and history byte-identical throughout. Fixture signed with a throwaway key (`desktop/scripts/make_updater_fixture.py`); no release, no real key.
+
 ## 0.8.8 — 2026-11-27
 
 ### Security

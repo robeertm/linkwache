@@ -1,0 +1,4 @@
+untrusted comment: signature from linkwache test key
+RUQ5BsKTkfJ9jvYU3FkXB51MuQugPWmGLdO98OAmt84qdRTKFfQ0dfqxZdb9e6s9g1N7DzxmAFBbP2jtsbHaEX/Vllmt4nGVXQo=
+trusted comment: timestamp:1 file:artefact-9.9.9.bin
+vLuci9JFHlwUErTmXnBasS+QC2MF1TO76sH5zGSBPiCidqKR734acfjc+WpbUBqSZ6z0rKoNnfuc0RaEDlFwDA==
