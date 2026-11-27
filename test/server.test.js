@@ -8,6 +8,7 @@ import net from "node:net";
 import { createLimiter } from "../server/ratelimit.js";
 import { isNewer, parseVersion, startUpdateCheck } from "../server/update.js";
 import pkg from "../package.json" with { type: "json" };
+import { waitForHealth } from "./helpers/wait.js";
 
 test("limiter: per-minute limit, then recovers", async () => {
   let t = 0;
@@ -78,11 +79,7 @@ before(async () => {
     stdio: "ignore",
   });
   base = `http://127.0.0.1:${port}`;
-  for (let i = 0; i < 50; i++) {
-    try { if ((await fetch(base + "/api/health")).ok) return; } catch { /* not up yet */ }
-    await new Promise((r) => setTimeout(r, 100));
-  }
-  throw new Error("server did not start");
+  await waitForHealth(base);
 });
 after(async () => {
   if (proc) { const done = new Promise((r) => proc.once("exit", r)); proc.kill(); await done; }

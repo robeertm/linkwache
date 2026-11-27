@@ -179,14 +179,27 @@ test("v1 never asks crt.sh (info only, often slow)", async () => {
 
 test("a hanging provider cannot hold the v1 answer beyond the time budget", async () => {
   // RDAP never answers (and ignores abort): the answer must still come within the first-pass budget.
-  router = (url, init) => (url.includes("rdap") ? new Promise(() => {}) : calm(url, init));
+  // The mechanism is the same at any budget, so the test tightens it (LITE_BUDGET_MS, the reserve server's knob) instead of
+  // waiting 2.5 s; the margin is generous so a loaded machine cannot turn timer lateness into a red result.
+  // The hanging lookup is released after the answer (like a socket finally dying): otherwise fetchTimeout's 8 s timer
+  // keeps the test process alive for 8 s after the last test.
+  const hanging = [];
+  router = (url, init) => (url.includes("rdap") ? new Promise((r) => hanging.push(r)) : calm(url, init));
+  const budget = { unwrap: 200, first: 300, second: 200 };
   const t0 = Date.now();
-  const res = await post(makeEnv(), { url: "https://hanging-rdap.example.org/" });
+  const res = await post(makeEnv({ LITE_BUDGET_MS: `${budget.unwrap},${budget.first},${budget.second}` }), { url: "https://hanging-rdap.example.org/" });
   const ms = Date.now() - t0;
+  assert.ok(hanging.length > 0, "the RDAP lookup really hung");
+  for (const release of hanging) release(jres({}, 404));
   assert.equal(res.status, 200);
   const j = await res.json();
   assert.ok(["gruen", "gelb", "rot"].includes(j.stufe));
-  assert.ok(ms < LITE_BUDGET.first + LITE_BUDGET.second + 800, `answered after ${ms} ms`);
+  assert.ok(ms >= budget.first - 50, `answered after ${ms} ms, before the hanging provider was given up on`);
+  assert.ok(ms < budget.first + budget.second + 2500, `answered after ${ms} ms`);
+});
+
+test("the default budget leaves the apps' 6 s limit room for the answer", () => {
+  assert.ok(LITE_BUDGET.unwrap + LITE_BUDGET.first + LITE_BUDGET.second < 6000);
 });
 
 test("health reports the supported API versions; the website check still stores and scans", async () => {

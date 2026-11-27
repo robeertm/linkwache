@@ -8,6 +8,7 @@ import os from "node:os";
 import path from "node:path";
 import net from "node:net";
 import pkg from "../package.json" with { type: "json" };
+import { waitFor, waitForHealth } from "./helpers/wait.js";
 
 const KEY = "test-key-" + Math.random().toString(16).slice(2);
 let proc, base, dataDir;
@@ -22,8 +23,7 @@ before(async () => {
     stdio: "ignore",
   });
   base = `http://127.0.0.1:${port}`;
-  for (let i = 0; i < 50; i++) { try { if ((await fetch(base + "/api/health")).ok) return; } catch { /* not up */ } await new Promise((r) => setTimeout(r, 100)); }
-  throw new Error("server did not start");
+  await waitForHealth(base);
 });
 after(async () => {
   if (proc) { const done = new Promise((r) => proc.once("exit", r)); proc.kill(); await done; }
@@ -70,7 +70,7 @@ test("admin: without ADMIN_TOKEN the page and API do not exist", async () => {
   const d = fs.mkdtempSync(path.join(os.tmpdir(), "lw-adm2-"));
   const p = spawn(process.execPath, ["server/index.js"], { env: { PATH: process.env.PATH, PORT: String(port), DATA_DIR: d, UPDATE_CHECK: "off" }, stdio: "ignore" });
   try {
-    for (let i = 0; i < 50; i++) { try { if ((await fetch(`http://127.0.0.1:${port}/api/health`)).ok) break; } catch { /* not up */ } await new Promise((r) => setTimeout(r, 100)); }
+    await waitForHealth(`http://127.0.0.1:${port}`);
     assert.equal((await fetch(`http://127.0.0.1:${port}/admin`)).status, 404);
     assert.equal((await fetch(`http://127.0.0.1:${port}/api/admin/status`, { headers: auth() })).status, 404);
   } finally { const done = new Promise((r) => p.once("exit", r)); p.kill(); await done; fs.rmSync(d, { recursive: true, force: true }); }
@@ -90,7 +90,7 @@ test("admin: a newer release unlocks the request, which lands as a 0600 file and
   const b = `http://127.0.0.1:${port}`;
   try {
     let st;
-    for (let i = 0; i < 60; i++) { try { st = await (await fetch(b + "/api/admin/status", { headers: auth() })).json(); if (st.latest) break; } catch { /* not up */ } await new Promise((r) => setTimeout(r, 100)); }
+    st = await waitFor(async () => { const j = await (await fetch(b + "/api/admin/status", { headers: auth() })).json(); return j.latest ? j : null; }, { what: "update check of " + b });
     assert.equal(st.latest, "99.0.0");
     assert.ok(st.checkedAt);
     assert.equal((await (await fetch(b + "/api/health")).json()).update, "99.0.0");

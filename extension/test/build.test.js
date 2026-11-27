@@ -11,7 +11,9 @@ import pkg from "../../package.json" with { type: "json" };
 const EXT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = path.join(EXT, "dist");
 const rd = (...p) => fs.readFileSync(path.join(DIST, ...p), "utf8");
-before(() => { execFileSync(process.execPath, [path.join(EXT, "scripts", "build.mjs")], { env: { ...process.env, LINKWACHE_DEFAULT_SERVER: "", LINKWACHE_PRESET_MIGRATE_FROM: "" }, stdio: "pipe" }); });
+// The build reads LINKWACHE_* from the environment (CI sets the repository variables for the real build): the test builds with none of them.
+const cleanEnv = (extra = {}) => ({ ...Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith("LINKWACHE_"))), ...extra });
+before(() => { execFileSync(process.execPath, [path.join(EXT, "scripts", "build.mjs")], { env: cleanEnv(), stdio: "pipe" }); });
 
 test("chromium: fixed id from the manifest key, service worker, MV3", () => {
   const m = JSON.parse(rd("chromium", "manifest.json"));

@@ -8,6 +8,7 @@ import os from "node:os";
 import path from "node:path";
 import net from "node:net";
 import { spawn } from "node:child_process";
+import { waitForHealth } from "./helpers/wait.js";
 
 const NEW = "https://new-address.example.test";
 const OLD_HOST = "old-address.example.test";
@@ -22,11 +23,7 @@ before(async () => {
     stdio: "ignore",
   });
   base = `http://127.0.0.1:${port}`;
-  for (let i = 0; i < 50; i++) {
-    try { if ((await fetch(base + "/api/health")).ok) return; } catch { /* not up yet */ }
-    await new Promise((r) => setTimeout(r, 100));
-  }
-  throw new Error("server did not start");
+  await waitForHealth(base);
 });
 after(async () => {
   if (proc) { const done = new Promise((r) => proc.once("exit", r)); proc.kill(); await done; }

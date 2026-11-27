@@ -7,6 +7,11 @@ All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 ### Fixed
 - Web page on phones: language selector, theme button, nav links and the share field now have 44 px touch targets and 16 px text (no zoom on focus in iOS Safari); help summaries and small buttons reach 44 px too, and buttons in a row keep equal height.
 
+### Tests
+- The extension build tests no longer inherit `LINKWACHE_*` variables from the environment (the CI repository variable for the reserve server made the "no reserve address baked in" test fail on the Safari workflow).
+- Tests that start the server wait for it with a deadline instead of 50 fixed polls, so a loaded machine only slows them down.
+- The hanging-provider test of the client API runs with a tightened lookup budget and releases the hanging lookup afterwards; the API test file went from about 10 s to 2 s (a pending 8 s timer kept the process alive).
+
 ## 0.8.7 — 2026-11-26
 
 ### Added

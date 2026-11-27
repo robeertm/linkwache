@@ -15,7 +15,7 @@ const DIST = fs.mkdtempSync(path.join(os.tmpdir(), "lw-safari-test-"));
 after(() => fs.rmSync(DIST, { recursive: true, force: true }));
 const rd = (...p) => fs.readFileSync(path.join(DIST, ...p), "utf8");
 const LANGS = ["de", "en", "tr", "pl", "ru", "es", "fr", "it"];
-before(() => { execFileSync(process.execPath, [path.join(EXT, "scripts", "build.mjs"), "safari"], { env: { ...process.env, LINKWACHE_EXT_DIST: DIST, LINKWACHE_DEFAULT_SERVER: "", LINKWACHE_PRESET_MIGRATE_FROM: "" }, stdio: "pipe" }); });
+before(() => { execFileSync(process.execPath, [path.join(EXT, "scripts", "build.mjs"), "safari"], { env: { ...Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith("LINKWACHE_"))), LINKWACHE_EXT_DIST: DIST }, stdio: "pipe" }); });
 
 const fullApi = () => ({
   runtime: { connectNative() {} },
