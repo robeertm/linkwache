@@ -218,3 +218,10 @@ pre.cmd{margin:.3rem 0 .6rem;padding:.6rem .8rem;border:1px solid var(--rand);bo
 .ss-btn.on{background:#fff;color:#17497f;font-weight:600}
 .ss figcaption{margin-top:6px;font-style:italic}
 @media (max-width:520px){.pkg-head .btn{flex:1 1 100%}.ss-body{padding:.9rem 1rem 1rem}}
+/* touch targets and no iOS focus-zoom on phones */
+@media (pointer:coarse),(max-width:520px){
+  header nav a{display:inline-flex;align-items:center;min-height:44px}
+  button.theme{min-width:44px;min-height:44px}
+  select.lang{min-height:44px;font-size:1rem}
+  .share input{min-height:44px;font-size:1rem}
+}
