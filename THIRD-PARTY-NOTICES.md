@@ -15,17 +15,17 @@ project's own sources, and the Safari app uses only the system frameworks.
 
 Production dependencies of `package-lock.json`, including transitive ones. The same code runs as a Cloudflare Worker and in the container.
 
-- `@babel/runtime` 7.29.7 - MIT
-- `@babel/runtime-corejs3` 7.29.7 - MIT
-- `core-js-pure` 3.50.0 - MIT
-- `js-base64` 3.9.3 - BSD-3-Clause
+- `@babel/runtime` 7.29.15 - MIT
+- `@babel/runtime-corejs3` 7.29.15 - MIT
+- `core-js-pure` 3.51.0 - MIT
+- `js-base64` 3.9.7 - BSD-3-Clause
 - `mime-db` 1.52.0 - MIT
 - `mime-types` 2.1.35 - MIT
 - `mimetext` 3.0.28 - MIT
 - `postal-mime` 4.2.1 - MIT-0
 - `qrcode-generator` 2.0.4 - MIT
-- `tldts` 6.1.86 - MIT
-- `tldts-core` 6.1.86 - MIT
+- `tldts` 7.6.2 - MIT
+- `tldts-core` 7.6.2 - MIT
 
 ## Desktop app (Rust crates)
 
@@ -36,7 +36,7 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `alloc-no-stdlib` 3.0.0 - BSD-3-Clause
 - `alloc-stdlib` 0.3.0 - BSD-3-Clause
 - `android_system_properties` 0.1.6 - MIT OR Apache-2.0
-- `anyhow` 1.0.104 - MIT OR Apache-2.0
+- `anyhow` 1.0.105 - MIT OR Apache-2.0
 - `async-broadcast` 0.7.2 - MIT OR Apache-2.0
 - `async-channel` 2.5.0 - Apache-2.0 OR MIT
 - `async-executor` 1.14.1 - Apache-2.0 OR MIT
@@ -62,23 +62,24 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `bitflags` 1.3.2 - MIT/Apache-2.0
 - `bitflags` 2.13.2 - MIT OR Apache-2.0
 - `block-buffer` 0.10.4 - MIT OR Apache-2.0
+- `block-buffer` 0.12.1 - MIT OR Apache-2.0
 - `block2` 0.6.2 - MIT
 - `blocking` 1.7.0 - Apache-2.0 OR MIT
 - `brotli` 9.1.3 - BSD-3-Clause AND MIT
-- `brotli-decompressor` 6.3.2 - BSD-3-Clause/MIT
+- `brotli-decompressor` 6.4.0 - BSD-3-Clause/MIT
 - `bs58` 0.5.1 - MIT/Apache-2.0
 - `bumpalo` 3.20.4 - MIT OR Apache-2.0
 - `bytemuck` 1.25.2 - Zlib OR Apache-2.0 OR MIT
 - `byteorder` 1.5.0 - Unlicense OR MIT
 - `byteorder-lite` 0.1.0 - Unlicense OR MIT
-- `bytes` 1.12.1 - MIT
+- `bytes` 1.12.2 - MIT
 - `cairo-rs` 0.18.5 - MIT
 - `cairo-sys-rs` 0.18.2 - MIT
 - `camino` 1.2.6 - MIT OR Apache-2.0
 - `cargo-platform` 0.1.9 - MIT OR Apache-2.0
 - `cargo_metadata` 0.19.2 - MIT
 - `cargo_toml` 1.0.1 - Apache-2.0 OR MIT
-- `cc` 1.11.2 - MIT OR Apache-2.0
+- `cc` 1.12.0 - MIT OR Apache-2.0
 - `cesu8` 1.1.0 - Apache-2.0/MIT
 - `cfb` 0.14.0 - MIT
 - `cfg-expr` 0.15.8 - MIT OR Apache-2.0
@@ -87,18 +88,21 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `chrono` 0.4.45 - MIT OR Apache-2.0
 - `combine` 4.6.9 - MIT
 - `concurrent-queue` 2.5.0 - Apache-2.0 OR MIT
-- `constant_time_eq` 0.6.1 - CC0-1.0 OR MIT-0 OR Apache-2.0
-- `cookie` 0.18.2 - MIT OR Apache-2.0
+- `const-oid` 0.10.3 - Apache-2.0 OR MIT
+- `constant_time_eq` 0.6.2 - CC0-1.0 OR MIT-0 OR Apache-2.0
+- `cookie` 0.18.3 - MIT OR Apache-2.0
 - `core-foundation` 0.9.4 - MIT OR Apache-2.0
 - `core-foundation` 0.10.1 - MIT OR Apache-2.0
 - `core-foundation-sys` 0.8.7 - MIT OR Apache-2.0
 - `core-graphics` 0.25.0 - MIT OR Apache-2.0
 - `core-graphics-types` 0.2.0 - MIT OR Apache-2.0
 - `cpufeatures` 0.2.17 - MIT OR Apache-2.0
-- `crc32fast` 1.5.5 - MIT OR Apache-2.0
+- `cpufeatures` 0.3.1 - MIT OR Apache-2.0
+- `crc32fast` 1.5.6 - MIT OR Apache-2.0
 - `crossbeam-channel` 0.5.17 - MIT OR Apache-2.0
 - `crossbeam-utils` 0.8.23 - MIT OR Apache-2.0
 - `crypto-common` 0.1.7 - MIT OR Apache-2.0
+- `crypto-common` 0.2.2 - MIT OR Apache-2.0
 - `cssparser` 0.37.0 - MPL-2.0
 - `cssparser` 0.38.0 - MPL-2.0
 - `cssparser-macros` 0.7.1 - MPL-2.0
@@ -111,6 +115,7 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `derive_more` 2.1.1 - MIT
 - `derive_more-impl` 2.1.1 - MIT
 - `digest` 0.10.7 - MIT OR Apache-2.0
+- `digest` 0.11.3 - MIT OR Apache-2.0
 - `dirs` 5.0.1 - MIT OR Apache-2.0
 - `dirs` 6.0.0 - MIT OR Apache-2.0
 - `dirs` 7.0.0 - MIT OR Apache-2.0
@@ -121,7 +126,7 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `dlopen2` 0.8.2 - MIT
 - `dlopen2_derive` 0.4.3 - MIT
 - `dom_query` 0.28.0 - MIT
-- `dom_query` 0.29.0 - MIT
+- `dom_query` 0.30.0 - MIT
 - `dpi` 0.1.2 - Apache-2.0 AND MIT
 - `dtoa` 1.0.11 - MIT OR Apache-2.0
 - `dtoa-short` 0.3.5 - MPL-2.0
@@ -140,15 +145,15 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `fastrand` 2.5.0 - Apache-2.0 OR MIT
 - `fdeflate` 0.3.7 - MIT OR Apache-2.0
 - `field-offset` 0.3.6 - MIT OR Apache-2.0
-- `filetime` 0.2.29 - MIT/Apache-2.0
-- `find-msvc-tools` 0.1.15 - MIT OR Apache-2.0
+- `filetime` 0.2.30 - MIT/Apache-2.0
+- `find-msvc-tools` 0.1.16 - MIT OR Apache-2.0
 - `flate2` 1.1.11 - MIT OR Apache-2.0
 - `fnv` 1.0.7 - Apache-2.0 / MIT
 - `foldhash` 0.2.0 - Zlib
 - `foreign-types` 0.5.0 - MIT/Apache-2.0
 - `foreign-types-macros` 0.2.4 - MIT/Apache-2.0
 - `foreign-types-shared` 0.3.1 - MIT/Apache-2.0
-- `form_urlencoded` 1.2.2 - MIT OR Apache-2.0
+- `form_urlencoded` 1.2.3 - MIT OR Apache-2.0
 - `futures-channel` 0.3.34 - MIT OR Apache-2.0
 - `futures-core` 0.3.34 - MIT OR Apache-2.0
 - `futures-executor` 0.3.34 - MIT OR Apache-2.0
@@ -180,7 +185,7 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `gtk-sys` 0.18.2 - MIT
 - `gtk3-macros` 0.18.2 - MIT
 - `hashbrown` 0.12.3 - MIT OR Apache-2.0
-- `hashbrown` 0.17.1 - MIT OR Apache-2.0
+- `hashbrown` 0.17.2 - MIT OR Apache-2.0
 - `heck` 0.4.1 - MIT OR Apache-2.0
 - `heck` 0.5.0 - MIT OR Apache-2.0
 - `hermit-abi` 0.5.3 - MIT OR Apache-2.0
@@ -191,7 +196,8 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `http-body` 1.1.0 - MIT
 - `http-body-util` 0.1.5 - MIT
 - `httparse` 1.10.1 - MIT OR Apache-2.0
-- `hyper` 1.12.0 - MIT
+- `hybrid-array` 0.4.15 - MIT OR Apache-2.0
+- `hyper` 1.13.0 - MIT
 - `hyper-rustls` 0.27.10 - Apache-2.0 OR ISC OR MIT
 - `hyper-util` 0.1.21 - MIT
 - `iana-time-zone` 0.1.65 - MIT OR Apache-2.0
@@ -216,10 +222,15 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `javascriptcore-rs` 1.1.2 - MIT
 - `javascriptcore-rs-sys` 1.1.1 - MIT
 - `jiff` 0.2.46 - Unlicense OR MIT
+- `jiff` 1.0.3 - Unlicense OR MIT
 - `jiff-core` 0.1.8 - Unlicense OR MIT
+- `jiff-core` 1.0.2 - Unlicense OR MIT
 - `jiff-static` 0.2.46 - Unlicense OR MIT
+- `jiff-static` 1.0.3 - Unlicense OR MIT
 - `jiff-tzdb` 0.1.10 - Unlicense OR MIT
+- `jiff-tzdb` 1.0.0 - Unlicense OR MIT
 - `jiff-tzdb-platform` 0.1.3 - Unlicense OR MIT
+- `jiff-tzdb-platform` 1.0.0 - Unlicense OR MIT
 - `jni` 0.21.1 - MIT/Apache-2.0
 - `jni` 0.22.4 - MIT OR Apache-2.0
 - `jni-macros` 0.22.4 - MIT OR Apache-2.0
@@ -256,7 +267,7 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `ndk-context` 0.1.1 - MIT OR Apache-2.0
 - `ndk-sys` 0.6.0+11769913 - MIT OR Apache-2.0
 - `new_debug_unreachable` 1.0.6 - MIT
-- `nix` 0.31.3 - MIT
+- `nix` 0.31.4 - MIT
 - `nix` 0.32.0 - MIT
 - `num-conv` 0.2.2 - MIT OR Apache-2.0
 - `num-traits` 0.2.19 - MIT OR Apache-2.0
@@ -304,10 +315,10 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `phf_macros` 0.14.0 - MIT
 - `phf_shared` 0.13.1 - MIT
 - `phf_shared` 0.14.0 - MIT
-- `pin-project-lite` 0.2.17 - Apache-2.0 OR MIT
+- `pin-project-lite` 0.2.18 - Apache-2.0 OR MIT
 - `piper` 0.2.5 - MIT OR Apache-2.0
 - `pkg-config` 0.3.34 - MIT OR Apache-2.0
-- `plist` 1.10.3 - MIT
+- `plist` 1.10.4 - MIT
 - `png` 0.18.1 - MIT OR Apache-2.0
 - `polling` 3.11.0 - Apache-2.0 OR MIT
 - `portable-atomic` 1.15.0 - Apache-2.0 OR MIT
@@ -321,7 +332,7 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `proc-macro-error` 1.0.4 - MIT OR Apache-2.0
 - `proc-macro-error-attr` 1.0.4 - MIT OR Apache-2.0
 - `proc-macro2` 1.0.107 - MIT OR Apache-2.0
-- `psl` 2.1.255 - MIT/Apache-2.0
+- `psl` 2.1.265 - MIT/Apache-2.0
 - `psl-types` 2.0.11 - MIT/Apache-2.0
 - `pxfm` 0.1.30 - BSD-3-Clause OR Apache-2.0
 - `quick-xml` 0.42.0 - MIT
@@ -334,9 +345,9 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `redox_users` 0.5.3 - MIT
 - `ref-cast` 1.0.27 - MIT OR Apache-2.0
 - `ref-cast-impl` 1.0.27 - MIT OR Apache-2.0
-- `regex` 1.13.1 - MIT OR Apache-2.0
-- `regex-automata` 0.4.18 - MIT OR Apache-2.0
-- `regex-syntax` 0.8.11 - MIT OR Apache-2.0
+- `regex` 1.13.2 - MIT OR Apache-2.0
+- `regex-automata` 0.4.19 - MIT OR Apache-2.0
+- `regex-syntax` 0.8.12 - MIT OR Apache-2.0
 - `reqwest` 0.13.5 - MIT OR Apache-2.0
 - `ring` 0.17.14 - Apache-2.0 AND ISC
 - `rustc-hash` 2.1.3 - Apache-2.0 OR MIT
@@ -370,13 +381,14 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `serde_repr` 0.1.21 - MIT OR Apache-2.0
 - `serde_spanned` 0.6.9 - MIT OR Apache-2.0
 - `serde_spanned` 1.1.3 - MIT OR Apache-2.0
-- `serde_with` 3.24.0 - MIT OR Apache-2.0
-- `serde_with_macros` 3.24.0 - MIT OR Apache-2.0
+- `serde_with` 3.25.0 - MIT OR Apache-2.0
+- `serde_with_macros` 3.25.0 - MIT OR Apache-2.0
 - `serialize-to-javascript` 0.1.2 - MIT OR Apache-2.0
 - `serialize-to-javascript-impl` 0.1.2 - MIT OR Apache-2.0
 - `servo_arc` 0.4.3 - MIT OR Apache-2.0
 - `servo_arc` 0.5.0 - MIT OR Apache-2.0
 - `sha2` 0.10.9 - MIT OR Apache-2.0
+- `sha2` 0.11.2 - MIT OR Apache-2.0
 - `shlex` 2.0.1 - MIT OR Apache-2.0
 - `signal-hook-registry` 1.4.8 - MIT OR Apache-2.0
 - `simd-adler32` 0.3.10 - MIT
@@ -384,7 +396,7 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `simdutf8` 0.1.5 - MIT OR Apache-2.0
 - `siphasher` 1.0.4 - MIT OR Apache-2.0
 - `slab` 0.4.12 - MIT
-- `smallvec` 1.16.5 - MIT OR Apache-2.0
+- `smallvec` 1.16.6 - MIT OR Apache-2.0
 - `smappservice-rs` 0.1.3 - MIT
 - `socket2` 0.6.5 - MIT OR Apache-2.0
 - `softbuffer` 0.4.8 - MIT OR Apache-2.0
@@ -408,21 +420,21 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `system-configuration` 0.7.0 - MIT OR Apache-2.0
 - `system-configuration-sys` 0.6.0 - MIT OR Apache-2.0
 - `system-deps` 6.2.2 - MIT OR Apache-2.0
-- `tao` 0.37.2 - Apache-2.0
+- `tao` 0.37.3 - Apache-2.0
 - `tao-macros` 0.1.4 - MIT OR Apache-2.0
 - `tar` 0.4.46 - MIT OR Apache-2.0
 - `target-lexicon` 0.12.16 - Apache-2.0 WITH LLVM-exception
-- `tauri` 2.12.5 - Apache-2.0 OR MIT
-- `tauri-build` 2.7.4 - Apache-2.0 OR MIT
-- `tauri-codegen` 2.7.4 - Apache-2.0 OR MIT
-- `tauri-macros` 2.7.4 - Apache-2.0 OR MIT
-- `tauri-plugin` 2.7.2 - Apache-2.0 OR MIT
+- `tauri` 2.12.7 - Apache-2.0 OR MIT
+- `tauri-build` 2.7.6 - Apache-2.0 OR MIT
+- `tauri-codegen` 2.7.6 - Apache-2.0 OR MIT
+- `tauri-macros` 2.7.6 - Apache-2.0 OR MIT
+- `tauri-plugin` 2.7.4 - Apache-2.0 OR MIT
 - `tauri-plugin-autostart` 2.7.0 - Apache-2.0 OR MIT
 - `tauri-plugin-single-instance` 2.5.5 - Apache-2.0 OR MIT
 - `tauri-plugin-updater` 2.14.1 - Apache-2.0 OR MIT
-- `tauri-runtime` 2.12.2 - Apache-2.0 OR MIT
-- `tauri-runtime-wry` 2.12.3 - Apache-2.0 OR MIT
-- `tauri-utils` 2.10.2 - Apache-2.0 OR MIT
+- `tauri-runtime` 2.12.4 - Apache-2.0 OR MIT
+- `tauri-runtime-wry` 2.12.5 - Apache-2.0 OR MIT
+- `tauri-utils` 2.10.4 - Apache-2.0 OR MIT
 - `tauri-winres` 0.3.7 - MIT
 - `tempfile` 3.27.0 - MIT OR Apache-2.0
 - `tendril` 0.5.1 - MIT OR Apache-2.0
@@ -439,13 +451,13 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `tokio-rustls` 0.26.6 - MIT OR Apache-2.0
 - `tokio-util` 0.7.20 - MIT
 - `toml` 0.8.2 - MIT OR Apache-2.0
-- `toml` 1.2.1+spec-1.1.0 - MIT OR Apache-2.0
+- `toml` 1.2.3+spec-1.1.0 - MIT OR Apache-2.0
 - `toml_datetime` 0.6.3 - MIT OR Apache-2.0
 - `toml_datetime` 1.1.3+spec-1.1.0 - MIT OR Apache-2.0
 - `toml_edit` 0.19.15 - MIT OR Apache-2.0
 - `toml_edit` 0.20.2 - MIT OR Apache-2.0
-- `toml_edit` 0.25.19+spec-1.1.0 - MIT OR Apache-2.0
-- `toml_parser` 1.1.5+spec-1.1.0 - MIT OR Apache-2.0
+- `toml_edit` 0.25.21+spec-1.1.0 - MIT OR Apache-2.0
+- `toml_parser` 1.1.7+spec-1.1.0 - MIT OR Apache-2.0
 - `toml_writer` 1.2.0+spec-1.1.0 - MIT OR Apache-2.0
 - `tower` 0.5.3 - MIT
 - `tower-http` 0.6.11 - MIT
@@ -464,16 +476,16 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `unicode-segmentation` 1.13.3 - MIT OR Apache-2.0
 - `untrusted` 0.9.0 - ISC
 - `ureq` 2.12.1 - MIT OR Apache-2.0
-- `url` 2.5.8 - MIT OR Apache-2.0
+- `url` 2.5.9 - MIT OR Apache-2.0
 - `urlpattern` 0.6.0 - MIT
 - `utf8_iter` 1.1.0 - Apache-2.0 OR MIT
 - `utf_types` 1.0.0 - Apache-2.0 OR MIT
-- `uuid` 1.29.2 - Apache-2.0 OR MIT
+- `uuid` 1.29.3 - Apache-2.0 OR MIT
 - `version-compare` 0.2.1 - MIT
 - `version_check` 0.9.5 - MIT/Apache-2.0
 - `vswhom` 0.1.0 - MIT
 - `vswhom-sys` 0.1.3 - MIT
-- `walkdir` 2.5.0 - Unlicense/MIT
+- `walkdir` 2.5.1 - Unlicense/MIT
 - `want` 0.3.2 - MIT
 - `wasi` 0.11.1+wasi-snapshot-preview1 - Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT
 - `wasip2` 1.0.4+wasi-0.2.12 - Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT
@@ -549,7 +561,7 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `winreg` 0.56.0 - MIT
 - `wit-bindgen` 0.57.1 - Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT
 - `writeable` 0.6.4 - Unicode-3.0
-- `wry` 0.57.2 - Apache-2.0 OR MIT
+- `wry` 0.57.4 - Apache-2.0 OR MIT
 - `x11` 2.21.0 - MIT
 - `x11-dl` 2.21.0 - MIT
 - `xattr` 1.7.0 - MIT OR Apache-2.0
@@ -558,16 +570,16 @@ All registry crates of `desktop/Cargo.lock` (a superset: which crates end up in 
 - `zbus` 5.19.0 - MIT
 - `zbus_macros` 5.19.0 - MIT
 - `zbus_names` 4.3.5 - MIT
-- `zcheapstr` 1.2.0 - MIT
+- `zcheapstr` 1.4.0 - MIT
 - `zerofrom` 0.1.8 - Unicode-3.0
 - `zerofrom-derive` 0.1.8 - Unicode-3.0
-- `zeroize` 1.9.1 - Apache-2.0 OR MIT
+- `zeroize` 1.9.2 - Apache-2.0 OR MIT
 - `zeroize_derive` 1.5.0 - Apache-2.0 OR MIT
 - `zerotrie` 0.2.5 - Unicode-3.0
 - `zerovec` 0.11.9 - Unicode-3.0
 - `zerovec-derive` 0.11.7 - Unicode-3.0
-- `zip` 9.6.0 - MIT
-- `zlib-rs` 0.6.8 - Zlib
+- `zip` 9.8.2 - MIT
+- `zlib-rs` 0.6.9 - Zlib
 - `zmij` 1.0.23 - MIT
 - `zvariant` 5.15.1 - MIT
 - `zvariant_derive` 5.15.1 - MIT
@@ -632,7 +644,7 @@ These crates declare their licence only in their package metadata; copyright bel
   (MPL-2.0: used unmodified, source code at the crate's page on crates.io)
 - `selectors` 0.41.0 - MPL-2.0 - Copyright (c) The Servo Project Developers
   (MPL-2.0: used unmodified, source code at the crate's page on crates.io)
-- `tauri-plugin` 2.7.2 - Apache-2.0 OR MIT - Copyright (c) Tauri Programme within The Commons Conservancy
+- `tauri-plugin` 2.7.4 - Apache-2.0 OR MIT - Copyright (c) Tauri Programme within The Commons Conservancy
 - `webview2-com` 0.39.1 - MIT - Copyright (c) the webview2-com authors
 - `webview2-com-macros` 0.8.1 - MIT - Copyright (c) the webview2-com-macros authors
 - `webview2-com-sys` 0.39.1 - MIT - Copyright (c) the webview2-com-sys authors
@@ -645,7 +657,7 @@ For crates offered under several licences, the permissive choice (MIT or Apache-
 
 ---
 
-Used by: @babel/runtime 7.29.7, @babel/runtime-corejs3 7.29.7
+Used by: @babel/runtime 7.29.15, @babel/runtime-corejs3 7.29.15
 
 ```text
 MIT License
@@ -674,7 +686,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: Android libraries (Apache License 2.0, standard text), embed_plist 1.2.2, rustls-platform-verifier 0.7.1, serialize-to-javascript 0.1.2, serialize-to-javascript-impl 0.1.2, siphasher 1.0.4, sys-locale 0.3.2, tinyvec 1.13.3, ureq 2.12.1, utf8_iter 1.1.0, utf_types 1.0.0, zeroize 1.9.1, zeroize_derive 1.5.0
+Used by: Android libraries (Apache License 2.0, standard text), embed_plist 1.2.2, rustls-platform-verifier 0.7.1, serialize-to-javascript 0.1.2, serialize-to-javascript-impl 0.1.2, siphasher 1.0.4, sys-locale 0.3.2, tinyvec 1.13.3, ureq 2.12.1, utf8_iter 1.1.0, utf_types 1.0.0, zeroize 1.9.2, zeroize_derive 1.5.0
 
 ```text
 Apache License
@@ -1109,7 +1121,7 @@ OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 ---
 
-Used by: adler2 2.0.1, anyhow 1.0.104, async-channel 2.5.0, async-executor 1.14.1, async-io 2.6.0, async-lock 3.5.0, async-process 2.5.0, async-signal 0.2.14, async-task 4.7.1, async-trait 0.1.92, atomic-waker 1.1.2, blocking 1.7.0, camino 1.2.6, cargo-platform 0.1.9, cargo_metadata 0.19.2, concurrent-queue 2.5.0, displaydoc 0.2.7, dtoa 1.0.11, dyn-clone 1.0.20, endi 1.1.1, erased-serde 0.4.11, event-listener 5.4.2, event-listener-strategy 0.5.4, fastrand 2.5.0, futures-lite 2.6.1, hermit-abi 0.5.3, itoa 1.0.19, linux-raw-sys 0.12.1, num_enum 0.7.6, num_enum_derive 0.7.6, once_cell 1.21.4, ordered-stream 0.2.0, parking 2.2.1, pin-project-lite 0.2.17, piper 0.2.5, polling 3.11.0, portable-atomic 1.15.0, portable-atomic-util 0.2.8, proc-macro-crate 1.3.1, proc-macro-crate 2.0.2, proc-macro-crate 3.5.0, proc-macro2 1.0.107, quote 1.0.47, ref-cast 1.0.27, ref-cast-impl 1.0.27, rustc-hash 2.1.3, rustix 1.1.6, rustversion 1.0.23, semver 1.0.28, serde 1.0.229, serde-untagged 0.1.9, serde_core 1.0.229, serde_derive 1.0.229, serde_derive_internals 0.29.1, serde_json 1.0.154, serde_repr 0.1.21, servo_arc 0.4.3, servo_arc 0.5.0, simd_cesu8 1.2.0, syn 1.0.109, syn 2.0.119, syn 3.0.10, system-deps 6.2.2, thiserror 1.0.69, thiserror 2.0.21, thiserror-impl 1.0.69, thiserror-impl 2.0.21, typed-path 0.13.0, typeid 1.0.3, unicode-ident 1.0.27, wasi 0.11.1+wasi-snapshot-preview1, wasip2 1.0.4+wasi-0.2.12, wasm-streams 0.5.0, wit-bindgen 0.57.1, x11 2.21.0, x11-dl 2.21.0, zmij 1.0.23, zvariant_utils 4.2.0
+Used by: adler2 2.0.1, anyhow 1.0.105, async-channel 2.5.0, async-executor 1.14.1, async-io 2.6.0, async-lock 3.5.0, async-process 2.5.0, async-signal 0.2.14, async-task 4.7.1, async-trait 0.1.92, atomic-waker 1.1.2, blocking 1.7.0, camino 1.2.6, cargo-platform 0.1.9, cargo_metadata 0.19.2, concurrent-queue 2.5.0, displaydoc 0.2.7, dtoa 1.0.11, dyn-clone 1.0.20, endi 1.1.1, erased-serde 0.4.11, event-listener 5.4.2, event-listener-strategy 0.5.4, fastrand 2.5.0, futures-lite 2.6.1, hermit-abi 0.5.3, itoa 1.0.19, linux-raw-sys 0.12.1, num_enum 0.7.6, num_enum_derive 0.7.6, once_cell 1.21.4, ordered-stream 0.2.0, parking 2.2.1, pin-project-lite 0.2.18, piper 0.2.5, polling 3.11.0, portable-atomic 1.15.0, portable-atomic-util 0.2.8, proc-macro-crate 1.3.1, proc-macro-crate 2.0.2, proc-macro-crate 3.5.0, proc-macro2 1.0.107, quote 1.0.47, ref-cast 1.0.27, ref-cast-impl 1.0.27, rustc-hash 2.1.3, rustix 1.1.6, rustversion 1.0.23, semver 1.0.28, serde 1.0.229, serde-untagged 0.1.9, serde_core 1.0.229, serde_derive 1.0.229, serde_derive_internals 0.29.1, serde_json 1.0.154, serde_repr 0.1.21, servo_arc 0.4.3, servo_arc 0.5.0, simd_cesu8 1.2.0, syn 1.0.109, syn 2.0.119, syn 3.0.10, system-deps 6.2.2, thiserror 1.0.69, thiserror 2.0.21, thiserror-impl 1.0.69, thiserror-impl 2.0.21, typed-path 0.13.0, typeid 1.0.3, unicode-ident 1.0.27, wasi 0.11.1+wasi-snapshot-preview1, wasip2 1.0.4+wasi-0.2.12, wasm-streams 0.5.0, wit-bindgen 0.57.1, x11 2.21.0, x11-dl 2.21.0, zmij 1.0.23, zvariant_utils 4.2.0
 
 ```text
 Permission is hereby granted, free of charge, to any
@@ -1139,7 +1151,7 @@ DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: aho-corasick 1.1.5, byteorder 1.5.0, byteorder-lite 0.1.0, jiff 0.2.46, jiff-core 0.1.8, jiff-static 0.2.46, jiff-tzdb 0.1.10, jiff-tzdb-platform 0.1.3, memchr 2.8.3, walkdir 2.5.0
+Used by: aho-corasick 1.1.5, byteorder 1.5.0, byteorder-lite 0.1.0, jiff 0.2.46, jiff 1.0.3, jiff-core 0.1.8, jiff-core 1.0.2, jiff-static 0.2.46, jiff-static 1.0.3, jiff-tzdb 0.1.10, jiff-tzdb 1.0.0, jiff-tzdb-platform 0.1.3, jiff-tzdb-platform 1.0.0, memchr 2.8.3, walkdir 2.5.1
 
 ```text
 The MIT License (MIT)
@@ -1167,7 +1179,7 @@ THE SOFTWARE.
 
 ---
 
-Used by: aho-corasick 1.1.5, byteorder 1.5.0, byteorder-lite 0.1.0, jiff 0.2.46, jiff-core 0.1.8, jiff-static 0.2.46, jiff-tzdb 0.1.10, jiff-tzdb-platform 0.1.3, memchr 2.8.3, same-file 1.0.6, walkdir 2.5.0, winapi-util 0.1.11
+Used by: aho-corasick 1.1.5, byteorder 1.5.0, byteorder-lite 0.1.0, jiff 0.2.46, jiff 1.0.3, jiff-core 0.1.8, jiff-core 1.0.2, jiff-static 0.2.46, jiff-static 1.0.3, jiff-tzdb 0.1.10, jiff-tzdb 1.0.0, jiff-tzdb-platform 0.1.3, jiff-tzdb-platform 1.0.0, memchr 2.8.3, same-file 1.0.6, walkdir 2.5.1, winapi-util 0.1.11
 
 ```text
 This is free and unencumbered software released into the public domain.
@@ -1198,7 +1210,7 @@ For more information, please refer to <http://unlicense.org/>
 
 ---
 
-Used by: aho-corasick 1.1.5, byteorder 1.5.0, jiff 0.2.46, jiff-core 0.1.8, jiff-static 0.2.46, jiff-tzdb 0.1.10, jiff-tzdb-platform 0.1.3, memchr 2.8.3, same-file 1.0.6, walkdir 2.5.0, winapi-util 0.1.11
+Used by: aho-corasick 1.1.5, byteorder 1.5.0, jiff 0.2.46, jiff 1.0.3, jiff-core 0.1.8, jiff-core 1.0.2, jiff-static 0.2.46, jiff-static 1.0.3, jiff-tzdb 0.1.10, jiff-tzdb 1.0.0, jiff-tzdb-platform 0.1.3, jiff-tzdb-platform 1.0.0, memchr 2.8.3, same-file 1.0.6, walkdir 2.5.1, winapi-util 0.1.11
 
 ```text
 This project is dual-licensed under the Unlicense and MIT licenses.
@@ -1208,7 +1220,7 @@ You may use this code under the terms of either license.
 
 ---
 
-Used by: alloc-no-stdlib 3.0.0, brotli 9.1.3, brotli-decompressor 6.3.2
+Used by: alloc-no-stdlib 3.0.0, brotli 9.1.3, brotli-decompressor 6.4.0
 
 ```text
 Copyright (c) 2016 Dropbox, Inc.
@@ -1310,7 +1322,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: anyhow 1.0.104, async-trait 0.1.92, constant_time_eq 0.6.1, dtoa 1.0.11, dyn-clone 1.0.20, erased-serde 0.4.11, itoa 1.0.19, libc 0.2.191, num_enum 0.7.6, num_enum_derive 0.7.6, osakit 0.3.1, proc-macro2 1.0.107, quote 1.0.47, ref-cast 1.0.27, ref-cast-impl 1.0.27, rustc-hash 2.1.3, rustversion 1.0.23, semver 1.0.28, serde 1.0.229, serde-untagged 0.1.9, serde_core 1.0.229, serde_derive 1.0.229, serde_derive_internals 0.29.1, serde_json 1.0.154, serde_repr 0.1.21, syn 2.0.119, syn 3.0.10, thiserror 1.0.69, thiserror 2.0.21, thiserror-impl 1.0.69, thiserror-impl 2.0.21, typed-path 0.13.0, typeid 1.0.3, unicode-ident 1.0.27, wasm-streams 0.5.0
+Used by: anyhow 1.0.105, async-trait 0.1.92, constant_time_eq 0.6.2, dtoa 1.0.11, dyn-clone 1.0.20, erased-serde 0.4.11, itoa 1.0.19, libc 0.2.191, num_enum 0.7.6, num_enum_derive 0.7.6, osakit 0.3.1, proc-macro2 1.0.107, quote 1.0.47, ref-cast 1.0.27, ref-cast-impl 1.0.27, rustc-hash 2.1.3, rustversion 1.0.23, semver 1.0.28, serde 1.0.229, serde-untagged 0.1.9, serde_core 1.0.229, serde_derive 1.0.229, serde_derive_internals 0.29.1, serde_json 1.0.154, serde_repr 0.1.21, syn 2.0.119, syn 3.0.10, thiserror 1.0.69, thiserror 2.0.21, thiserror-impl 1.0.69, thiserror-impl 2.0.21, typed-path 0.13.0, typeid 1.0.3, unicode-ident 1.0.27, wasm-streams 0.5.0
 
 ```text
 Apache License
@@ -1718,7 +1730,7 @@ SOFTWARE.
 
 ---
 
-Used by: async-channel 2.5.0, async-executor 1.14.1, async-io 2.6.0, async-lock 3.5.0, async-process 2.5.0, async-signal 0.2.14, async-task 4.7.1, atomic-waker 1.1.2, autocfg 1.5.1, base64 0.21.7, base64 0.22.1, base64 0.23.1, bitflags 1.3.2, bitflags 2.13.2, blocking 1.7.0, bs58 0.5.1, bumpalo 3.20.4, camino 1.2.6, cc 1.11.2, cfg-if 1.0.5, concurrent-queue 2.5.0, core-foundation 0.10.1, core-foundation 0.9.4, core-foundation-sys 0.8.7, core-graphics 0.25.0, core-graphics-types 0.2.0, crossbeam-channel 0.5.17, crossbeam-utils 0.8.23, displaydoc 0.2.7, equivalent 1.0.3, errno 0.3.15, event-listener 5.4.2, event-listener-strategy 0.5.4, fastrand 2.5.0, filetime 0.2.29, find-msvc-tools 0.1.15, flate2 1.1.11, fnv 1.0.7, form_urlencoded 1.2.2, futures-lite 2.6.1, glob 0.3.4, hashbrown 0.12.3, hashbrown 0.17.1, heck 0.4.1, heck 0.5.0, hermit-abi 0.5.3, html5ever 0.39.0, html5ever 0.40.1, httparse 1.10.1, hyper-rustls 0.27.10, idna 1.1.0, idna_adapter 1.2.2, indexmap 1.9.3, indexmap 2.14.2, jni 0.21.1, js-sys 0.3.107, keyboard-types 0.8.3, libappindicator 0.9.0, linux-raw-sys 0.12.1, lock_api 0.4.14, log 0.4.35, markup5ever 0.39.0, markup5ever 0.40.0, mime 0.3.18, muda 0.20.0, num-traits 0.2.19, once_cell 1.21.4, openssl-probe 0.2.2, ordered-stream 0.2.0, parking 2.2.1, parking_lot 0.12.5, parking_lot_core 0.9.12, percent-encoding 2.3.2, piper 0.2.5, pkg-config 0.3.34, png 0.18.1, polling 3.11.0, psl-types 2.0.11, regex 1.13.1, regex-automata 0.4.18, regex-syntax 0.8.11, rustc_version 0.4.1, rustix 1.1.6, rustls 0.23.46, rustls-native-certs 0.8.5, scopeguard 1.2.0, security-framework 3.7.0, security-framework-sys 2.17.0, serde_with 3.24.0, serde_with_macros 3.24.0, servo_arc 0.4.3, servo_arc 0.5.0, signal-hook-registry 1.4.8, simd_cesu8 1.2.0, smallvec 1.16.5, socket2 0.6.5, stable_deref_trait 1.2.1, string_cache 0.11.0, string_cache 0.9.0, string_cache_codegen 0.11.2, string_cache_codegen 0.6.1, syn 1.0.109, system-configuration 0.7.0, system-configuration-sys 0.6.0, system-deps 6.2.2, tao-macros 0.1.4, tar 0.4.46, tempfile 3.27.0, tendril 0.5.1, toml_datetime 0.6.3, tray-icon 0.25.1, unicode-segmentation 1.13.3, url 2.5.8, uuid 1.29.2, version_check 0.9.5, wasi 0.11.1+wasi-snapshot-preview1, wasip2 1.0.4+wasi-0.2.12, wasm-bindgen 0.2.130, wasm-bindgen-futures 0.4.80, wasm-bindgen-macro 0.2.130, wasm-bindgen-macro-support 0.2.130, wasm-bindgen-shared 0.2.130, web-sys 0.3.107, web_atoms 0.2.6, web_atoms 0.3.0, window-vibrancy 0.8.1, wit-bindgen 0.57.1, wry 0.57.2, xattr 1.7.0
+Used by: async-channel 2.5.0, async-executor 1.14.1, async-io 2.6.0, async-lock 3.5.0, async-process 2.5.0, async-signal 0.2.14, async-task 4.7.1, atomic-waker 1.1.2, autocfg 1.5.1, base64 0.21.7, base64 0.22.1, base64 0.23.1, bitflags 1.3.2, bitflags 2.13.2, blocking 1.7.0, bs58 0.5.1, bumpalo 3.20.4, camino 1.2.6, cc 1.12.0, cfg-if 1.0.5, concurrent-queue 2.5.0, core-foundation 0.10.1, core-foundation 0.9.4, core-foundation-sys 0.8.7, core-graphics 0.25.0, core-graphics-types 0.2.0, crossbeam-channel 0.5.17, crossbeam-utils 0.8.23, displaydoc 0.2.7, equivalent 1.0.3, errno 0.3.15, event-listener 5.4.2, event-listener-strategy 0.5.4, fastrand 2.5.0, filetime 0.2.30, find-msvc-tools 0.1.16, flate2 1.1.11, fnv 1.0.7, form_urlencoded 1.2.3, futures-lite 2.6.1, glob 0.3.4, hashbrown 0.12.3, hashbrown 0.17.2, heck 0.4.1, heck 0.5.0, hermit-abi 0.5.3, html5ever 0.39.0, html5ever 0.40.1, httparse 1.10.1, hyper-rustls 0.27.10, idna 1.1.0, idna_adapter 1.2.2, indexmap 1.9.3, indexmap 2.14.2, jni 0.21.1, js-sys 0.3.107, keyboard-types 0.8.3, libappindicator 0.9.0, linux-raw-sys 0.12.1, lock_api 0.4.14, log 0.4.35, markup5ever 0.39.0, markup5ever 0.40.0, mime 0.3.18, muda 0.20.0, num-traits 0.2.19, once_cell 1.21.4, openssl-probe 0.2.2, ordered-stream 0.2.0, parking 2.2.1, parking_lot 0.12.5, parking_lot_core 0.9.12, percent-encoding 2.3.2, piper 0.2.5, pkg-config 0.3.34, png 0.18.1, polling 3.11.0, psl-types 2.0.11, regex 1.13.2, regex-automata 0.4.19, regex-syntax 0.8.12, rustc_version 0.4.1, rustix 1.1.6, rustls 0.23.46, rustls-native-certs 0.8.5, scopeguard 1.2.0, security-framework 3.7.0, security-framework-sys 2.17.0, serde_with 3.25.0, serde_with_macros 3.25.0, servo_arc 0.4.3, servo_arc 0.5.0, signal-hook-registry 1.4.8, simd_cesu8 1.2.0, smallvec 1.16.6, socket2 0.6.5, stable_deref_trait 1.2.1, string_cache 0.11.0, string_cache 0.9.0, string_cache_codegen 0.11.2, string_cache_codegen 0.6.1, syn 1.0.109, system-configuration 0.7.0, system-configuration-sys 0.6.0, system-deps 6.2.2, tao-macros 0.1.4, tar 0.4.46, tempfile 3.27.0, tendril 0.5.1, toml_datetime 0.6.3, tray-icon 0.25.1, unicode-segmentation 1.13.3, url 2.5.9, uuid 1.29.3, version_check 0.9.5, wasi 0.11.1+wasi-snapshot-preview1, wasip2 1.0.4+wasi-0.2.12, wasm-bindgen 0.2.130, wasm-bindgen-futures 0.4.80, wasm-bindgen-macro 0.2.130, wasm-bindgen-macro-support 0.2.130, wasm-bindgen-shared 0.2.130, web-sys 0.3.107, web_atoms 0.2.6, web_atoms 0.3.0, window-vibrancy 0.8.1, wit-bindgen 0.57.1, wry 0.57.4, xattr 1.7.0
 
 ```text
 Apache License
@@ -2617,7 +2629,7 @@ DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: bitflags 1.3.2, bitflags 2.13.2, glob 0.3.4, log 0.4.35, num-traits 0.2.19, regex 1.13.1, regex-automata 0.4.18, regex-syntax 0.8.11
+Used by: bitflags 1.3.2, bitflags 2.13.2, glob 0.3.4, log 0.4.35, num-traits 0.2.19, regex 1.13.2, regex-automata 0.4.19, regex-syntax 0.8.12
 
 ```text
 Copyright (c) 2014 The Rust Project Developers
@@ -2649,7 +2661,7 @@ DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: block-buffer 0.10.4, cpufeatures 0.2.17, crypto-common 0.1.7, digest 0.10.7, sha2 0.10.9
+Used by: block-buffer 0.10.4, block-buffer 0.12.1, const-oid 0.10.3, cpufeatures 0.2.17, cpufeatures 0.3.1, crypto-common 0.1.7, crypto-common 0.2.2, digest 0.10.7, digest 0.11.3, hybrid-array 0.4.15, sha2 0.10.9, sha2 0.11.2
 
 ```text
 Apache License
@@ -2861,6 +2873,38 @@ Used by: block-buffer 0.10.4
 
 ```text
 Copyright (c) 2018-2019 The RustCrypto Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+```
+
+---
+
+Used by: block-buffer 0.12.1
+
+```text
+Copyright (c) 2018-2025 The RustCrypto Project Developers
 
 Permission is hereby granted, free of charge, to any
 person obtaining a copy of this software and associated
@@ -3104,7 +3148,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ---
 
-Used by: bytes 1.12.1
+Used by: bytes 1.12.2
 
 ```text
 Copyright (c) 2018 Carl Lerche
@@ -3345,7 +3389,7 @@ DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: cc 1.11.2, cfg-if 1.0.5, filetime 0.2.29, find-msvc-tools 0.1.15, js-sys 0.3.107, openssl-probe 0.2.2, pkg-config 0.3.34, socket2 0.6.5, toml_datetime 0.6.3, wasm-bindgen 0.2.130, wasm-bindgen-futures 0.4.80, wasm-bindgen-macro 0.2.130, wasm-bindgen-macro-support 0.2.130, wasm-bindgen-shared 0.2.130, web-sys 0.3.107
+Used by: cc 1.12.0, cfg-if 1.0.5, filetime 0.2.30, find-msvc-tools 0.1.16, js-sys 0.3.107, openssl-probe 0.2.2, pkg-config 0.3.34, socket2 0.6.5, toml_datetime 0.6.3, wasm-bindgen 0.2.130, wasm-bindgen-futures 0.4.80, wasm-bindgen-macro 0.2.130, wasm-bindgen-macro-support 0.2.130, wasm-bindgen-shared 0.2.130, web-sys 0.3.107
 
 ```text
 Copyright (c) 2014 Alex Crichton
@@ -4189,7 +4233,39 @@ THE SOFTWARE.
 
 ---
 
-Used by: constant_time_eq 0.6.1, dunce 1.0.5
+Used by: const-oid 0.10.3, cpufeatures 0.3.1
+
+```text
+Copyright (c) 2020-2026 The RustCrypto Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+```
+
+---
+
+Used by: constant_time_eq 0.6.2, dunce 1.0.5
 
 ```text
 Creative Commons Legal Code
@@ -4317,7 +4393,7 @@ express Statement of Purpose.
 
 ---
 
-Used by: constant_time_eq 0.6.1
+Used by: constant_time_eq 0.6.2
 
 ```text
 Permission is hereby granted, free of charge, to any person obtaining a
@@ -4338,7 +4414,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: cookie 0.18.2
+Used by: cookie 0.18.3
 
 ```text
 Apache License
@@ -4547,7 +4623,7 @@ limitations under the License.
 
 ---
 
-Used by: cookie 0.18.2
+Used by: cookie 0.18.3
 
 ```text
 Copyright (c) 2017 Sergio Benitez
@@ -4624,7 +4700,7 @@ copied, modified, or distributed except according to those terms.
 
 ---
 
-Used by: core-js-pure 3.50.0
+Used by: core-js-pure 3.51.0
 
 ```text
 Copyright (c) 2013–2025 Denis Pushkarev (zloirock.ru)
@@ -4683,7 +4759,7 @@ DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: crc32fast 1.5.5, ctor 1.0.14, dpi 0.1.2, foreign-types 0.5.0, foreign-types-macros 0.2.4, foreign-types-shared 0.3.1, hex 0.4.3, jni-sys 0.3.1, jni-sys 0.4.1, json-patch 4.2.0, link-section 0.19.4, serde_spanned 0.6.9, tao 0.37.2, toml 0.8.2, toml_edit 0.19.15, toml_edit 0.20.2, winapi 0.3.9
+Used by: crc32fast 1.5.6, ctor 1.0.14, dpi 0.1.2, foreign-types 0.5.0, foreign-types-macros 0.2.4, foreign-types-shared 0.3.1, hex 0.4.3, jni-sys 0.3.1, jni-sys 0.4.1, json-patch 4.2.0, link-section 0.19.4, serde_spanned 0.6.9, tao 0.37.3, toml 0.8.2, toml_edit 0.19.15, toml_edit 0.20.2, winapi 0.3.9
 
 ```text
 Apache License
@@ -4891,7 +4967,7 @@ Apache License
 
 ---
 
-Used by: crc32fast 1.5.5
+Used by: crc32fast 1.5.6
 
 ```text
 MIT License
@@ -5557,6 +5633,38 @@ Used by: crypto-common 0.1.7
 
 ```text
 Copyright (c) 2021 RustCrypto Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+```
+
+---
+
+Used by: crypto-common 0.2.2
+
+```text
+Copyright (c) 2021-2026 RustCrypto Developers
 
 Permission is hereby granted, free of charge, to any
 person obtaining a copy of this software and associated
@@ -6533,6 +6641,39 @@ DEALINGS IN THE SOFTWARE.
 
 ---
 
+Used by: digest 0.11.3
+
+```text
+Copyright (c) 2017-2025 RustCrypto Developers
+Copyright (c) 2017 Artyom Pavlov
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+```
+
+---
+
 Used by: dirs 5.0.1, dirs 6.0.0, dirs 7.0.0, dirs-sys 0.4.1, dirs-sys 0.5.0
 
 ```text
@@ -6824,7 +6965,7 @@ SOFTWARE.
 
 ---
 
-Used by: dom_query 0.28.0, dom_query 0.29.0
+Used by: dom_query 0.28.0, dom_query 0.30.0
 
 ```text
 MIT License
@@ -7630,7 +7771,7 @@ DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: fdeflate 0.3.7, field-offset 0.3.6, image 0.25.10, miniz_oxide 0.8.9, miniz_oxide 0.9.1, num-conv 0.2.2, pin-project-lite 0.2.17, portable-atomic 1.15.0, portable-atomic-util 0.2.8, raw-window-handle 0.6.2, simdutf8 0.1.5, sync_wrapper 1.0.2, tauri 2.12.5, tauri-build 2.7.4, tauri-codegen 2.7.4, tauri-macros 2.7.4, tauri-plugin-autostart 2.7.0, tauri-plugin-single-instance 2.5.5, tauri-plugin-updater 2.14.1, tauri-runtime 2.12.2, tauri-runtime-wry 2.12.3, tauri-utils 2.10.2, time 0.3.55, time-core 0.1.9, time-macros 0.2.32
+Used by: fdeflate 0.3.7, field-offset 0.3.6, image 0.25.10, miniz_oxide 0.8.9, miniz_oxide 0.9.1, num-conv 0.2.2, pin-project-lite 0.2.18, portable-atomic 1.15.0, portable-atomic-util 0.2.8, raw-window-handle 0.6.2, simdutf8 0.1.5, sync_wrapper 1.0.2, tauri 2.12.7, tauri-build 2.7.6, tauri-codegen 2.7.6, tauri-macros 2.7.6, tauri-plugin-autostart 2.7.0, tauri-plugin-single-instance 2.5.5, tauri-plugin-updater 2.14.1, tauri-runtime 2.12.4, tauri-runtime-wry 2.12.5, tauri-utils 2.10.4, time 0.3.55, time-core 0.1.9, time-macros 0.2.32
 
 ```text
 Apache License
@@ -7989,7 +8130,7 @@ SOFTWARE.
 
 ---
 
-Used by: form_urlencoded 1.2.2
+Used by: form_urlencoded 1.2.3
 
 ```text
 Copyright (c) 2013-2016 The rust-url developers
@@ -8598,7 +8739,7 @@ DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: hashbrown 0.12.3, hashbrown 0.17.1
+Used by: hashbrown 0.12.3, hashbrown 0.17.2
 
 ```text
 Copyright (c) 2016 Amanieu d'Antras
@@ -9019,7 +9160,39 @@ THE SOFTWARE.
 
 ---
 
-Used by: hyper 1.12.0
+Used by: hybrid-array 0.4.15
+
+```text
+Copyright (c) 2022-2026 The RustCrypto Project Developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+```
+
+---
+
+Used by: hyper 1.13.0
 
 ```text
 Copyright (c) 2014-2026 Sean McArthur
@@ -9472,7 +9645,7 @@ SOFTWARE.
 
 ---
 
-Used by: idna 1.1.0, percent-encoding 2.3.2, url 2.5.8
+Used by: idna 1.1.0, percent-encoding 2.3.2, url 2.5.9
 
 ```text
 Copyright (c) 2013-2025 The rust-url developers
@@ -10013,7 +10186,7 @@ SOFTWARE.
 
 ---
 
-Used by: js-base64 3.9.3
+Used by: js-base64 3.9.7
 
 ```text
 Copyright (c) 2014, Dan Kogai
@@ -11465,7 +11638,7 @@ DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: nix 0.31.3, nix 0.32.0
+Used by: nix 0.31.4, nix 0.32.0
 
 ```text
 The MIT License (MIT)
@@ -12512,7 +12685,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: plist 1.10.3
+Used by: plist 1.10.4
 
 ```text
 Copyright (c) 2015 Edward Barnard
@@ -13299,7 +13472,7 @@ limitations under the License.
 
 ---
 
-Used by: psl 2.1.255
+Used by: psl 2.1.265
 
 ```text
 MIT License
@@ -14567,7 +14740,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: serde_spanned 0.6.9, serde_spanned 1.1.3, toml 0.8.2, toml 1.2.1+spec-1.1.0, toml_datetime 1.1.3+spec-1.1.0, toml_edit 0.19.15, toml_edit 0.20.2, toml_edit 0.25.19+spec-1.1.0, toml_parser 1.1.5+spec-1.1.0, toml_writer 1.2.0+spec-1.1.0
+Used by: serde_spanned 0.6.9, serde_spanned 1.1.3, toml 0.8.2, toml 1.2.3+spec-1.1.0, toml_datetime 1.1.3+spec-1.1.0, toml_edit 0.19.15, toml_edit 0.20.2, toml_edit 0.25.21+spec-1.1.0, toml_parser 1.1.7+spec-1.1.0, toml_writer 1.2.0+spec-1.1.0
 
 ```text
 Copyright (c) Individual contributors
@@ -14593,7 +14766,7 @@ SOFTWARE.
 
 ---
 
-Used by: serde_spanned 1.1.3, toml 1.2.1+spec-1.1.0, toml_datetime 1.1.3+spec-1.1.0, toml_edit 0.25.19+spec-1.1.0, toml_parser 1.1.5+spec-1.1.0, toml_writer 1.2.0+spec-1.1.0
+Used by: serde_spanned 1.1.3, toml 1.2.3+spec-1.1.0, toml_datetime 1.1.3+spec-1.1.0, toml_edit 0.25.21+spec-1.1.0, toml_parser 1.1.7+spec-1.1.0, toml_writer 1.2.0+spec-1.1.0
 
 ```text
 Apache License
@@ -14801,7 +14974,7 @@ Apache License
 
 ---
 
-Used by: serde_with 3.24.0, serde_with_macros 3.24.0
+Used by: serde_with 3.25.0, serde_with_macros 3.25.0
 
 ```text
 Copyright (c) 2015
@@ -14867,6 +15040,41 @@ Used by: sha2 0.10.9
 Copyright (c) 2006-2009 Graydon Hoare
 Copyright (c) 2009-2013 Mozilla Foundation
 Copyright (c) 2016 Artyom Pavlov
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+```
+
+---
+
+Used by: sha2 0.11.2
+
+```text
+Copyright (c) 2016-2026 The RustCrypto Project Developers
+Copyright (c) 2016 Artyom Pavlov
+Copyright (c) 2009-2013 Mozilla Foundation
+Copyright (c) 2006-2009 Graydon Hoare
 
 Permission is hereby granted, free of charge, to any
 person obtaining a copy of this software and associated
@@ -15049,7 +15257,7 @@ DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: smallvec 1.16.5
+Used by: smallvec 1.16.6
 
 ```text
 Copyright (c) 2018 The Servo Project Developers
@@ -15791,7 +15999,7 @@ DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: tao 0.37.2
+Used by: tao 0.37.3
 
 ```text
 SPDXVersion: SPDX-2.1
@@ -15902,7 +16110,7 @@ DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: tauri 2.12.5, tauri-build 2.7.4, tauri-codegen 2.7.4, tauri-macros 2.7.4, tauri-plugin-autostart 2.7.0, tauri-plugin-updater 2.14.1, tauri-runtime 2.12.2, tauri-runtime-wry 2.12.3, tauri-utils 2.10.2
+Used by: tauri 2.12.7, tauri-build 2.7.6, tauri-codegen 2.7.6, tauri-macros 2.7.6, tauri-plugin-autostart 2.7.0, tauri-plugin-updater 2.14.1, tauri-runtime 2.12.4, tauri-runtime-wry 2.12.5, tauri-utils 2.10.4
 
 ```text
 MIT License
@@ -15930,7 +16138,7 @@ SOFTWARE.
 
 ---
 
-Used by: tauri-plugin 2.7.2 (standard MIT text)
+Used by: tauri-plugin 2.7.4 (standard MIT text)
 
 ```text
 MIT License
@@ -16138,7 +16346,7 @@ SOFTWARE.
 
 ---
 
-Used by: tldts 6.1.86, tldts-core 6.1.86
+Used by: tldts 7.6.2, tldts-core 7.6.2
 
 ```text
 Copyright (c) 2017 Thomas Parisot, 2018 Rémi Berson
@@ -17091,7 +17299,7 @@ the individual files for PD/CC0-dedicated sections).
 
 ---
 
-Used by: uuid 1.29.2
+Used by: uuid 1.29.3
 
 ```text
 Copyright (c) 2014 The Rust Project Developers
@@ -18065,7 +18273,7 @@ THE SOFTWARE.
 
 ---
 
-Used by: wry 0.57.2
+Used by: wry 0.57.4
 
 ```text
 MIT License
@@ -18093,7 +18301,7 @@ SOFTWARE.
 
 ---
 
-Used by: wry 0.57.2
+Used by: wry 0.57.4
 
 ```text
 SPDXVersion: SPDX-2.1
@@ -18152,7 +18360,7 @@ DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: zcheapstr 1.2.0
+Used by: zcheapstr 1.4.0
 
 ```text
 Copyright (c) 2026 Zeeshan Ali Khan & zcheapstr contributors
@@ -18184,7 +18392,7 @@ DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: zeroize 1.9.1
+Used by: zeroize 1.9.2
 
 ```text
 Copyright (c) 2018-2026 The RustCrypto Project Developers
@@ -18248,7 +18456,7 @@ DEALINGS IN THE SOFTWARE.
 
 ---
 
-Used by: zip 9.6.0
+Used by: zip 9.8.2
 
 ```text
 The MIT License (MIT)
@@ -18276,7 +18484,7 @@ SOFTWARE.
 
 ---
 
-Used by: zlib-rs 0.6.8
+Used by: zlib-rs 0.6.9
 
 ```text
 (C) 2024 Trifecta Tech Foundation 

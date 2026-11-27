@@ -15,10 +15,10 @@
     "mimetext": "^3.0.24",
     "postal-mime": "^4.2.1",
     "qrcode-generator": "2.0.4",
-    "tldts": "^6.1.86"
+    "tldts": "^7.6.2"
   },
   "devDependencies": {
-    "esbuild": "^0.28.1",
+    "esbuild": "^0.28.2",
     "wrangler": "^4.0.0"
   }
 }
