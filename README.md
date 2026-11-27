@@ -177,6 +177,8 @@ test/           node --test
 
 ## Run locally
 
+Needs Node 22 or newer. `npm test` also expects `git` and `unzip` on the PATH (the packaging and updater tests call them); on a minimal image such as `node:22-slim`, install both first.
+
 ```
 npm install
 npm test
