@@ -46,6 +46,34 @@ wait_text() {
   return 1
 }
 
+# wait_text_progress "<text>" <base s> <max s> <progress text>…: like wait_text, but after the
+# base time keeps waiting (up to max) as long as one of the progress texts is still on screen,
+# so a slow emulator is judged by progress, not by the clock; a stuck screen still fails.
+wait_text_progress() {
+  local text=$1 base=$2 max=$3; shift 3
+  local start now p busy
+  start=$(date +%s)
+  while :; do
+    now=$(date +%s)
+    dump > "$OUT/ui.xml" 2>/dev/null && grep -qF "$text" "$OUT/ui.xml" && return 0
+    if [ $((now - start)) -ge "$max" ]; then return 1; fi
+    if [ $((now - start)) -ge "$base" ]; then
+      busy=0
+      for p in "$@"; do grep -qF "$p" "$OUT/ui.xml" 2>/dev/null && busy=1; done
+      [ "$busy" = 1 ] || return 1
+    fi
+    sleep 0.5
+  done
+}
+
+# update_diag <mode>: keep evidence of a failed updater case (screen, texts, app log).
+update_diag() {
+  shot "$OUT/proof/e2e-update-$1-fail.png"
+  dump > "$OUT/proof/e2e-update-$1-fail.xml" 2>/dev/null
+  log "screen texts: $(grep -o 'text="[^"]\+"' "$OUT/proof/e2e-update-$1-fail.xml" 2>/dev/null | head -12 | tr '\n' ' ')"
+  adb logcat -d -t 200 2>/dev/null | grep -i -E 'linkwache|AndroidRuntime|ANR' | tail -40 > "$OUT/proof/e2e-update-$1-fail.log"
+}
+
 # tap "<exact text>": tap the centre of the first node whose text starts with it.
 tap() {
   dump > "$OUT/ui.xml" 2>/dev/null
@@ -192,7 +220,12 @@ update_case() {  # $1 mode, $2 expected text
   adb shell am start -n $APP/.MainActivity >/dev/null
   wait_text "Update 99.0.0 available" 15 || { fail "update notice ($1)"; return; }
   tap "Download and install" || { fail "update button ($1)"; return; }
-  if wait_text "$2" 30; then ok "updater $1: $2"; else fail "updater $1"; fi
+  if wait_text_progress "$2" 30 180 "Downloading" "Checking signature"; then
+    ok "updater $1: $2"
+  else
+    fail "updater $1"
+    update_diag "$1"
+  fi
 }
 update_case badsha "checksum mismatch"
 update_case signer "not signed with the Linkwache key"
