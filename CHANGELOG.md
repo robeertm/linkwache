@@ -4,6 +4,8 @@ All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 
 ## [Unreleased]
 
+## 0.8.8 — 2026-11-27
+
 ### Security
 - Dependencies refreshed so `npm audit` reports 0 findings for the server and the desktop tooling: `wrangler` 4.135 -> 4.168 (clears the high findings in `undici`, `sharp` and `miniflare`, dev tooling only), `esbuild` 0.28.2, `@tauri-apps/cli` 2.12.6.
 - Desktop app: `cargo update` within the semver ranges, including `cookie` 0.18.3 (RUSTSEC-2026-0594) and `url` 2.5.9 (RUSTSEC-2026-0592), the two open `cargo audit` vulnerabilities. Remaining notes are unmaintained or unsound transitive crates of Tauri's GTK stack (`glib`, `zbus`/`zvariant`, `proc-macro-error`, `chrono`) with no fix available upstream yet.
