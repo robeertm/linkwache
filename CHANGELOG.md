@@ -5,7 +5,7 @@ All notable changes to Linkwache. Dates are ISO (YYYY-MM-DD).
 ## [Unreleased]
 
 ### Fixed
-- Web page on phones: language selector, theme button, nav links and the share field now have 44 px touch targets and 16 px text (no zoom on focus in iOS Safari).
+- Web page on phones: language selector, theme button, nav links and the share field now have 44 px touch targets and 16 px text (no zoom on focus in iOS Safari). The download page's collapsible headings and copy buttons are 44 px high on phones, and the two buttons under the link field share one bottom edge on wide screens.
 
 ## 0.8.7 — 2026-11-26
 

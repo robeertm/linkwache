@@ -99,7 +99,7 @@ select.lang{font:inherit;font-size:.84rem;padding:.35rem .5rem;border:1px solid 
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
 .btn{display:inline-block;background:var(--akzent);color:var(--akzent-tinte);border:1px solid var(--akzent);border-radius:.8rem;padding:12px 18px;font:inherit;font-weight:650;cursor:pointer;text-decoration:none;text-align:center;transition:filter .15s ease,background .15s ease}
 .btn:hover{filter:brightness(1.08)}
-.row .btn{flex:1 1 200px}
+.row .btn{flex:1 1 200px;align-self:stretch;display:inline-flex;align-items:center;justify-content:center}
 .btn.big{font-size:1.08rem;padding:14px 22px;box-shadow:0 8px 24px var(--akzent-glow)}
 .btn.ghost{background:var(--karte2);color:var(--text);border-color:var(--rand)}
 .btn.ghost:hover{background:var(--karte3);filter:none}
@@ -224,4 +224,6 @@ pre.cmd{margin:.3rem 0 .6rem;padding:.6rem .8rem;border:1px solid var(--rand);bo
   button.theme{min-width:44px;min-height:44px}
   select.lang{min-height:44px;font-size:1rem}
   .share input{min-height:44px;font-size:1rem}
+  .btn.small{min-height:44px}
+  .helpbox>summary,.facts summary{display:flex;align-items:center;min-height:44px}
 }
